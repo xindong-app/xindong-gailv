@@ -21,6 +21,7 @@ output/
 **/.vite/
 **/.cache/
 **/.playwright/
+**/.playwright-cli/
 
 # Editors and operating systems
 .idea/

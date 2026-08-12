@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="心动概率局">
+  <rect width="64" height="64" rx="16" fill="#fffaf2"/>
+  <path d="M32 50C18 41 11 34 11 23c0-8 5-13 12-13 4 0 7 2 9 6 2-4 5-6 9-6 7 0 12 5 12 13 0 11-7 18-21 27Z" fill="#f19abe" stroke="#3e334f" stroke-width="4" stroke-linejoin="round"/>
+  <path d="m22 29 6 5 13-14" fill="none" stroke="#3e334f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

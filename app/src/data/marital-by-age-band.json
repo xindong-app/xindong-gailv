@@ -1,0 +1,34 @@
+{
+  "dataVersion": "2026.08.13",
+  "source": {
+    "publisher": "United Nations Statistics Division (data reported by China National Bureau of Statistics)",
+    "sourceTitle": "Population by marital status, age, sex and urban/rural residence — China, 2020",
+    "sourceUrl": "https://data.un.org/Data.aspx?d=POP&f=tableCode%3A23%3BcountryCode%3A156",
+    "retrievedAt": "2026-08-13",
+    "sourceYear": 2024,
+    "referenceYear": 2020,
+    "notes": [
+      "Long-form census counts; UNdata footnote says they are not estimated up to total population.",
+      "Rates are calculated within each sex and five-year age band.",
+      "The source has one divorced-and-not-remarried category and does not split by children."
+    ]
+  },
+  "rows": [
+    { "gender": "male", "minAge": 15, "maxAge": 19, "total": 4137501, "neverMarried": 4125594, "divorced": 164, "widowed": 9 },
+    { "gender": "male", "minAge": 20, "maxAge": 24, "total": 3799538, "neverMarried": 3462773, "divorced": 5511, "widowed": 144 },
+    { "gender": "male", "minAge": 25, "maxAge": 29, "total": 4611843, "neverMarried": 2440886, "divorced": 54800, "widowed": 970 },
+    { "gender": "male", "minAge": 30, "maxAge": 34, "total": 6354314, "neverMarried": 1305522, "divorced": 190591, "widowed": 4144 },
+    { "gender": "male", "minAge": 35, "maxAge": 39, "total": 5108028, "neverMarried": 477957, "divorced": 213764, "widowed": 6658 },
+    { "gender": "male", "minAge": 40, "maxAge": 44, "total": 4758438, "neverMarried": 273283, "divorced": 214448, "widowed": 13691 },
+    { "gender": "male", "minAge": 45, "maxAge": 49, "total": 5774455, "neverMarried": 256579, "divorced": 236922, "widowed": 34168 },
+    { "gender": "male", "minAge": 50, "maxAge": 54, "total": 6019802, "neverMarried": 206146, "divorced": 208600, "widowed": 76077 },
+    { "gender": "female", "minAge": 15, "maxAge": 19, "total": 3650914, "neverMarried": 3610088, "divorced": 364, "widowed": 34 },
+    { "gender": "female", "minAge": 20, "maxAge": 24, "total": 3503735, "neverMarried": 2816378, "divorced": 9237, "widowed": 466 },
+    { "gender": "female", "minAge": 25, "maxAge": 29, "total": 4282074, "neverMarried": 1421277, "divorced": 57513, "widowed": 2790 },
+    { "gender": "female", "minAge": 30, "maxAge": 34, "total": 6044337, "neverMarried": 563926, "divorced": 159136, "widowed": 10696 },
+    { "gender": "female", "minAge": 35, "maxAge": 39, "total": 4807252, "neverMarried": 197850, "divorced": 170176, "widowed": 20354 },
+    { "gender": "female", "minAge": 40, "maxAge": 44, "total": 4487894, "neverMarried": 95497, "divorced": 177868, "widowed": 42331 },
+    { "gender": "female", "minAge": 45, "maxAge": 49, "total": 5511824, "neverMarried": 69300, "divorced": 207095, "widowed": 103468 },
+    { "gender": "female", "minAge": 50, "maxAge": 54, "total": 5906378, "neverMarried": 41026, "divorced": 183456, "widowed": 224336 }
+  ]
+}

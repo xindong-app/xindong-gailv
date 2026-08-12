@@ -1,10 +1,8 @@
-// 城市数据层
-// 数据来源:
-// - 常住人口: 各市 2023 年统计公报(约数)
-// - 平均工资: 各市统计局 2023 年城镇非私营单位就业人员年平均工资(无市级数据时用省级值)
-//   省级数据来自《中国统计年鉴 2024》/ 国家统计局
-// - rich600: 600 万资产家庭户数(万户), 来自《2025 胡润财富报告》(截至 2025-01-01);
-//   无直接数据的城市为 null, 引擎用工资系数推算
+// 城市数据层。populationYear/sourceEvidenceId 让运行时可以区分：
+// 1) 已登记的 2025 市级常住人口 A 级锚点；
+// 2) 尚未更新的历史人口估计（仅 C 级地域缩放）。
+// 工资仍是历史市/省级锚点，只能作收入模型的 C 级地域校准；
+// rich600 是旧界面兼容字段，当前人口引擎不读取，避免非官方财富数据进入人口漏斗。
 
 export interface City {
   name: string
@@ -13,9 +11,11 @@ export interface City {
   wage: number // 城镇非私营单位年平均工资, 元 (2023)
   rich600: number | null // 600万资产家庭, 万户
   hot?: boolean
+  populationYear?: number
+  sourceEvidenceId?: string
 }
 
-export const NATIONAL_WAGE = 124110 // 2024 全国城镇非私营单位年平均工资(国家统计局, 2025-05 发布)
+export const NATIONAL_WAGE = 106_080 // 2025 规模以上企业就业人员年平均工资，仅作地域比值分母。
 
 // 2023 年各省城镇非私营单位年平均工资(元), 国家统计局
 export const PROVINCE_WAGE: Record<string, number> = {
@@ -29,15 +29,15 @@ export const PROVINCE_WAGE: Record<string, number> = {
 }
 
 export const CITIES: City[] = [
-  { name: '北京', province: '北京', pop: 2186, wage: 218312, rich600: 71.9, hot: true },
-  { name: '上海', province: '上海', pop: 2487, wage: 229337, rich600: 62.2, hot: true },
-  { name: '深圳', province: '广东', pop: 1779, wage: 174640, rich600: 17.5, hot: true },
-  { name: '广州', province: '广东', pop: 1883, wage: 158318, rich600: 16.8, hot: true },
+  { name: '北京', province: '北京', pop: 2180, wage: 218312, rich600: 71.9, hot: true, populationYear: 2025, sourceEvidenceId: 'evidence.base.region.beijing-2025' },
+  { name: '上海', province: '上海', pop: 2485.41, wage: 229337, rich600: 62.2, hot: true, populationYear: 2025, sourceEvidenceId: 'evidence.base.region.shanghai-2025' },
+  { name: '深圳', province: '广东', pop: 1824.85, wage: 174640, rich600: 17.5, hot: true, populationYear: 2025, sourceEvidenceId: 'evidence.base.region.shenzhen-2025' },
+  { name: '广州', province: '广东', pop: 1910.10, wage: 158318, rich600: 16.8, hot: true, populationYear: 2025, sourceEvidenceId: 'evidence.base.region.guangzhou-2025' },
   { name: '杭州', province: '浙江', pop: 1252, wage: 161660, rich600: 13.5, hot: true },
   { name: '成都', province: '四川', pop: 2140, wage: 127093, rich600: null, hot: true },
   { name: '南京', province: '江苏', pop: 955, wage: 159659, rich600: null, hot: true },
-  { name: '武汉', province: '湖北', pop: 1377, wage: 109227, rich600: null, hot: true },
-  { name: '苏州', province: '江苏', pop: 1296, wage: 138732, rich600: null, hot: true },
+  { name: '武汉', province: '湖北', pop: 1386.19, wage: 109227, rich600: null, hot: true, populationYear: 2025, sourceEvidenceId: 'evidence.base.region.wuhan-2025' },
+  { name: '苏州', province: '江苏', pop: 1304.77, wage: 138732, rich600: null, hot: true, populationYear: 2025, sourceEvidenceId: 'evidence.base.region.suzhou-2025' },
   { name: '西安', province: '陕西', pop: 1308, wage: 128675, rich600: null, hot: true },
   { name: '重庆', province: '重庆', pop: 3191, wage: 117446, rich600: null, hot: true },
   { name: '天津', province: '天津', pop: 1364, wage: 138007, rich600: null, hot: true },
