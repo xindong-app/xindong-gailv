@@ -1,0 +1,32 @@
+# Dependencies and generated output
+**/node_modules/
+**/dist/
+**/coverage/
+**/test-results/
+**/playwright-report/
+output/
+
+# Local and sensitive configuration
+**/.env
+**/.env.*
+!**/.env.example
+**/*.local
+**/.vercel/
+**/.edgeone/
+**/.tef_dist/
+
+# Logs and caches
+**/*.log
+**/.eslintcache
+**/.vite/
+**/.cache/
+**/.playwright/
+
+# Editors and operating systems
+.idea/
+.vscode/
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+*.suo
+*.user
