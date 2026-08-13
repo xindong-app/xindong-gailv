@@ -16,7 +16,7 @@ export function WelcomeStep({ onStart }: { onStart: () => void }) {
           <b>成年人轻娱乐提示</b>
           <p>本工具不撮合、不评价谁高谁低，也不预测真实爱情结果。敏感条件由你主动展开，默认不进入分享。</p>
         </div>
-        <button className="button button-primary button-large" type="button" onClick={onStart}>开始设置范围</button>
+        <button className="button button-primary button-large" type="button" onClick={onStart}>🎯 开筛！</button>
       </div>
       <div className="welcome-visual" aria-hidden="true">
         <div className="paper-heart">♡</div>

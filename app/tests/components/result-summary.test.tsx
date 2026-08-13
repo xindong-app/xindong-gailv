@@ -15,7 +15,7 @@ describe('result summary', () => {
     expect(screen.getByText('软偏好契合')).toBeTruthy()
     expect(screen.getByText('娱乐指数')).toBeTruthy()
     expect(screen.getByText(`模型 ${result.versions.modelVersion} · 数据 ${result.versions.dataVersion}`)).toBeTruthy()
-    expect(screen.getByText(/基础范围/)).toBeTruthy()
+    expect(screen.getByText(/全员摸鱼中/)).toBeTruthy()
     expect(screen.getByText('模型可信 A').getAttribute('title')).not.toContain('权威直接数据')
     expect(screen.getByLabelText(result.population.display).getAttribute('aria-live')).toBe('polite')
   })

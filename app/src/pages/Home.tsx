@@ -5,6 +5,7 @@ import { StepNav, type StepDefinition } from '../components/StepNav'
 import { Dialog, ToastRegion, type ToastMessage } from '../components/ui'
 import { EVIDENCE_REGISTRY } from '../data/evidence'
 import { computeModel } from '../engine/modelEngine'
+import { Confetti } from '../fun/Confetti'
 import { CoreCriteriaStep } from '../features/steps/CoreCriteriaStep'
 import { DimensionLibraryStep } from '../features/steps/DimensionLibraryStep'
 import { PopulationStep } from '../features/steps/PopulationStep'
@@ -19,13 +20,13 @@ import { DEFAULT_SELECTION, safeParseSelection, type ModelSelection } from '../m
 import { SharePreviewDialog } from '../components/SharePreviewDialog'
 
 const STEPS: readonly StepDefinition[] = [
-  { id: 'welcome', label: '先看边界', shortLabel: '开始', description: '了解模型边界' },
-  { id: 'population', label: '基础范围', shortLabel: '范围', description: '性别、年龄、城市与婚史' },
-  { id: 'core', label: '核心条件', shortLabel: '核心', description: '身高、教育、经济与生活习惯' },
-  { id: 'library', label: '维度库', shortLabel: '维度', description: '搜索进阶维度' },
-  { id: 'sensitive', label: '敏感与娱乐', shortLabel: '边界', description: '主动展开敏感条件与娱乐彩蛋' },
-  { id: 'results', label: '结果解释', shortLabel: '结果', description: '查看范围、影响和灵敏度' },
-  { id: 'share', label: '调整与分享', shortLabel: '分享', description: '本地生成隐私安全的战报' },
+  { id: 'welcome', label: '开局须知', shortLabel: '开局', description: '了解模型边界' },
+  { id: 'population', label: '第一关 · 圈定人群', shortLabel: '圈人', description: '性别、年龄、城市与婚史' },
+  { id: 'core', label: '第二关 · 硬核条件', shortLabel: '硬核', description: '身高、教育、经济与生活习惯' },
+  { id: 'library', label: '第三关 · 维度宝库', shortLabel: '宝库', description: '搜索进阶维度' },
+  { id: 'sensitive', label: '第四关 · 彩蛋与边界', shortLabel: '彩蛋', description: '主动展开敏感条件与娱乐彩蛋' },
+  { id: 'results', label: '揭榜时刻', shortLabel: '揭榜', description: '查看范围、影响和灵敏度' },
+  { id: 'share', label: '生成战报', shortLabel: '战报', description: '本地生成隐私安全的战报' },
 ]
 
 interface Preset {
@@ -100,6 +101,14 @@ export default function Home() {
   const selection = history.value
   const result = useMemo(() => computeModel(selection), [selection])
   const conditions = useMemo(() => activeConditions(selection), [selection])
+  // SSR 及以上稀有度下彩带雨; seed 随结果变化, 同一份结果同一场雨
+  const celebrationSeed = useMemo(() => {
+    const base = result.population.base
+    if (base <= 0 || result.population.estimate <= 0) return null
+    const perWan = (result.population.estimate / base) * 10_000
+    if (perWan >= 5) return null
+    return `${result.population.estimate.toFixed(3)}-${result.frames.length}`
+  }, [result])
   const [currentStep, setCurrentStep] = useState(0)
   const [comparison, setComparison] = useState<ReturnType<typeof computeModel> | null>(null)
   const [clearOpen, setClearOpen] = useState(false)
@@ -275,7 +284,7 @@ export default function Home() {
           onClick={() => setMobileResultOpen(true)}
         >
           <span><small>满足硬条件</small><b>{result.population.displayShort}</b></span>
-          <span>查看结果 ↑</span>
+          <span>查看战况 ↑</span>
         </button>
       </div>
 
@@ -324,6 +333,7 @@ export default function Home() {
           onNotify={push}
         />
       )}
+      {celebrationSeed && <Confetti seed={celebrationSeed} />}
       <ToastRegion messages={messages} onDismiss={dismiss} />
     </div>
   )

@@ -22,7 +22,7 @@ export function ResultsStep({ result, selection, comparison, onChange, onRelax, 
   const reciprocalOptions = [...targetSoftIds].map((id) => DIMENSION_BY_ID.get(id)).filter(Boolean)
   return (
     <section className="step-panel results-step" aria-labelledby="results-title">
-      <div className="step-heading"><span className="eyebrow">第 6 步 · 结果解释</span><h2 id="results-title" tabIndex={-1}>先看范围，再看为什么</h2><p>数字不是名单，范围不是置信区间，双向命中也不是爱情预测。每一层都能展开复核。</p></div>
+      <div className="step-heading"><span className="eyebrow">揭榜时刻</span><h2 id="results-title" tabIndex={-1}>先看战况，再看谁是守门员</h2><p>数字不是名单，范围不是置信区间，双向命中也不是爱情预测。每一层都能展开复核。</p></div>
       <ResultSummary headingId="main-result-summary-title" result={result} onShare={onShare} />
       <article className="comparison-card">
         <div>
