@@ -1,4 +1,4 @@
-// 音效 —— WebAudio 合成, 无外部音频文件; 默认关闭, 用户主动开启
+// 音效 —— WebAudio 合成, 无外部音频文件; 默认开启, 可随时关闭
 // 偏好存 localStorage(纯 UI 偏好, 不含任何筛选数据)
 const STORAGE_KEY = 'xindong.fun.sound'
 
@@ -6,9 +6,9 @@ let ctx: AudioContext | null = null
 
 export function isSoundOn(): boolean {
   try {
-    return typeof window !== 'undefined' && window.localStorage.getItem(STORAGE_KEY) === 'on'
+    return typeof window !== 'undefined' && window.localStorage.getItem(STORAGE_KEY) !== 'off'
   } catch {
-    return false
+    return true
   }
 }
 
