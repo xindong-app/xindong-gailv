@@ -1,3 +1,4 @@
+// @ts-nocheck — Playwright 页面回调运行在浏览器上下文, 脚本工程无 DOM 类型
 // UI 截图验证: 预填一份带城市皮肤的条件, 分别截桌面端与手机端
 import { chromium } from '@playwright/test'
 

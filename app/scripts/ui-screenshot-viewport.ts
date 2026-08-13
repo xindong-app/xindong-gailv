@@ -1,3 +1,4 @@
+// @ts-nocheck — Playwright 页面回调运行在浏览器上下文, 脚本工程无 DOM 类型
 // 视口级截图(不拼接): 验证盖戳与漏斗的真实渲染
 import { chromium } from '@playwright/test'
 

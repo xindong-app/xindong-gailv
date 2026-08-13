@@ -1,3 +1,4 @@
+// @ts-nocheck — Playwright 页面回调运行在浏览器上下文, 脚本工程无 DOM 类型
 // 动态编排截图: 先加载只有身高的草稿, 再点击学历 chip 触发关卡动画
 import { chromium } from '@playwright/test'
 
