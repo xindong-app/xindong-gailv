@@ -71,7 +71,10 @@ export function buildShareDto(
     const survivorIndex = Math.max(0, survivors - 1)
     const survivorProf = pickProf(survivorIndex, selection.target.cities)
     const frames = buildFunnelFrames(selection)
-    const verdict = conditions && conditions.length > 0 ? buildVerdict(frames) : null
+    // 毒舌总评只允许点名实际公开的条件, 未公开敏感维度用"神秘条件"代称
+    const verdict = conditions && conditions.length > 0
+      ? buildVerdict(frames, { publicDimensionIds: new Set(conditions.map((condition) => condition.dimensionId)) })
+      : null
     dto.fun = {
       tierKey: tier.key,
       tierLabel: tier.label,

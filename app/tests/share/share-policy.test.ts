@@ -84,6 +84,27 @@ describe('share privacy policy', () => {
       .toEqual(expect.arrayContaining([expect.objectContaining({ dimensionId: 'economy.income' })]))
   })
 
+  it('masks the verdict top killer when that sensitive dimension is not public', () => {
+    const selection = privateSelection()
+    selection.correlated.minAnnualIncomeWan = 10_000 // 确保收入是淘汰最多的那一刀
+    const result = computeModel(selection)
+    const defaults = createDefaultShareSettings(selection)
+
+    // 默认(收入未二次确认): 毒舌总评只亮"神秘条件", 不点名最低年收入
+    const dto = buildShareDto(selection, result, defaults)
+    expect(dto.fun?.verdict).toContain('某个神秘条件')
+    expect(dto.fun?.verdict).not.toContain('最低年收入')
+    expect(buildTextFallback(dto)).not.toContain('最低年收入')
+
+    // 用户明确公开收入后: 恢复点名与专属玩笑
+    const explicit: ShareSettings = {
+      ...defaults,
+      includedDimensionIds: [...defaults.includedDimensionIds, 'economy.income'],
+      sensitiveConsentDimensionIds: ['economy.income'],
+    }
+    expect(buildShareDto(selection, result, explicit).fun?.verdict).toContain('最低年收入')
+  })
+
   it('strictly ignores unknown ids instead of copying arbitrary input into the DTO', () => {
     const selection = privateSelection()
     const settings = createDefaultShareSettings(selection)

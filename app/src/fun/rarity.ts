@@ -44,11 +44,18 @@ const VERDICT_JOKES: Record<string, string> = {
   'appearance.hair_full': '比收入还能打, 秃然真实',
 }
 
-export function buildVerdict(frames: readonly FunnelFrame[]): string | null {
+export function buildVerdict(
+  frames: readonly FunnelFrame[],
+  options: { publicDimensionIds?: ReadonlySet<string> } = {},
+): string | null {
   if (frames.length === 0) return null
   const worst = frames.reduce((a, b) => (b.factor < a.factor ? b : a))
-  const joke = VERDICT_JOKES[worst.dimensionId] ?? '这一关是真·守门员'
   const pct = ((1 - worst.factor) * 100).toFixed(worst.factor > 0.1 ? 0 : 1)
+  // 分享场景: 未公开的维度只亮刀法不亮名号(专属玩笑会泄身份, 一并换通用梗)
+  if (options.publicDimensionIds && !options.publicDimensionIds.has(worst.dimensionId)) {
+    return `致命一击是「某个神秘条件」, 一刀淘汰 ${pct}% 的选手 —— 名字保密, 刀是真的快`
+  }
+  const joke = VERDICT_JOKES[worst.dimensionId] ?? '这一关是真·守门员'
   return `致命一击是「${worst.label}」, 一刀淘汰 ${pct}% 的选手 —— ${joke}`
 }
 
