@@ -1,5 +1,6 @@
 import { encode as encodeQr } from 'uqr'
 import { stickerFor } from '../fun/stickers'
+import { CHALLENGE_URL } from './challenge'
 import type { ShareConditionDto, ShareDto } from './types'
 import { ShareCardError } from './types'
 
@@ -7,7 +8,7 @@ const WIDTH = 1080
 const HEIGHT = 1560
 
 /** 印在战报卡上的入口(永久链接, 临时部署链接 3 小时过期不能上卡) */
-const SHARE_URL = 'https://xindong-gailv.vercel.app'
+const SHARE_URL = CHALLENGE_URL
 
 export interface CanvasRenderDependencies {
   document?: Pick<Document, 'createElement'>

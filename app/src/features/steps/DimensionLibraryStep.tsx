@@ -74,10 +74,11 @@ export function DimensionLibraryStep({ selection, onChange, onNext }: {
           {dimensions.map((dimension) => {
             const copy = CLASS_COPY[dimension.classification]
             return (
-              <article className="dimension-card" data-class={dimension.classification} key={dimension.id}>
+              <article className={`dimension-card${isActive(dimension.id) ? ' equipped' : ''}`} data-class={dimension.classification} key={dimension.id}>
                 <div className="dimension-card-top"><span className="class-badge">{copy[0]}</span><EvidenceStatusBadge grade={dimension.evidenceGrade} /></div>
                 <h3>{dimension.label}</h3><p>{dimension.description}</p><small>{copy[1]}</small>
                 <Chip active={isActive(dimension.id)} tone={dimension.classification === 'soft_preference' ? 'mint' : 'sun'} onClick={() => toggleDimension(dimension.id)}>{isActive(dimension.id) ? '已加入' : '加入条件'}</Chip>
+                {isActive(dimension.id) && <span aria-hidden="true" className="equipped-stamp">已装备</span>}
               </article>
             )
           })}

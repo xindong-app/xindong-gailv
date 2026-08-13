@@ -3972,3 +3972,133 @@ body {
     animation: none !important;
   }
 }
+
+/* ============================================================
+   🎒 二期补装 (2026-08-13 晚): 挑战卡 + 已装备章 + 呼吸光
+   ============================================================ */
+
+/* ---------- 反向挑战卡: 票根式虚线框 ---------- */
+.challenge-card {
+  display: flex;
+  margin-top: 16px;
+  padding: 20px 22px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border: 2px dashed var(--ink);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--lilac) 22%, var(--surface-strong));
+}
+
+.challenge-card blockquote {
+  margin: 10px 0 0;
+  padding: 10px 14px;
+  border-left: 3px solid var(--ink);
+  border-radius: 0 10px 10px 0;
+  background: var(--surface-strong);
+  color: var(--ink-soft);
+  font-size: 0.84rem;
+  font-weight: 650;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.challenge-card h3 {
+  margin: 6px 0 0;
+}
+
+.challenge-card-copy {
+  min-width: 0;
+}
+
+.challenge-card > .button {
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .challenge-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+/* ---------- 已装备章: 砸落式盖章 ---------- */
+.dimension-card {
+  position: relative;
+}
+
+.equipped-stamp {
+  position: absolute;
+  right: 12px;
+  bottom: 14px;
+  padding: 3px 10px 4px;
+  border: 2px solid var(--peach-strong, #d0613a);
+  border-radius: 8px;
+  color: var(--peach-strong, #d0613a);
+  font-size: 0.78rem;
+  font-weight: 860;
+  letter-spacing: 0.12em;
+  transform: rotate(6deg);
+  pointer-events: none;
+  animation: stamp-in 320ms var(--spring-soft) backwards;
+  background: color-mix(in srgb, var(--surface-strong) 82%, transparent);
+}
+
+/* 硬核卡标题内联版(底部是滑杆/输入框, 章盖在标题尾) */
+.equipped-stamp.equipped-inline {
+  position: static;
+  display: inline-block;
+  margin-left: 9px;
+  padding: 1px 8px 2px;
+  font-size: 0.68rem;
+  vertical-align: 3px;
+  transform: rotate(-5deg);
+}
+
+@keyframes stamp-in {
+  from {
+    scale: 2.4;
+    opacity: 0;
+    rotate: -14deg;
+  }
+
+  to {
+    scale: 1;
+    opacity: 1;
+    rotate: 0deg;
+  }
+}
+
+/* ---------- 正在调的卡: 同色系呼吸光 ---------- */
+.criteria-card,
+.dimension-card {
+  transition: transform 220ms var(--spring-soft), box-shadow 220ms var(--spring-soft);
+}
+
+.criteria-card[data-kind="hard"]:focus-within {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sky) 62%, transparent), 0 12px 26px rgba(36, 28, 51, 0.12);
+}
+
+.criteria-card[data-kind="correlated"]:focus-within,
+.dimension-card[data-class="correlated_hard"]:focus-within {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sun) 68%, transparent), 0 12px 26px rgba(36, 28, 51, 0.12);
+}
+
+.dimension-card[data-class="soft_preference"]:focus-within {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--mint) 68%, transparent), 0 12px 26px rgba(36, 28, 51, 0.12);
+}
+
+.dimension-card[data-class="entertainment"]:focus-within {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--lilac) 68%, transparent), 0 12px 26px rgba(36, 28, 51, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .equipped-stamp {
+    animation: none !important;
+  }
+
+  .criteria-card,
+  .dimension-card {
+    transition-duration: 0.01ms !important;
+  }
+}

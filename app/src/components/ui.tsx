@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, type ReactNode } from 'react'
+import { playPop } from '../fun/sound'
 
 export function Chip({
   active,
@@ -23,7 +24,10 @@ export function Chip({
       data-tone={tone}
       disabled={disabled}
       type="button"
-      onClick={onClick}
+      onClick={() => {
+        playPop()
+        onClick()
+      }}
     >
       {children}
     </button>

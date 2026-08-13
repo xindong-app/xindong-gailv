@@ -100,6 +100,61 @@ export function playTada(): void {
   } catch { /* 静默 */ }
 }
 
+/** 点 chip: 一声短促的「啵」, 选条件上瘾音 */
+export function playPop(): void {
+  if (!isSoundOn()) return
+  const context = ensureContext()
+  if (!context) return
+  try {
+    const now = context.currentTime
+    const osc = context.createOscillator()
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(540, now)
+    osc.frequency.exponentialRampToValueAtTime(920, now + 0.07)
+    const gain = context.createGain()
+    gain.gain.setValueAtTime(0.0001, now)
+    gain.gain.exponentialRampToValueAtTime(0.14, now + 0.012)
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12)
+    osc.connect(gain).connect(context.destination)
+    osc.start(now)
+    osc.stop(now + 0.13)
+  } catch { /* 音频设备不可用时静默 */ }
+}
+
+/** 盖章: 低频「砰」+ 一点纸面摩擦 */
+export function playStamp(): void {
+  if (!isSoundOn()) return
+  const context = ensureContext()
+  if (!context) return
+  try {
+    const now = context.currentTime
+    const thud = context.createOscillator()
+    thud.type = 'square'
+    thud.frequency.setValueAtTime(160, now)
+    thud.frequency.exponentialRampToValueAtTime(64, now + 0.1)
+    const thudGain = context.createGain()
+    thudGain.gain.setValueAtTime(0.0001, now)
+    thudGain.gain.exponentialRampToValueAtTime(0.18, now + 0.014)
+    thudGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16)
+    thud.connect(thudGain).connect(context.destination)
+    thud.start(now)
+    thud.stop(now + 0.17)
+
+    const paper = context.createBufferSource()
+    paper.buffer = noiseBuffer(context, 0.08)
+    const lowpass = context.createBiquadFilter()
+    lowpass.type = 'lowpass'
+    lowpass.frequency.value = 900
+    const paperGain = context.createGain()
+    paperGain.gain.setValueAtTime(0.0001, now)
+    paperGain.gain.exponentialRampToValueAtTime(0.07, now + 0.01)
+    paperGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08)
+    paper.connect(lowpass).connect(paperGain).connect(context.destination)
+    paper.start(now)
+    paper.stop(now + 0.09)
+  } catch { /* 静默 */ }
+}
+
 /** 新关卡开启: 两声轻快的「叮」 */
 export function playLevelUp(): void {
   if (!isSoundOn()) return

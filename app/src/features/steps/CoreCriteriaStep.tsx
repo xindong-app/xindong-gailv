@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { EducationId, ModelSelection, SchoolTierId } from '../../model/schema'
 import { toggleArrayValue } from '../../model/selectionUtils'
 import { Chip, EvidenceBadge, FieldHelp } from '../../components/ui'
+import { playStamp } from '../../fun/sound'
 import { DimensionSticker } from '../../fun/DimensionSticker'
 
 const EDUCATION_OPTIONS: Array<{ id: EducationId; label: string }> = [
@@ -71,6 +72,8 @@ export function CoreCriteriaStep({ selection, onChange, onNext }: {
     onChange(draft)
   }
   const heightEnabled = selection.target.heightCm != null
+  const educationActive = selection.correlated.educationLevels.length > 0 || selection.correlated.schoolTier != null
+  const financeActive = selection.correlated.minAnnualIncomeWan != null || selection.correlated.minHouseholdWealthWan != null
 
   return (
     <section className="step-panel" aria-labelledby="core-title">
@@ -82,7 +85,7 @@ export function CoreCriteriaStep({ selection, onChange, onNext }: {
       <div className="criteria-grid">
         <article className="criteria-card has-sticker" data-kind="hard">
           <DimensionSticker dimensionId="appearance.height" />
-          <div className="criteria-card-head"><div><span className="class-badge">硬筛选</span><h3>身高范围</h3></div><EvidenceBadge grade="C" /></div>
+          <div className="criteria-card-head"><div><span className="class-badge">硬筛选</span><h3>身高范围{heightEnabled && <span aria-hidden="true" className="equipped-stamp equipped-inline">已装备</span>}</h3></div><EvidenceBadge grade="C" /></div>
           <div className="chip-row"><Chip active={!heightEnabled} onClick={() => update((draft) => { draft.target.heightCm = null })}>不限</Chip><Chip active={heightEnabled} tone="sky" onClick={() => update((draft) => { draft.target.heightCm = { min: draft.target.gender === 'male' ? 170 : 158, max: null } })}>设置范围</Chip></div>
           {selection.target.heightCm && <div className="range-fields single-column">
             <label>最低身高 <output>{selection.target.heightCm.min ?? 130} cm</output><input min={130} max={210} type="range" value={selection.target.heightCm.min ?? 130} onChange={(event) => update((draft) => { if (draft.target.heightCm) draft.target.heightCm.min = Number(event.target.value) })} /></label>
@@ -92,7 +95,7 @@ export function CoreCriteriaStep({ selection, onChange, onNext }: {
 
         <article className="criteria-card criteria-wide has-sticker" data-kind="correlated">
           <DimensionSticker dimensionId="education.level" />
-          <div className="criteria-card-head"><div><span className="class-badge">相关硬条件 ＋ 软偏好</span><h3>学历与院校偏好</h3></div><EvidenceBadge grade="C" /></div>
+          <div className="criteria-card-head"><div><span className="class-badge">相关硬条件 ＋ 软偏好</span><h3>学历与院校偏好{educationActive && <span aria-hidden="true" className="equipped-stamp equipped-inline">已装备</span>}</h3></div><EvidenceBadge grade="C" /></div>
           <div className="chip-row">{EDUCATION_OPTIONS.map((option) => <Chip key={option.id} active={selection.correlated.educationLevels.includes(option.id)} tone="sun" onClick={() => update((draft) => { draft.correlated.educationLevels = toggleArrayValue(draft.correlated.educationLevels, option.id) })}>{option.label}</Chip>)}</div>
           <div className="chip-row nested-row"><span>院校层级</span>{SCHOOL_OPTIONS.map((option) => <Chip key={option.id} active={selection.correlated.schoolTier === option.id} tone="sun" onClick={() => update((draft) => { draft.correlated.schoolTier = draft.correlated.schoolTier === option.id ? null : option.id })}>{option.label}</Chip>)}</div>
           <FieldHelp>学历进入相关模型；院校层级缺少同口径存量数据，仅作为软偏好，不再砍人口。清北 ⊂ C9 ⊂ 985 ⊂ 211。</FieldHelp>
@@ -100,7 +103,7 @@ export function CoreCriteriaStep({ selection, onChange, onNext }: {
 
         <article className="criteria-card has-sticker" data-kind="correlated">
           <DimensionSticker dimensionId="economy.income" />
-          <div className="criteria-card-head"><div><span className="class-badge">相关硬条件</span><h3>收入与资产</h3></div><EvidenceBadge grade="C" /></div>
+          <div className="criteria-card-head"><div><span className="class-badge">相关硬条件</span><h3>收入与资产{financeActive && <span aria-hidden="true" className="equipped-stamp equipped-inline">已装备</span>}</h3></div><EvidenceBadge grade="C" /></div>
           <div className="number-fields">
             <label htmlFor="income-min">最低税前年收入（万元）</label>
             <ValidatedNumberField
@@ -111,7 +114,7 @@ export function CoreCriteriaStep({ selection, onChange, onNext }: {
               id="income-min"
               max={10_000}
               value={selection.correlated.minAnnualIncomeWan}
-              onCommit={(value) => update((draft) => { draft.correlated.minAnnualIncomeWan = value })}
+              onCommit={(value) => update((draft) => { if (value != null) playStamp(); draft.correlated.minAnnualIncomeWan = value })}
             />
             <label htmlFor="wealth-min">最低家庭资产（万元）</label>
             <ValidatedNumberField
@@ -122,7 +125,7 @@ export function CoreCriteriaStep({ selection, onChange, onNext }: {
               id="wealth-min"
               max={1_000_000}
               value={selection.correlated.minHouseholdWealthWan}
-              onCommit={(value) => update((draft) => { draft.correlated.minHouseholdWealthWan = value })}
+              onCommit={(value) => update((draft) => { if (value != null) playStamp(); draft.correlated.minHouseholdWealthWan = value })}
             />
           </div>
           <FieldHelp>两者使用相关联合尾部估算；高收入、高资产、有房和学历不会各砍一刀再相乘。</FieldHelp>

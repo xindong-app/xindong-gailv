@@ -1,4 +1,5 @@
 export { renderShareCard, type CanvasRenderDependencies } from './canvas'
+export { buildChallengeText, CHALLENGE_URL, copyChallenge } from './challenge'
 export { downloadShareBlob, type DownloadDependencies } from './download'
 export { buildShareDto } from './dto'
 export { createDefaultShareSettings, listShareFieldCandidates } from './policy'

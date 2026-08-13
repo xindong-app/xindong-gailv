@@ -15,6 +15,14 @@
 | ✅ | 音效默认开启（opt-out 存 localStorage） | `fun/sound.ts` |
 | ✅ | 25 城职业皮肤小人 + 遗言弹幕 + 刀光震屏 + 关卡横幅 | `fun/skins.tsx` / `fun/FunFunnel.tsx` |
 | ✅ | 稀有度六档钢印 + 毒舌总评 + 清华/双色球类比 | `fun/rarity.ts` |
+| ✅ | 剧场骨架：单栏叙事 + 去框化 + 底部常驻舞台 + 幕布开场 + 老虎机数字 | `Home.tsx` / `fun/Stage.tsx` / `fun/IntroCurtain.tsx` / `fun/SlotNumber.tsx` |
+| ✅ | 19 张 AI 剪纸贴纸接入三关道具卡 + 图例 | `public/assets/stickers/` + `fun/stickers.ts` + `fun/DimensionSticker.tsx` |
+| ✅ | 战报卡 2.0 收藏卡：条件贴纸墙 + 淘汰分镜胶片带 + 画布 1080×1560 | `share/canvas.ts` |
+| ✅ | 毒舌总评脱敏：未公开敏感维度以「某个神秘条件」代称 | `fun/rarity.ts` + `share/dto.ts` + 回归测试 |
+| ✅ | 反向挑战书（PK 入口）：固定文案一键复制，不带任何用户数据 | `share/challenge.ts` + ShareStep 挑战卡 |
+| ✅ | 已装备章（宝库角章 + 硬核卡题内章，砸落式动画） | `DimensionLibraryStep.tsx` / `CoreCriteriaStep.tsx` + `index.css` |
+| ✅ | 音效 2.0 精简版：chip 啵声全局接入 + 数字提交盖章砰 | `fun/sound.ts` + `components/ui.tsx` |
+| ✅ | 条件卡呼吸光（focus-within 同色系微光） + 文字版片尾彩蛋 | `index.css` / `share/text.ts` |
 
 ---
 
@@ -34,11 +42,11 @@
 | # | 想法 | 实现路径 |
 |---|------|---------|
 | 7 | **道具卡插画**（AI 剪纸贴纸） | image_generation 插件统一 prompt 逐张生成 → `public/assets/stickers/*.webp` → 维度注册表加 sticker 字段（仅呈现层映射，不动数据数学）；Open Doodles（CC0）兜底；加载失败回落现状 |
-| 8 | **卡片翻面盖"已装备"章** | CSS 3D rotateY 翻面 + 印章 div；`criteria-card` 加 .equipped 态 |
+| 8 | **卡片翻面盖"已装备"章** | ✅ 已上线（角章+题内章形式，未做 3D 翻面） |
 | 9 | **宝库卡片飞向舞台** | FLIP 动效：getBoundingClientRect 起止点 + transform 过渡 |
 | 10 | **开屏剧本卡四选一** | WelcomeStep 改四张横排剧本卡（含"我自己写"）；预设逻辑复用现有 PRESETS |
-| 11 | **音效 2.0**（chip 啵/按钮 click/翻页 whoosh/纸片声㉖/印章声㉗/幕布声㉘） | `fun/sound.ts` 扩展 WebAudio 合成器（振荡器+滤波白噪声），全局开关进 header |
-| 12 | **条件色带呼吸发光** | CSS 变量 --band-glow + focus-within 触发 |
+| 11 | **音效 2.0**（chip 啵/按钮 click/翻页 whoosh/纸片声㉖/印章声㉗/幕布声㉘） | ✅ 精简版已上线（chip 啵 + 盖章砰）；翻页/纸片/幕布声待补 |
+| 12 | **条件色带呼吸发光** | ✅ 已上线 |
 | 13 | **节日限定舞台㉓** | `fun/seasonal.ts` 按日期返回主题（七夕/520/圣诞），Stage 条件渲染皮肤层 |
 | 14 | **战报卡=演出票根⑫** | `share/canvas.ts` 重绘：撕线（虚线+半圆缺口）、座位号=稀有度、检票=现有二维码 |
 
@@ -54,7 +62,7 @@
 | 20 | **修罗场模式⑭** | logo 连击计数（5 次/2s）→ body[data-mode=roast]，文案映射表切换 + 小人墨镜 SVG 层 |
 | 21 | **深夜档⑮** | `new Date().getHours() >= 23` → Stage 蓝调主题 + 旁白替换 |
 | 22 | **"全网最狠"烫金章⑯** | rarity.ts 已有神话级判定 → 追加隐藏章组件 + 战报卡烫金（canvas 渐变填充） |
-| 23 | **文字版彩蛋结尾⑬** | `share/text.ts` 追加一行 |
+| 23 | **文字版彩蛋结尾⑬** | ✅ 已上线（片尾字幕行） |
 
 ## 五、🔮 远期（需要新能力/后端，先记录不排期）
 
