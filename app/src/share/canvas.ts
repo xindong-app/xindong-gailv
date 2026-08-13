@@ -1,8 +1,12 @@
+import { encode as encodeQr } from 'uqr'
 import type { ShareDto } from './types'
 import { ShareCardError } from './types'
 
 const WIDTH = 1080
 const HEIGHT = 1350
+
+/** 印在战报卡上的入口(永久链接, 临时部署链接 3 小时过期不能上卡) */
+const SHARE_URL = 'https://xindong-gailv.vercel.app'
 
 export interface CanvasRenderDependencies {
   document?: Pick<Document, 'createElement'>
@@ -176,6 +180,37 @@ function drawStamp(
   context.restore()
 }
 
+/** 右下角二维码: 任何一步失败都静默跳过, 不影响卡片其余部分 */
+function drawQr(context: CanvasRenderingContext2D, ink: string) {
+  try {
+    const matrix = encodeQr(SHARE_URL, { ecc: 'M' }).data
+    const modules = matrix.length + 2 // 四周各留 1 模块静区
+    const size = 104
+    const x = WIDTH - 200
+    const y = HEIGHT - 238
+    // 白底托, 防止扫码区域透出底色
+    context.fillStyle = '#ffffff'
+    roundedRect(context, x - 8, y - 8, size + 16, size + 16, 12)
+    context.fill()
+    context.strokeStyle = ink
+    context.lineWidth = 2.5
+    roundedRect(context, x - 8, y - 8, size + 16, size + 16, 12)
+    context.stroke()
+    const cell = size / modules
+    context.fillStyle = ink
+    matrix.forEach((row, rowIndex) => {
+      row.forEach((dark, colIndex) => {
+        if (dark) context.fillRect(x + (colIndex + 1) * cell, y + (rowIndex + 1) * cell, cell + 0.5, cell + 0.5)
+      })
+    })
+    context.font = '600 18px system-ui, "Microsoft YaHei", sans-serif'
+    context.textAlign = 'center'
+    context.fillText('扫码自己算一卦', x + size / 2, y + size + 24)
+  } catch {
+    // 二维码只是裂变入口, 失败不阻塞出卡
+  }
+}
+
 export async function renderShareCard(
   dto: ShareDto,
   dependencies: CanvasRenderDependencies = {},
@@ -344,6 +379,12 @@ export async function renderShareCard(
     context.fillText(`娱乐指数 ${dto.scores.entertainment}/100`, center, y)
     y += 42
   }
+  if (dto.scores.bidirectional != null) {
+    context.fillStyle = '#655a75'
+    context.font = '600 24px system-ui, "Microsoft YaHei", sans-serif'
+    context.fillText(`双向命中示意 ${dto.scores.bidirectional}/100（示意，非预测）`, center, y)
+    y += 42
+  }
 
   if (dto.conditions && dto.conditions.length > 0) {
     y += 10
@@ -355,7 +396,8 @@ export async function renderShareCard(
     context.fillStyle = ink
     context.font = '24px system-ui, "Microsoft YaHei", sans-serif'
     for (const condition of dto.conditions.slice(0, 7)) {
-      if (y > HEIGHT - 235) break
+      // 给右下角二维码留位: 条件文字底部不越过 HEIGHT-264
+      if (y > HEIGHT - 270) break
       y += drawLeftWrappedText(
         context,
         `• ${condition.label}：${condition.summary}`,
@@ -365,7 +407,7 @@ export async function renderShareCard(
         32,
       ) + 5
     }
-    if (dto.conditions.length > 7 && y <= HEIGHT - 235) {
+    if (dto.conditions.length > 7 && y <= HEIGHT - 270) {
       context.fillText(`…另有 ${dto.conditions.length - 7} 项已公开条件`, 140, y)
     }
   }
@@ -381,6 +423,8 @@ export async function renderShareCard(
     context.fillText(line, center, noticeY)
     noticeY += 28
   }
+
+  drawQr(context, ink)
 
   return canvasToBlob(canvas)
 }

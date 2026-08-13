@@ -21,11 +21,15 @@ export function buildTextFallback(dto: ShareDto): string {
   if (dto.scores.entertainment != null && dto.scores.entertainment > 0) {
     lines.push(`娱乐指数：${dto.scores.entertainment} / 100`)
   }
+  if (dto.scores.bidirectional != null) {
+    lines.push(`双向命中示意：${dto.scores.bidirectional} / 100（示意，非预测）`)
+  }
   if (dto.conditions && dto.conditions.length > 0) {
     lines.push('公开条件：')
     for (const condition of dto.conditions) lines.push(`- ${condition.label}：${condition.summary}`)
   }
   lines.push(`模型 ${dto.versions.modelVersion} · 数据 ${dto.versions.dataVersion} · 模型可信度 ${dto.confidenceGrade}`)
   lines.push(dto.notice)
+  lines.push('自己算一卦 → https://xindong-gailv.vercel.app')
   return lines.join('\n')
 }

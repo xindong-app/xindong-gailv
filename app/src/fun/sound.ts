@@ -77,6 +77,29 @@ export function playSlash(): void {
   } catch { /* 音频设备不可用时静默 */ }
 }
 
+/** 揭榜开奖: 三连上行 + 终音, 小小的仪式感 */
+export function playTada(): void {
+  if (!isSoundOn()) return
+  const context = ensureContext()
+  if (!context) return
+  try {
+    const now = context.currentTime
+    ;[392, 523.25, 659.25, 784].forEach((freq, index) => {
+      const osc = context.createOscillator()
+      osc.type = 'triangle'
+      osc.frequency.value = freq
+      const gain = context.createGain()
+      const start = now + index * 0.11
+      gain.gain.setValueAtTime(0.0001, start)
+      gain.gain.exponentialRampToValueAtTime(0.11, start + 0.02)
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + (index === 3 ? 0.7 : 0.22))
+      osc.connect(gain).connect(context.destination)
+      osc.start(start)
+      osc.stop(start + 0.75)
+    })
+  } catch { /* 静默 */ }
+}
+
 /** 新关卡开启: 两声轻快的「叮」 */
 export function playLevelUp(): void {
   if (!isSoundOn()) return

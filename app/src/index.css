@@ -1496,6 +1496,8 @@ input[aria-invalid="true"] {
   text-align: right;
 }
 
+.results-step { position: relative; }
+
 .results-step > .result-summary {
   margin-bottom: 16px;
 }
@@ -3101,4 +3103,28 @@ input[aria-invalid="true"] {
   border-radius: 10px;
   background: var(--sun);
   color: var(--ink) !important;
+}
+
+/* ---------- 揭榜聚光灯 ---------- */
+.reveal-spotlight {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: radial-gradient(ellipse 70% 46% at 50% 0%, rgba(255, 252, 235, 0.95), rgba(255, 220, 130, 0.35) 55%, transparent 75%);
+  animation: reveal-spotlight 1.2s ease-out forwards;
+}
+
+@keyframes reveal-spotlight {
+  0% { opacity: 0; transform: translateY(-60%) scaleY(0.4); }
+  35% { opacity: 1; }
+  70% { opacity: 1; transform: translateY(0) scaleY(1); }
+  100% { opacity: 0; transform: translateY(6%) scaleY(1.05); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-spotlight {
+    animation: none !important;
+    display: none !important;
+  }
 }

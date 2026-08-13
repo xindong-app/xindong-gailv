@@ -13,6 +13,7 @@ export function ResultSummary({
   compact = false,
   showFunnel = true,
   headingId = 'result-summary-title',
+  revealKey,
   onOpenDetails,
   onShare,
 }: {
@@ -20,6 +21,8 @@ export function ResultSummary({
   compact?: boolean
   showFunnel?: boolean
   headingId?: string
+  /** 变化时钢印重新砸落(用于揭榜仪式感) */
+  revealKey?: string | number
   onOpenDetails?: () => void
   onShare?: () => void
 }) {
@@ -57,7 +60,7 @@ export function ResultSummary({
           {numberText}
         </div>
         <p className="result-scope">在「{scope}」的池子里捞</p>
-        {!compact && base > 0 && <RarityStamp tier={tier} rarityText={fmtRarity(probability)} />}
+        {!compact && base > 0 && <RarityStamp tier={tier} rarityText={fmtRarity(probability)} revealKey={revealKey} />}
       </div>
       {!compact && (
         <>

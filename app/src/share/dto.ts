@@ -40,7 +40,14 @@ export function buildShareDto(
       genderLabel: selection.target.gender === 'male' ? '男性' : '女性',
       ...(settings.showAge ? { ageRange: `${selection.target.age.min}–${selection.target.age.max} 岁` } : {}),
     },
-    scores: settings.showEntertainment ? { entertainment: result.scores.entertainment } : {},
+    scores: settings.showEntertainment
+      ? {
+          entertainment: result.scores.entertainment,
+          ...(result.scoreDetails.reciprocalPreferencesProvided
+            ? { bidirectional: result.scores.bidirectionalIllustration }
+            : {}),
+        }
+      : {},
     confidenceGrade: result.confidence.grade,
     notice: NOTICE,
   }

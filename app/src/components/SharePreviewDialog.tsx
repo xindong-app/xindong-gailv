@@ -141,6 +141,7 @@ export function SharePreviewDialog({
               </div>
             )}
             {dto.scores.entertainment != null && <div><span>娱乐 {dto.scores.entertainment}/100</span></div>}
+            {dto.scores.bidirectional != null && <div><span>双向命中示意 {dto.scores.bidirectional}/100（非预测）</span></div>}
             {dto.conditions && dto.conditions.length > 0 && <ul>{dto.conditions.slice(0, 6).map((condition) => <li key={condition.dimensionId}>{condition.label}：{condition.summary}</li>)}</ul>}
             <footer>模型 {dto.versions.modelVersion} · 数据 {dto.versions.dataVersion}<br />{dto.notice}</footer>
           </div>

@@ -78,6 +78,8 @@ export interface ShareDto {
   }
   scores: {
     entertainment?: number
+    /** 双向命中示意(0-100), 仅当用户填了反向自评且公开娱乐指数时携带 */
+    bidirectional?: number
   }
   confidenceGrade: 'A' | 'B' | 'C' | 'D' | 'NA'
   conditions?: ShareConditionDto[]

@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react'
 import type { ModelResult } from '../../engine/modelEngine'
 import { formatCount } from '../../engine/modelEngine'
 import { ResultSummary } from '../../components/ResultSummary'
+import { playTada } from '../../fun/sound'
 import type { ModelSelection, SoftPreferenceId } from '../../model/schema'
 import { DIMENSION_BY_ID } from '../../model/dimensions'
 import { toggleArrayValue } from '../../model/selectionUtils'
@@ -15,6 +17,9 @@ export function ResultsStep({ result, selection, comparison, onChange, onRelax, 
   onShare: () => void
   onCaptureComparison: () => void
 }) {
+  // 揭榜仪式感: 进入本步时钢印重新砸落 + 聚光灯扫过 + tada 音效
+  const [revealKey] = useState(() => Date.now())
+  useEffect(() => { playTada() }, [])
   const targetSoftIds = new Set<SoftPreferenceId>(selection.softPreferenceIds)
   if (selection.correlated.schoolTier) targetSoftIds.add('education.school')
   if (selection.correlated.healthCriteria.includes('no_myopia')) targetSoftIds.add('health.myopia')
@@ -22,8 +27,9 @@ export function ResultsStep({ result, selection, comparison, onChange, onRelax, 
   const reciprocalOptions = [...targetSoftIds].map((id) => DIMENSION_BY_ID.get(id)).filter(Boolean)
   return (
     <section className="step-panel results-step" aria-labelledby="results-title">
+      <div className="reveal-spotlight" aria-hidden="true" />
       <div className="step-heading"><span className="eyebrow">揭榜时刻</span><h2 id="results-title" tabIndex={-1}>先看战况，再看谁是守门员</h2><p>数字不是名单，范围不是置信区间，双向命中也不是爱情预测。每一层都能展开复核。</p></div>
-      <ResultSummary headingId="main-result-summary-title" result={result} onShare={onShare} />
+      <ResultSummary headingId="main-result-summary-title" result={result} onShare={onShare} revealKey={revealKey} />
       <article className="comparison-card">
         <div>
           <span className="eyebrow">方案 A / B</span>
