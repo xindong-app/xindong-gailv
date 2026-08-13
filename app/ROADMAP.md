@@ -78,6 +78,19 @@
 
 ---
 
+## 六、🧱 技术债（2026-08-14 实测记录，待 Codex 审核轮处理）
+
+**JS 总预算 149.7 / 150 KiB，余量 0.3 KiB。** 实测结论（sourcemap 归因 + manualChunks 对照实验）：
+
+- 预算扫描口径是 dist **全部** JS 的 gzip 总量；纯静态分包不减肥，实测反而 +4.6 KiB（已还原配置，未提交）
+- 包体实测构成：react 59.6 / 应用自身 72.9 / zod 18.1 / uqr 3.8 KiB gzip
+- **最大赘肉 = zod 的 JSON-Schema 生成器**（json-schema-processors + to-json-schema 等约 229 KiB 源码中相当一部分）：运行时零调用，被 `import { z } from 'zod'` 命名空间导入整体物化拖进包里
+- 涉及文件：`src/model/schema.ts`、`src/engine/modelEngine.ts`、`src/data/evidence.ts`（Codex 领地，未动）
+- 建议方案：三处改为具名 core 导入（避开 `z` 命名空间物化），链式 API 全保留、语义零变化；预期 −5~7 KiB。109 个测试可兜底验证
+- 备选：预算口径改"首屏入口 ≤150 + 总量 ≤180"，之后分享栈（canvas+uqr ≈ 8 KiB）做 React.lazy 才有意义
+
+---
+
 ## 执行铁律（全程有效）
 
 - 不改 `src/engine` / `src/data` / `src/model` 的数学与校验（Codex 领地）
