@@ -9,6 +9,15 @@ export function buildTextFallback(dto: ShareDto): string {
     lines.push(`满足硬条件的估算人群：${dto.population.estimateLabel}`)
     lines.push(`敏感度范围：${dto.population.rangeLabel}`)
   }
+  if (dto.fun) {
+    lines.push(`稀有度：${dto.fun.tierLabel}（${dto.fun.rarityText}）—— ${dto.fun.tierComment}`)
+    lines.push(
+      dto.fun.survivors > 0
+        ? `小人剧场还剩 ${dto.fun.survivors}/80 · 最后下班的是「${dto.fun.survivor.name}」${dto.fun.survivor.emoji}`
+        : '小人剧场全员下班, 一个没剩',
+    )
+    if (dto.fun.verdict) lines.push(`毒舌总评：${dto.fun.verdict}`)
+  }
   if (dto.scores.entertainment != null && dto.scores.entertainment > 0) {
     lines.push(`娱乐指数：${dto.scores.entertainment} / 100`)
   }

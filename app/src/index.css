@@ -3070,3 +3070,35 @@ input[aria-invalid="true"] {
 @media (max-width: 560px) {
   .ff-meta > span { max-width: 220px; }
 }
+
+/* ---------- 分享迷你卡趣味块 ---------- */
+.share-mini-fun {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 10px 0;
+}
+.share-mini-stamp {
+  display: inline-block;
+  padding: 6px 14px;
+  border: 2.5px solid var(--ink);
+  border-radius: 12px;
+  box-shadow: 3px 3px 0 var(--ink);
+  font-size: 0.9rem;
+  font-weight: 900;
+  transform: rotate(-2deg);
+}
+.share-mini-fun p {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.share-mini-verdict {
+  padding: 6px 10px;
+  border: 1.5px dashed var(--ink);
+  border-radius: 10px;
+  background: var(--sun);
+  color: var(--ink) !important;
+}

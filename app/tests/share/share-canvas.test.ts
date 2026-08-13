@@ -20,6 +20,8 @@ function dto() {
 function successfulCanvas() {
   const fillText = vi.fn()
   const context = {
+    save: vi.fn(), restore: vi.fn(), translate: vi.fn(), rotate: vi.fn(),
+    scale: vi.fn(), setLineDash: vi.fn(), quadraticCurveTo: vi.fn(), stroke: vi.fn(),
     beginPath: vi.fn(), moveTo: vi.fn(), arcTo: vi.fn(), closePath: vi.fn(),
     fill: vi.fn(), fillRect: vi.fn(), arc: vi.fn(), fillText,
     measureText: vi.fn((text: string) => ({ width: text.length * 24 })),
@@ -52,6 +54,8 @@ describe('canvas failure boundaries', () => {
 
   it('returns ENCODE_FAILED when toBlob produces null', async () => {
     const context = {
+      save: vi.fn(), restore: vi.fn(), translate: vi.fn(), rotate: vi.fn(),
+      scale: vi.fn(), setLineDash: vi.fn(), quadraticCurveTo: vi.fn(), stroke: vi.fn(),
       beginPath: vi.fn(), moveTo: vi.fn(), arcTo: vi.fn(), closePath: vi.fn(),
       fill: vi.fn(), fillRect: vi.fn(), arc: vi.fn(), fillText: vi.fn(),
       measureText: vi.fn((text: string) => ({ width: text.length * 10 })),
@@ -73,6 +77,8 @@ describe('canvas failure boundaries', () => {
 
   it('returns a Blob after successful PNG encoding', async () => {
     const context = {
+      save: vi.fn(), restore: vi.fn(), translate: vi.fn(), rotate: vi.fn(),
+      scale: vi.fn(), setLineDash: vi.fn(), quadraticCurveTo: vi.fn(), stroke: vi.fn(),
       beginPath: vi.fn(), moveTo: vi.fn(), arcTo: vi.fn(), closePath: vi.fn(),
       fill: vi.fn(), fillRect: vi.fn(), arc: vi.fn(), fillText: vi.fn(),
       measureText: vi.fn((text: string) => ({ width: text.length * 10 })),

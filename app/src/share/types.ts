@@ -44,6 +44,21 @@ export interface ShareConditionDto {
   summary: string
 }
 
+/** 趣味展示块: 全部由已授权公开字段派生, 不新增信息暴露面 */
+export interface ShareFunDto {
+  tierKey: string
+  tierLabel: string
+  tierComment: string
+  tierBg: string
+  tierFg: string
+  rarityText: string
+  /** 80 小人剧场里还站着的数量(0–80) */
+  survivors: number
+  survivor: { name: string; emoji: string }
+  /** 仅当条件列表公开时才带上毒舌总评(避免泄露被隐藏的维度) */
+  verdict?: string
+}
+
 export interface ShareDto {
   schemaVersion: 1
   title: '择偶条件分析战报'
@@ -66,6 +81,7 @@ export interface ShareDto {
   }
   confidenceGrade: 'A' | 'B' | 'C' | 'D' | 'NA'
   conditions?: ShareConditionDto[]
+  fun?: ShareFunDto
   notice: '仅供娱乐参考·模型推算，不是官方结论，也不预测具体感情结果'
 }
 

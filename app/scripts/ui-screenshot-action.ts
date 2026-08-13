@@ -1,4 +1,3 @@
-// @ts-nocheck — Playwright 页面回调运行在浏览器上下文, 脚本工程无 DOM 类型
 // 动态编排截图: 先加载只有身高的草稿, 再点击学历 chip 触发关卡动画
 import { chromium } from '@playwright/test'
 
@@ -32,7 +31,8 @@ const run = async () => {
   const browser = await chromium.launch()
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
   await page.addInitScript((sel) => {
-    window.sessionStorage.setItem('heart-probability-lab:safe-draft:v2', JSON.stringify(sel))
+    (globalThis as unknown as { sessionStorage: { setItem(key: string, value: string): void } })
+      .sessionStorage.setItem('heart-probability-lab:safe-draft:v2', JSON.stringify(sel))
   }, SELECTION)
   await page.goto('http://localhost:5199/', { waitUntil: 'networkidle' })
   await page.getByRole('button', { name: /开筛/ }).click()

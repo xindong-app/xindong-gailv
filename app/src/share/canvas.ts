@@ -97,6 +97,85 @@ function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
   })
 }
 
+/** 画一个小人: 身体 + 头 + 笑脸 + 头顶 emoji 皮肤 */
+function drawPerson(
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  scale: number,
+  color: string,
+  emoji: string,
+  ink: string,
+) {
+  context.save()
+  context.translate(x, y)
+  context.scale(scale, scale)
+  context.fillStyle = color
+  context.strokeStyle = ink
+  context.lineWidth = 2.2
+  // 身体
+  context.beginPath()
+  context.moveTo(-16, 44)
+  context.quadraticCurveTo(-16, 12, 0, 12)
+  context.quadraticCurveTo(16, 12, 16, 44)
+  context.closePath()
+  context.fill()
+  context.stroke()
+  // 头
+  context.beginPath()
+  context.arc(0, 0, 10, 0, Math.PI * 2)
+  context.fill()
+  context.stroke()
+  // 表情
+  context.fillStyle = ink
+  context.beginPath()
+  context.arc(-3.6, -1, 1.3, 0, Math.PI * 2)
+  context.arc(3.6, -1, 1.3, 0, Math.PI * 2)
+  context.fill()
+  context.beginPath()
+  context.arc(0, 2.5, 3.4, 0.15 * Math.PI, 0.85 * Math.PI)
+  context.stroke()
+  // 头顶皮肤 emoji
+  context.font = '20px system-ui, sans-serif'
+  context.textAlign = 'center'
+  context.fillText(emoji, 0, -14)
+  context.restore()
+}
+
+/** 稀有度钢印: 斜贴 + 硬阴影 */
+function drawStamp(
+  context: CanvasRenderingContext2D,
+  centerX: number,
+  centerY: number,
+  fun: NonNullable<ShareDto['fun']>,
+  ink: string,
+) {
+  context.save()
+  context.translate(centerX, centerY)
+  context.rotate((-3 * Math.PI) / 180)
+  const width = 330
+  const height = 108
+  // 硬阴影
+  context.fillStyle = ink
+  roundedRect(context, -width / 2 + 7, -height / 2 + 7, width, height, 22)
+  context.fill()
+  // 章体
+  context.fillStyle = fun.tierBg
+  roundedRect(context, -width / 2, -height / 2, width, height, 22)
+  context.fill()
+  context.strokeStyle = ink
+  context.lineWidth = 4
+  roundedRect(context, -width / 2, -height / 2, width, height, 22)
+  context.stroke()
+  context.fillStyle = fun.tierFg
+  context.textAlign = 'center'
+  context.font = '800 40px system-ui, "Microsoft YaHei", sans-serif'
+  context.fillText(fun.tierLabel, 0, -4)
+  context.font = '700 26px system-ui, "Microsoft YaHei", sans-serif'
+  context.fillText(fun.rarityText, 0, 34)
+  context.restore()
+}
+
 export async function renderShareCard(
   dto: ShareDto,
   dependencies: CanvasRenderDependencies = {},
@@ -149,16 +228,16 @@ export async function renderShareCard(
   context.fill()
 
   const center = WIDTH / 2
-  let y = 170
+  let y = 158
   context.textAlign = 'center'
   context.fillStyle = brown
   context.font = '600 30px system-ui, "Microsoft YaHei", sans-serif'
-  context.fillText('严肃数据 × 轻松拆条件', center, y)
-  y += 82
+  context.fillText('💘 心动概率局 · 严肃数据 × 轻松拆条件', center, y)
+  y += 74
   context.fillStyle = ink
   context.font = '700 58px system-ui, "Microsoft YaHei", sans-serif'
   context.fillText(dto.title, center, y)
-  y += 62
+  y += 56
   context.font = '28px system-ui, "Microsoft YaHei", sans-serif'
   context.fillStyle = '#655a75'
   y += drawCenteredWrappedText(
@@ -168,50 +247,126 @@ export async function renderShareCard(
     y,
     WIDTH - 260,
     38,
-  ) + 44
+  ) + 40
 
   if (dto.population) {
     context.fillStyle = '#fff3d9'
-    roundedRect(context, 130, y - 50, WIDTH - 260, 166, 28)
+    roundedRect(context, 130, y - 50, WIDTH - 260, 150, 28)
     context.fill()
     context.fillStyle = ink
     context.font = '700 42px system-ui, "Microsoft YaHei", sans-serif'
     context.fillText(dto.population.estimateLabel, center, y + 4)
     context.fillStyle = '#655a75'
     context.font = '25px system-ui, "Microsoft YaHei", sans-serif'
-    context.fillText(`敏感度范围：${dto.population.rangeLabel}`, center, y + 62)
-    y += 166
+    context.fillText(`敏感度范围：${dto.population.rangeLabel}`, center, y + 58)
+    y += 132
+  }
+
+  // ---------- 趣味区: 钢印 + 幸存者小人 + 毒舌总评 ----------
+  if (dto.fun) {
+    const fun = dto.fun
+    // SSR 及以上撒糖
+    if (['SSR', 'UR', 'M'].includes(fun.tierKey)) {
+      context.font = '34px system-ui, sans-serif'
+      context.textAlign = 'center'
+      const candies = ['🎉', '💖', '✨', '🍬', '🌟', '💘']
+      candies.forEach((emoji, index) => {
+        const angle = (index / candies.length) * Math.PI * 2
+        context.fillText(emoji, center + Math.cos(angle) * 330, y + 30 + Math.sin(angle) * 60)
+      })
+    }
+
+    drawStamp(context, center, y + 58, fun, ink)
+    y += 146
+    context.fillStyle = '#655a75'
+    context.font = '24px system-ui, "Microsoft YaHei", sans-serif'
+    context.textAlign = 'center'
+    y += drawCenteredWrappedText(context, fun.tierComment, center, y, WIDTH - 320, 32, 1) + 12
+
+    // 幸存者小人: 最后站着的戴城市皮肤, 旁边排几个气氛组
+    const survivors = Math.max(0, Math.min(80, fun.survivors))
+    const shown = Math.min(5, Math.max(1, survivors))
+    const palette = ['#cdeafa', '#ffd9b8', '#ddefd3', '#e6dbf7', '#ffd9e2']
+    const startX = center - ((shown - 1) * 64) / 2
+    for (let index = 0; index < shown; index += 1) {
+      const isLast = index === shown - 1
+      drawPerson(
+        context,
+        startX + index * 64,
+        y + 10,
+        0.9,
+        palette[index % palette.length],
+        isLast ? fun.survivor.emoji : '',
+        ink,
+      )
+    }
+    y += 66
+    context.fillStyle = ink
+    context.font = '700 24px system-ui, "Microsoft YaHei", sans-serif'
+    context.fillText(
+      survivors > 0
+        ? `小人剧场还剩 ${survivors} / 80 · 最后下班的是「${fun.survivor.name}」`
+        : '小人剧场全员下班, 一个没剩',
+      center,
+      y,
+    )
+    y += 30
+
+    if (fun.verdict) {
+      // 虚线毒舌框(emoji 单独画在框首, 避免代理对被换行拆散)
+      const verdictLines = wrapText(context, fun.verdict, WIDTH - 380).slice(0, 2)
+      const boxHeight = 34 + verdictLines.length * 34
+      context.fillStyle = '#fff8e6'
+      roundedRect(context, 130, y - 4, WIDTH - 260, boxHeight, 16)
+      context.fill()
+      context.strokeStyle = ink
+      context.lineWidth = 2.5
+      context.setLineDash([10, 8])
+      roundedRect(context, 130, y - 4, WIDTH - 260, boxHeight, 16)
+      context.stroke()
+      context.setLineDash([])
+      context.font = '26px system-ui, sans-serif'
+      context.textAlign = 'left'
+      context.fillText('🌶️', 152, y + 30)
+      context.fillStyle = ink
+      context.font = '600 24px system-ui, "Microsoft YaHei", sans-serif'
+      context.textAlign = 'center'
+      verdictLines.forEach((line, index) => context.fillText(line, center + 16, y + 30 + index * 34))
+      y += boxHeight + 18
+    }
+    y += 4
   }
 
   context.fillStyle = ink
-  context.font = '600 29px system-ui, "Microsoft YaHei", sans-serif'
+  context.font = '600 27px system-ui, "Microsoft YaHei", sans-serif'
+  context.textAlign = 'center'
   if (dto.scores.entertainment != null && dto.scores.entertainment > 0) {
     context.fillText(`娱乐指数 ${dto.scores.entertainment}/100`, center, y)
-    y += 48
+    y += 42
   }
 
   if (dto.conditions && dto.conditions.length > 0) {
-    y += 20
+    y += 10
     context.textAlign = 'left'
     context.fillStyle = brown
-    context.font = '700 27px system-ui, "Microsoft YaHei", sans-serif'
+    context.font = '700 26px system-ui, "Microsoft YaHei", sans-serif'
     context.fillText('本次公开条件', 130, y)
-    y += 48
+    y += 40
     context.fillStyle = ink
-    context.font = '25px system-ui, "Microsoft YaHei", sans-serif'
-    for (const condition of dto.conditions.slice(0, 8)) {
-      if (y > HEIGHT - 270) break
+    context.font = '24px system-ui, "Microsoft YaHei", sans-serif'
+    for (const condition of dto.conditions.slice(0, 7)) {
+      if (y > HEIGHT - 235) break
       y += drawLeftWrappedText(
         context,
         `• ${condition.label}：${condition.summary}`,
         140,
         y,
         WIDTH - 280,
-        34,
-      ) + 8
+        32,
+      ) + 5
     }
-    if (dto.conditions.length > 8 && y <= HEIGHT - 270) {
-      context.fillText(`…另有 ${dto.conditions.length - 8} 项已公开条件`, 140, y)
+    if (dto.conditions.length > 7 && y <= HEIGHT - 235) {
+      context.fillText(`…另有 ${dto.conditions.length - 7} 项已公开条件`, 140, y)
     }
   }
 

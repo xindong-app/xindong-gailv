@@ -127,6 +127,19 @@ export function SharePreviewDialog({
             <h4>{[dto.audience.genderLabel, dto.audience.ageRange].filter(Boolean).join(' · ')}</h4>
             {dto.region && <p>{dto.region}</p>}
             {dto.population && <strong>{dto.population.estimateLabel}</strong>}
+            {dto.fun && (
+              <div className="share-mini-fun">
+                <span className="share-mini-stamp" style={{ background: dto.fun.tierBg, color: dto.fun.tierFg }}>
+                  {dto.fun.tierLabel} · {dto.fun.rarityText}
+                </span>
+                <p>
+                  {dto.fun.survivors > 0
+                    ? `小人剧场还剩 ${dto.fun.survivors}/80 · 最后下班的是「${dto.fun.survivor.name}」${dto.fun.survivor.emoji}`
+                    : '小人剧场全员下班, 一个没剩 🫠'}
+                </p>
+                {dto.fun.verdict && <p className="share-mini-verdict">🌶️ {dto.fun.verdict}</p>}
+              </div>
+            )}
             {dto.scores.entertainment != null && <div><span>娱乐 {dto.scores.entertainment}/100</span></div>}
             {dto.conditions && dto.conditions.length > 0 && <ul>{dto.conditions.slice(0, 6).map((condition) => <li key={condition.dimensionId}>{condition.label}：{condition.summary}</li>)}</ul>}
             <footer>模型 {dto.versions.modelVersion} · 数据 {dto.versions.dataVersion}<br />{dto.notice}</footer>

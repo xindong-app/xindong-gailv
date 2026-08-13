@@ -1,4 +1,3 @@
-// @ts-nocheck — Playwright 页面回调运行在浏览器上下文, 脚本工程无 DOM 类型
 // UI 截图验证: 预填一份带城市皮肤的条件, 分别截桌面端与手机端
 import { chromium } from '@playwright/test'
 
@@ -34,7 +33,8 @@ const run = async () => {
   // 桌面端
   const desktop = await browser.newPage({ viewport: { width: 1440, height: 900 } })
   await desktop.addInitScript((sel) => {
-    window.sessionStorage.setItem('heart-probability-lab:safe-draft:v2', JSON.stringify(sel))
+    (globalThis as unknown as { sessionStorage: { setItem(key: string, value: string): void } })
+      .sessionStorage.setItem('heart-probability-lab:safe-draft:v2', JSON.stringify(sel))
   }, SELECTION)
   await desktop.goto('http://localhost:5199/', { waitUntil: 'networkidle' })
   await desktop.screenshot({ path: '_shots/desktop-welcome.png' })
@@ -50,7 +50,8 @@ const run = async () => {
   // 手机端
   const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })
   await mobile.addInitScript((sel) => {
-    window.sessionStorage.setItem('heart-probability-lab:safe-draft:v2', JSON.stringify(sel))
+    (globalThis as unknown as { sessionStorage: { setItem(key: string, value: string): void } })
+      .sessionStorage.setItem('heart-probability-lab:safe-draft:v2', JSON.stringify(sel))
   }, SELECTION)
   await mobile.goto('http://localhost:5199/', { waitUntil: 'networkidle' })
   await mobile.getByRole('button', { name: /开筛/ }).click()
