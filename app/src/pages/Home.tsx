@@ -6,6 +6,7 @@ import { Dialog, ToastRegion, type ToastMessage } from '../components/ui'
 import { EVIDENCE_REGISTRY } from '../data/evidence'
 import { computeModel } from '../engine/modelEngine'
 import { Confetti } from '../fun/Confetti'
+import { buildFunnelFrames } from '../fun/funnelFrames'
 import { CoreCriteriaStep } from '../features/steps/CoreCriteriaStep'
 import { DimensionLibraryStep } from '../features/steps/DimensionLibraryStep'
 import { PopulationStep } from '../features/steps/PopulationStep'
@@ -107,7 +108,7 @@ export default function Home() {
     if (base <= 0 || result.population.estimate <= 0) return null
     const perWan = (result.population.estimate / base) * 10_000
     if (perWan >= 5) return null
-    return `${result.population.estimate.toFixed(3)}-${result.frames.length}`
+    return `${result.population.estimate.toFixed(3)}-${buildFunnelFrames(result.input).length}`
   }, [result])
   const [currentStep, setCurrentStep] = useState(0)
   const [comparison, setComparison] = useState<ReturnType<typeof computeModel> | null>(null)

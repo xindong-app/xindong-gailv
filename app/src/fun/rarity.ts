@@ -1,5 +1,5 @@
 // 稀有度抽卡分级 + 毒舌总评 —— 纯文案/纯函数, 不碰引擎数学
-import type { FunnelFrame } from '../engine/modelEngine'
+import type { FunnelFrame } from './funnelFrames'
 
 export interface Tier {
   key: string

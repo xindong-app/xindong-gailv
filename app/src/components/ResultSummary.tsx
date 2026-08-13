@@ -1,6 +1,8 @@
+import { useMemo } from 'react'
 import type { ModelResult } from '../engine/modelEngine'
 import { formatCount, formatCountShort } from '../engine/modelEngine'
 import { FunFunnel } from '../fun/FunFunnel'
+import { buildFunnelFrames } from '../fun/funnelFrames'
 import { RarityStamp } from '../fun/RarityStamp'
 import { buildComparisons, buildVerdict, fmtRarity, rarityTier } from '../fun/rarity'
 import { useCountUp } from '../fun/useCountUp'
@@ -23,11 +25,13 @@ export function ResultSummary({
 }) {
   const topImpact = result.impacts[0]
   const animated = useCountUp(result.population.estimate)
+  // 帧拆解走趣味层(渐进调用引擎公开接口), result.input 身份不变时命中缓存
+  const frames = useMemo(() => buildFunnelFrames(result.input), [result.input])
   const base = result.population.base
   const probability = base > 0 ? result.population.estimate / base : 0
   const perWan = probability * 10_000
   const tier = rarityTier(perWan)
-  const verdict = buildVerdict(result.frames)
+  const verdict = buildVerdict(frames)
   const comparisons = buildComparisons(probability)
   const cities = result.input.target.cities
   const scope = `${cities.includes('全国') ? '全国' : cities.join('、')} · ${result.input.target.age.min}–${result.input.target.age.max} 岁 · ${result.input.target.gender === 'male' ? '男生' : '女生'}`
@@ -72,7 +76,7 @@ export function ResultSummary({
               )}
             </div>
           )}
-          {showFunnel && <FunFunnel pool={base} frames={result.frames} />}
+          {showFunnel && <FunFunnel pool={base} frames={frames} />}
           <p className="result-boundary">
             {result.population.resolutionExceeded
               ? '不是宇宙没货，是数据分辨率到头了；现实中不等于绝对不存在。'

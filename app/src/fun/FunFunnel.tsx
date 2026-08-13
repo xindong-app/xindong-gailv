@@ -1,7 +1,8 @@
 // 小人淘汰赛 2.0 —— 帧数据来自引擎的链式分解(result.frames),
 // 动画只是表演, 每一刀的幸存人数都是引擎算出来的真实估算。
 import { useEffect, useRef, useState } from 'react'
-import { formatCount, type FunnelFrame } from '../engine/modelEngine'
+import { formatCount } from '../engine/modelEngine'
+import type { FunnelFrame } from './funnelFrames'
 import { ROSTER, rnd, type Prof } from './roster'
 
 const TOTAL = 80

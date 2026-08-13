@@ -82,49 +82,6 @@ export interface GroupResult {
   note: string
 }
 
-/**
- * Dimension-level chain step for the淘汰 funnel. Frames are an exact
- * telescoping decomposition of the group factors: multiplying every frame
- * factor reproduces the final estimate, so the animation never lies about
- * the math. Conditional factors inside a correlation group are derived as
- * cumulative-joint ÷ previous-cumulative, never as independent marginals.
- */
-export interface FunnelFrame {
-  dimensionId: string
-  label: string
-  emoji: string
-  /** Conditional retention applied at this step (0–1). */
-  factor: number
-  /** Estimated survivors after this step. */
-  survivors: number
-  evidenceGrade: EvidenceGrade
-}
-
-const FRAME_EMOJI: Readonly<Record<string, string>> = {
-  'appearance.height': '📏',
-  'education.level': '🎓',
-  'economy.income': '💰',
-  'economy.wealth': '🏦',
-  'economy.house': '🏠',
-  'economy.vehicle': '🚗',
-  'appearance.body_type': '🍰',
-  'lifestyle.smoking': '🚭',
-  'lifestyle.drinking': '🍺',
-  'appearance.hair_full': '💇',
-}
-
-function buildFrame(dimensionId: string, factor: number, survivors: number): FunnelFrame {
-  const registry = DIMENSION_BY_ID.get(dimensionId)
-  return {
-    dimensionId,
-    label: registry?.label ?? dimensionId,
-    emoji: FRAME_EMOJI[dimensionId] ?? '🎯',
-    factor: clampProbability(factor),
-    survivors: Math.max(0, survivors),
-    evidenceGrade: registry?.evidenceGrade ?? 'C',
-  }
-}
-
 export interface ModelResult {
   versions: { modelVersion: string; dataVersion: string }
   input: ModelSelection
@@ -157,7 +114,6 @@ export interface ModelResult {
   impacts: ConditionImpact[]
   relaxations: RelaxationSuggestion[]
   groups: GroupResult[]
-  frames: FunnelFrame[]
   explanation: string[]
 }
 
@@ -175,7 +131,6 @@ interface RawPopulationResult {
   base: number
   estimate: number
   groups: GroupResult[]
-  frames: FunnelFrame[]
   activeDimensions: string[]
   uncertaintyContributions: number[]
   confidenceReasons: string[]
@@ -341,28 +296,17 @@ function wealthTail(xWan: number): number {
   return clampProbability(1 - normalCdf(Math.log(xWan / WEALTH_MEDIAN_WAN) / WEALTH_SIGMA))
 }
 
-interface FactorPart {
-  dimensionId: string
-  /** Conditional factor at this chain position; the parts telescope to the group factor. */
-  factor: number
-}
-
-function socioeconomicFactor(selection: ModelSelection): { factor: number; dimensions: string[]; note: string; parts: FactorPart[] } {
+function socioeconomicFactor(selection: ModelSelection): { factor: number; dimensions: string[]; note: string } {
   const midpoint = (selection.target.age.min + selection.target.age.max) / 2
   const dimensions: string[] = []
-  const parts: FactorPart[] = []
   const education = educationProbability(selection, midpoint)
-  if (selection.correlated.educationLevels.length > 0) {
-    dimensions.push('education.level')
-    parts.push({ dimensionId: 'education.level', factor: clampProbability(education) })
-  }
+  if (selection.correlated.educationLevels.length > 0) dimensions.push('education.level')
 
   let income = 1
   if (selection.correlated.minAnnualIncomeWan != null) {
     dimensions.push('economy.income')
     const scale = cityWageScale(selection.target.cities) * incomeAgeFactor(midpoint)
     income = incomeTail(selection.correlated.minAnnualIncomeWan / Math.max(0.1, scale * educationIncomePremium(selection)))
-    parts.push({ dimensionId: 'economy.income', factor: income })
   }
 
   let wealth = 1
@@ -374,14 +318,6 @@ function socioeconomicFactor(selection: ModelSelection): { factor: number; dimen
   const economy = income < 1 && wealth < 1
     ? gaussianCopulaJointTail(income, wealth, ECON_RHO)
     : Math.min(income, wealth)
-  if (selection.correlated.minHouseholdWealthWan != null) {
-    // P(wealth | income) = joint ÷ marginal income; collapses to the plain
-    // wealth tail when no income condition is active.
-    const conditionalWealth = income < 1 && wealth < 1
-      ? (income > 0 ? clampProbability(economy / income) : 0)
-      : wealth
-    parts.push({ dimensionId: 'economy.wealth', factor: conditionalWealth })
-  }
 
   const housing = selection.correlated.housing
   const hasHousingCondition = housing.required || housing.location != null || housing.minAreaSqm != null || housing.type != null
@@ -401,7 +337,6 @@ function socioeconomicFactor(selection: ModelSelection): { factor: number; dimen
       : ({ large_flat: 0.02, villa: 0.006, courtyard: 0.0002 } as const)[housing.type]
     // Type implies a size class, so it and area are nested rather than multiplied.
     house = ownership * locationProbability * Math.min(areaProbability, typeProbability)
-    parts.push({ dimensionId: 'economy.house', factor: clampProbability(house) })
   }
 
   const vehicle = selection.correlated.vehicle
@@ -415,7 +350,6 @@ function socioeconomicFactor(selection: ModelSelection): { factor: number; dimen
           under_10: 0.35, '10_20': 0.35, '20_50': 0.22, '50_100': 0.06, over_100: 0.02,
         } as const)[band], 0)
     car = conditionalOwnership * clampProbability(bandShare)
-    parts.push({ dimensionId: 'economy.vehicle', factor: car })
   }
 
   // This multiplication is a documented conditional chain:
@@ -428,7 +362,6 @@ function socioeconomicFactor(selection: ModelSelection): { factor: number; dimen
     note: income < 1 && wealth < 1
       ? '学历→收入、收入×资产 Gaussian copula、住房/车辆条件概率链'
       : '学历、经济与资产条件通过条件概率链合并',
-    parts,
   }
 }
 
@@ -447,50 +380,34 @@ function correlatedConjunction(probabilities: readonly number[], correlation: nu
   return clampProbability(Math.pow(independent, 1 - correlation) * Math.pow(upperBound, correlation))
 }
 
-function healthBodyFactor(selection: ModelSelection): { factor: number; dimensions: string[]; note: string; parts: FactorPart[] } {
+function healthBodyFactor(selection: ModelSelection): { factor: number; dimensions: string[]; note: string } {
   const midpoint = (selection.target.age.min + selection.target.age.max) / 2
-  const entries: { dimensionId: string; probability: number }[] = []
+  const probabilities: number[] = []
+  const dimensions: string[] = []
   const body = bodyTypeProbability(selection, midpoint)
-  if (body != null) entries.push({ dimensionId: 'appearance.body_type', probability: body })
+  if (body != null) { probabilities.push(body); dimensions.push('appearance.body_type') }
   if (selection.correlated.smoking === 'non_smoker') {
-    entries.push({ dimensionId: 'lifestyle.smoking', probability: nonSmokerRate(selection.target.gender) })
+    probabilities.push(nonSmokerRate(selection.target.gender)); dimensions.push('lifestyle.smoking')
   }
   if (selection.correlated.drinking !== 'any') {
     const level = selection.correlated.drinking === 'not_regular' ? 'notRegular' : 'none'
-    entries.push({
-      dimensionId: 'lifestyle.drinking',
-      probability: demographicWeightedProbability(
-        selection,
-        (age) => drinkingRate(selection.target.gender, level, age),
-      ),
-    })
+    probabilities.push(demographicWeightedProbability(
+      selection,
+      (age) => drinkingRate(selection.target.gender, level, age),
+    )); dimensions.push('lifestyle.drinking')
   }
   // `no_major_chronic` is retained in the schema for saved selections, but the
   // registry marks its composite prevalence as excluded. It is scored as a soft
   // preference below and must never enter this population factor.
   if (selection.correlated.hairCriteria.includes('full_hair')) {
-    entries.push({ dimensionId: 'appearance.hair_full', probability: fullHairRate(midpoint, selection.target.gender) })
-  }
-  // Telescoping chain: each part is cumulative-conjunction(k) ÷ cumulative(k-1),
-  // so the parts multiply back to the exact group factor without pretending
-  // the health traits are independent.
-  const parts: FactorPart[] = []
-  let cumulative = 1
-  for (let index = 0; index < entries.length; index += 1) {
-    const next = correlatedConjunction(entries.slice(0, index + 1).map((entry) => entry.probability), 0.3)
-    parts.push({
-      dimensionId: entries[index].dimensionId,
-      factor: cumulative > 0 ? clampProbability(next / cumulative) : 0,
-    })
-    cumulative = next
+    probabilities.push(fullHairRate(midpoint, selection.target.gender)); dimensions.push('appearance.hair_full')
   }
   return {
-    factor: cumulative,
-    dimensions: entries.map((entry) => entry.dimensionId),
-    note: entries.length > 1
+    factor: correlatedConjunction(probabilities, 0.3),
+    dimensions,
+    note: probabilities.length > 1
       ? '健康/体型/生活方式使用正相关交集近似（独立乘积与最小边际之间）'
       : '单一健康或生活方式边际概率',
-    parts,
   }
 }
 
@@ -513,7 +430,6 @@ function calculatePopulation(selection: ModelSelection): RawPopulationResult {
         : '婚史互斥类别按官方五岁组直接率取并集。',
   }]
   const activeDimensions: string[] = []
-  const frames: FunnelFrame[] = []
   let estimate = base
 
   const height = heightFactor(selection)
@@ -521,7 +437,6 @@ function calculatePopulation(selection: ModelSelection): RawPopulationResult {
     const before = estimate
     estimate *= height
     activeDimensions.push('appearance.height')
-    frames.push(buildFrame('appearance.height', height, estimate))
     groups.push({
       id: 'anthropometric', label: '明确身高范围', classification: 'hard_filter', dimensions: ['appearance.height'],
       factor: height, before, after: estimate, method: '官方年龄/性别均值 + C级正态离散度区间概率', evidenceGrade: 'C',
@@ -532,11 +447,6 @@ function calculatePopulation(selection: ModelSelection): RawPopulationResult {
   const socioeconomic = socioeconomicFactor(selection)
   if (socioeconomic.dimensions.length > 0) {
     const before = estimate
-    let running = estimate
-    for (const part of socioeconomic.parts) {
-      running *= part.factor
-      frames.push(buildFrame(part.dimensionId, part.factor, running))
-    }
     estimate *= socioeconomic.factor
     activeDimensions.push(...socioeconomic.dimensions)
     groups.push({
@@ -549,11 +459,6 @@ function calculatePopulation(selection: ModelSelection): RawPopulationResult {
   const healthBody = healthBodyFactor(selection)
   if (healthBody.dimensions.length > 0) {
     const before = estimate
-    let running = estimate
-    for (const part of healthBody.parts) {
-      running *= part.factor
-      frames.push(buildFrame(part.dimensionId, part.factor, running))
-    }
     estimate *= healthBody.factor
     activeDimensions.push(...healthBody.dimensions)
     groups.push({
@@ -567,7 +472,6 @@ function calculatePopulation(selection: ModelSelection): RawPopulationResult {
     base,
     estimate: Math.max(0, Number.isFinite(estimate) ? estimate : 0),
     groups,
-    frames,
     activeDimensions,
     uncertaintyContributions: [
       selection.target.cities.includes('全国') ? 0.12 : 0.2,
@@ -805,7 +709,6 @@ export function computeModel(input: unknown): ModelResult {
     impacts,
     relaxations: buildRelaxations(impacts),
     groups: raw.groups,
-    frames: raw.frames,
     explanation: [
       '硬条件用于人口范围；相关硬条件只在所属相关组内通过条件概率或相关交集计算。',
       '软偏好和娱乐条件不会减少满足硬条件的估算人数。',
