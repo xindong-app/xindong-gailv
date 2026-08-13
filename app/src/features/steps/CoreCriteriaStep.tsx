@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { EducationId, ModelSelection, SchoolTierId } from '../../model/schema'
 import { toggleArrayValue } from '../../model/selectionUtils'
 import { Chip, EvidenceBadge, FieldHelp } from '../../components/ui'
+import { DimensionSticker } from '../../fun/DimensionSticker'
 
 const EDUCATION_OPTIONS: Array<{ id: EducationId; label: string }> = [
   { id: 'junior_college', label: '大专' }, { id: 'bachelor', label: '本科' },
@@ -79,7 +80,8 @@ export function CoreCriteriaStep({ selection, onChange, onNext }: {
         <p>黄色卡是相关硬条件：会影响人数，但模型会在经济与教育组内联合处理，不逐项无脑连乘。体型、烟酒、健康与房车等敏感项放在下一步主动展开。</p>
       </div>
       <div className="criteria-grid">
-        <article className="criteria-card" data-kind="hard">
+        <article className="criteria-card has-sticker" data-kind="hard">
+          <DimensionSticker dimensionId="appearance.height" />
           <div className="criteria-card-head"><div><span className="class-badge">硬筛选</span><h3>身高范围</h3></div><EvidenceBadge grade="C" /></div>
           <div className="chip-row"><Chip active={!heightEnabled} onClick={() => update((draft) => { draft.target.heightCm = null })}>不限</Chip><Chip active={heightEnabled} tone="sky" onClick={() => update((draft) => { draft.target.heightCm = { min: draft.target.gender === 'male' ? 170 : 158, max: null } })}>设置范围</Chip></div>
           {selection.target.heightCm && <div className="range-fields single-column">
@@ -88,14 +90,16 @@ export function CoreCriteriaStep({ selection, onChange, onNext }: {
           </div>}
         </article>
 
-        <article className="criteria-card criteria-wide" data-kind="correlated">
+        <article className="criteria-card criteria-wide has-sticker" data-kind="correlated">
+          <DimensionSticker dimensionId="education.level" />
           <div className="criteria-card-head"><div><span className="class-badge">相关硬条件 ＋ 软偏好</span><h3>学历与院校偏好</h3></div><EvidenceBadge grade="C" /></div>
           <div className="chip-row">{EDUCATION_OPTIONS.map((option) => <Chip key={option.id} active={selection.correlated.educationLevels.includes(option.id)} tone="sun" onClick={() => update((draft) => { draft.correlated.educationLevels = toggleArrayValue(draft.correlated.educationLevels, option.id) })}>{option.label}</Chip>)}</div>
           <div className="chip-row nested-row"><span>院校层级</span>{SCHOOL_OPTIONS.map((option) => <Chip key={option.id} active={selection.correlated.schoolTier === option.id} tone="sun" onClick={() => update((draft) => { draft.correlated.schoolTier = draft.correlated.schoolTier === option.id ? null : option.id })}>{option.label}</Chip>)}</div>
           <FieldHelp>学历进入相关模型；院校层级缺少同口径存量数据，仅作为软偏好，不再砍人口。清北 ⊂ C9 ⊂ 985 ⊂ 211。</FieldHelp>
         </article>
 
-        <article className="criteria-card" data-kind="correlated">
+        <article className="criteria-card has-sticker" data-kind="correlated">
+          <DimensionSticker dimensionId="economy.income" />
           <div className="criteria-card-head"><div><span className="class-badge">相关硬条件</span><h3>收入与资产</h3></div><EvidenceBadge grade="C" /></div>
           <div className="number-fields">
             <label htmlFor="income-min">最低税前年收入（万元）</label>

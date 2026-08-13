@@ -3458,9 +3458,9 @@ body {
 /* ---------- 步骤条 → 虚线关卡路径 ---------- */
 .step-nav {
   border-bottom: 0;
-  background: transparent;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 
 .step-nav li {
@@ -3888,5 +3888,87 @@ body {
 
   .mobile-result-bar > button > span:last-child {
     color: #ffe9a8;
+  }
+}
+
+/* ============================================================
+   🃏 二期 · 道具卡贴纸 (2026-08-13)
+   AI 剪纸贴纸: 硬条件卡右上角"贴上" + 表单图例小贴纸
+   ============================================================ */
+
+/* 贴纸要溢出卡片上沿, 卡片需放行 */
+.criteria-card {
+  position: relative;
+  overflow: visible;
+}
+
+/* 卡片角贴: 斜贴盖章感, 不抢交互 */
+.card-sticker {
+  position: absolute;
+  top: -24px;
+  right: 14px;
+  z-index: 2;
+  width: 72px;
+  height: auto;
+  pointer-events: none;
+  filter: drop-shadow(0 9px 12px rgba(36, 28, 51, 0.24));
+  transform: rotate(5deg);
+  animation: sticker-pop 460ms var(--spring-soft) backwards;
+}
+
+/* 贴纸占位: 头部证据章避开右上角 */
+.criteria-card.has-sticker .criteria-card-head {
+  padding-right: 86px;
+}
+
+@keyframes sticker-pop {
+  from {
+    scale: 0.2;
+    opacity: 0;
+  }
+
+  to {
+    scale: 1;
+    opacity: 1;
+  }
+}
+
+/* 图例小贴纸: 贴着文字歪一点, 像手账胶带 */
+.legend-sticker {
+  width: 36px;
+  height: auto;
+  margin-right: 7px;
+  vertical-align: -9px;
+  filter: drop-shadow(2px 3px 3px rgba(36, 28, 51, 0.2));
+  transform: rotate(-4deg);
+}
+
+.fun-box .legend-sticker {
+  transform: rotate(4deg);
+}
+
+/* 窄屏: 贴纸收小, 别挡字 */
+@media (max-width: 640px) {
+  .card-sticker {
+    top: -18px;
+    right: 10px;
+    width: 56px;
+  }
+
+  .criteria-card.has-sticker .criteria-card-head {
+    padding-right: 66px;
+  }
+
+  .legend-sticker {
+    width: 30px;
+    margin-right: 5px;
+    vertical-align: -8px;
+  }
+}
+
+/* 减少动态: 贴纸直接静驻 */
+@media (prefers-reduced-motion: reduce) {
+  .card-sticker {
+    animation: none !important;
   }
 }

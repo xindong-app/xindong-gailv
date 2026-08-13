@@ -3,6 +3,7 @@ import { CITIES } from '../../data/cities'
 import type { ModelSelection, MaritalStatusId } from '../../model/schema'
 import { toggleArrayValue } from '../../model/selectionUtils'
 import { Chip, EvidenceBadge, FieldHelp } from '../../components/ui'
+import { DimensionSticker } from '../../fun/DimensionSticker'
 
 const MARITAL_OPTIONS: Array<{ id: MaritalStatusId; label: string }> = [
   { id: 'never_married', label: '未婚' },
@@ -52,14 +53,14 @@ export function PopulationStep({
       </div>
       <div className="form-card">
         <fieldset>
-          <legend>目标性别 <EvidenceBadge grade="A" /></legend>
+          <legend><DimensionSticker className="legend-sticker" dimensionId="base.gender" />目标性别 <EvidenceBadge grade="A" /></legend>
           <div className="chip-row">
             <Chip active={selection.target.gender === 'male'} tone="sky" onClick={() => update((draft) => { draft.target.gender = 'male' })}>男性</Chip>
             <Chip active={selection.target.gender === 'female'} tone="pink" onClick={() => update((draft) => { draft.target.gender = 'female' })}>女性</Chip>
           </div>
         </fieldset>
         <fieldset>
-          <legend>年龄范围 <EvidenceBadge grade="A" /></legend>
+          <legend><DimensionSticker className="legend-sticker" dimensionId="base.age" />年龄范围 <EvidenceBadge grade="A" /></legend>
           <div className="range-fields">
             <label htmlFor="minimum-age">最低年龄 <output>{selection.target.age.min} 岁</output>
               <input id="minimum-age" aria-label="最低年龄" aria-valuetext={`${selection.target.age.min} 岁`} max={selection.target.age.max} min={18} type="range" value={selection.target.age.min}
@@ -73,7 +74,7 @@ export function PopulationStep({
           <FieldHelp>18–50 岁每个单岁都有有效人口锚点，区间按单岁求和。</FieldHelp>
         </fieldset>
         <fieldset>
-          <legend>居住地区 <EvidenceBadge grade="C" /></legend>
+          <legend><DimensionSticker className="legend-sticker" dimensionId="base.region" />居住地区 <EvidenceBadge grade="C" /></legend>
           <div className="chip-row">
             <Chip active={selection.target.cities.includes('全国')} tone="sun" onClick={() => chooseCity('全国')}>全国</Chip>
             {hotCities.map((city) => (
@@ -96,7 +97,7 @@ export function PopulationStep({
           <FieldHelp>多城市按人口并集；全国与城市互斥。城市搜索无结果时不会静默写入未知地区。</FieldHelp>
         </fieldset>
         <fieldset>
-          <legend>婚姻状态 <EvidenceBadge grade="B" /></legend>
+          <legend><DimensionSticker className="legend-sticker" dimensionId="base.marital" />婚姻状态 <EvidenceBadge grade="B" /></legend>
           <div className="chip-row">
             {MARITAL_OPTIONS.map((option) => (
               <Chip active={selection.target.maritalStatuses.includes(option.id)} key={option.id} tone="lilac"
