@@ -74,7 +74,7 @@ export function CoreCriteriaStep({ selection, onChange, onNext }: {
   return (
     <section className="step-panel" aria-labelledby="core-title">
       <div className="step-heading">
-        <span className="eyebrow">第 3 步 · 核心条件</span>
+        <span className="eyebrow">第二关 · 硬核条件</span>
         <h2 id="core-title" tabIndex={-1}>把最在意的硬门槛放这里</h2>
         <p>黄色卡是相关硬条件：会影响人数，但模型会在经济与教育组内联合处理，不逐项无脑连乘。体型、烟酒、健康与房车等敏感项放在下一步主动展开。</p>
       </div>

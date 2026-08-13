@@ -1,9 +1,11 @@
-// 小人淘汰赛 2.0 —— 帧数据来自引擎的链式分解(result.frames),
-// 动画只是表演, 每一刀的幸存人数都是引擎算出来的真实估算。
+// 小人淘汰赛 2.0 —— 帧数据来自趣味层链式分解(buildFunnelFrames),
+// 动画只是表演, 每一刀的幸存人数都是引擎公开接口算出来的真实估算。
 import { useEffect, useRef, useState } from 'react'
 import { formatCount } from '../engine/modelEngine'
 import type { FunnelFrame } from './funnelFrames'
-import { ROSTER, rnd, type Prof } from './roster'
+import { rnd, type Prof } from './roster'
+import { pickProf } from './skins'
+import { isSoundOn, playLevelUp, playSlash, setSoundOn } from './sound'
 
 const TOTAL = 80
 const INK = '#3b3050'
@@ -25,6 +27,7 @@ const LAST_WORDS: Record<string, string[]> = {
 const GENERIC_LAST_WORDS = ['我不服!', '下次一定', '先走一步']
 
 interface Ghost { id: number; text: string; x: number; gr: number }
+interface Banner { id: number; text: string }
 
 function roast(factor: number): string {
   if (factor < 0.02) return '一回头, 人没了…'
@@ -79,7 +82,7 @@ function Person({ color, prof, out, delay, fx, fr, hopClass, hopDelay }: {
   )
 }
 
-export function FunFunnel({ pool, frames }: { pool: number; frames: readonly FunnelFrame[] }) {
+export function FunFunnel({ pool, frames, cities }: { pool: number; frames: readonly FunnelFrame[]; cities: readonly string[] }) {
   const safePool = pool > 0 ? pool : 1 // 防 0 池除零
   const stageCounts: number[] = [TOTAL]
   for (const frame of frames) {
@@ -88,12 +91,33 @@ export function FunFunnel({ pool, frames }: { pool: number; frames: readonly Fun
   const finalCount = stageCounts[stageCounts.length - 1]
   const perPerson = pool > 0 ? pool / TOTAL : 0
   const hopClass = frames.length % 2 === 0 ? 'hop-a' : 'hop-b'
+  const [soundOn, setSoundOnState] = useState(() => isSoundOn())
 
-  // ---------- 遗言弹幕 ----------
+  // ---------- 遗言弹幕 + 刀光 + 震屏 ----------
   const [ghosts, setGhosts] = useState<Ghost[]>([])
+  const [slashId, setSlashId] = useState(0)
+  const [banner, setBanner] = useState<Banner | null>(null)
   const prevFinal = useRef(finalCount)
   const prevFrames = useRef<Map<string, number>>(new Map())
+  const prevFrameCount = useRef(frames.length)
+
   useEffect(() => {
+    // 新关卡开启: 横幅 + 叮
+    if (frames.length > prevFrameCount.current) {
+      const latest = frames[frames.length - 1]
+      const bannerId = Date.now()
+      const t0 = setTimeout(() => {
+        setBanner({ id: bannerId, text: `⚔️ 第 ${frames.length} 关 · ${latest.label}` })
+        playLevelUp()
+      }, 0)
+      const t1 = setTimeout(() => setBanner((b) => (b?.id === bannerId ? null : b)), 1600)
+      prevFrameCount.current = frames.length
+      prevFinal.current = finalCount
+      prevFrames.current = new Map(frames.map((frame) => [frame.dimensionId, frame.factor]))
+      return () => { clearTimeout(t0); clearTimeout(t1) }
+    }
+    prevFrameCount.current = frames.length
+
     if (finalCount < prevFinal.current && frames.length > 0) {
       // 找出本轮变化最大的关卡配台词(改中间条件也不会张冠李戴)
       let culprit = frames[frames.length - 1]
@@ -108,7 +132,7 @@ export function FunFunnel({ pool, frames }: { pool: number; frames: readonly Fun
       }
       const lines = LAST_WORDS[culprit.dimensionId] ?? GENERIC_LAST_WORDS
       const spawned: Ghost[] = Array.from({ length: 3 }, (_, k) => {
-        const prof = ROSTER[Math.floor(Math.random() * ROSTER.length)]
+        const prof = pickProf(Math.floor(Math.random() * TOTAL), cities)
         return {
           id: Date.now() + k,
           text: `${prof.emoji} ${prof.name}: ${lines[Math.floor(Math.random() * lines.length)]}`,
@@ -118,6 +142,8 @@ export function FunFunnel({ pool, frames }: { pool: number; frames: readonly Fun
       })
       const t0 = setTimeout(() => {
         setGhosts((g) => [...g.slice(-4), ...spawned])
+        setSlashId((id) => id + 1) // 刀光 + 震屏
+        playSlash()
       }, 0)
       const t = setTimeout(() => {
         setGhosts((g) => g.filter((x) => !spawned.some((n) => n.id === x.id)))
@@ -129,13 +155,28 @@ export function FunFunnel({ pool, frames }: { pool: number; frames: readonly Fun
     prevFinal.current = finalCount
     prevFrames.current = new Map(frames.map((frame) => [frame.dimensionId, frame.factor]))
     return undefined
-  }, [finalCount, frames])
+  }, [finalCount, frames, cities])
+
+  const toggleSound = () => {
+    const next = !soundOn
+    setSoundOn(next)
+    setSoundOnState(next)
+    if (next) playLevelUp() // 开启时叮一声确认
+  }
 
   return (
     <div className="fun-funnel">
       <div className="ff-meta">
-        <span>小人是气氛组, 别拿我们数人头</span>
-        <span>1 个小人 ≈ {formatCount(perPerson)}</span>
+        <span>小人是气氛组, 别拿我们数人头 · 1 个小人 ≈ {formatCount(perPerson)}</span>
+        <button
+          aria-pressed={soundOn}
+          className="ff-sound-btn"
+          title={soundOn ? '关闭音效' : '开启音效'}
+          type="button"
+          onClick={toggleSound}
+        >
+          {soundOn ? '🔊 音效开' : '🔇 音效关'}
+        </button>
       </div>
 
       {/* 幸存者进度条 */}
@@ -152,8 +193,10 @@ export function FunFunnel({ pool, frames }: { pool: number; frames: readonly Fun
         </div>
       </div>
 
-      {/* 小人阵列 + 遗言弹幕层 */}
-      <div className="ff-arena">
+      {/* 小人阵列 + 刀光 + 弹幕层 */}
+      <div className={`ff-arena ${slashId > 0 ? 'shake' : ''}`}>
+        {slashId > 0 && <div key={slashId} aria-hidden="true" className="ff-slash" onAnimationEnd={() => setSlashId(0)} />}
+        {banner && <div key={banner.id} className="ff-banner" role="status">{banner.text}</div>}
         <div className="ff-grid">
           {Array.from({ length: TOTAL }).map((_, i) => {
             const out = i >= finalCount
@@ -161,7 +204,7 @@ export function FunFunnel({ pool, frames }: { pool: number; frames: readonly Fun
               <Person
                 key={i}
                 color={PALETTE[i % PALETTE.length]}
-                prof={ROSTER[Math.floor(rnd(i, 9) * ROSTER.length)]}
+                prof={pickProf(i, cities)}
                 out={out}
                 delay={rnd(i, 1) * 480}
                 fx={(rnd(i, 2) - 0.5) * 56}
@@ -185,17 +228,17 @@ export function FunFunnel({ pool, frames }: { pool: number; frames: readonly Fun
         </div>
       </div>
 
-      {/* 每关真实数量(引擎链式分解, 帧因子相乘 = 最终结果) */}
+      {/* 每关真实数量(链式分解, 帧因子相乘 = 最终结果) */}
       {frames.length > 0 && (
         <div className="ff-steps">
           <div className="ff-step ff-step-base">
             <span>🎯 初始目标池</span>
             <b>{formatCount(pool)}</b>
           </div>
-          {frames.map((frame) => (
+          {frames.map((frame, index) => (
             <div key={frame.dimensionId} className="ff-step fade-up">
               <div className="ff-step-row">
-                <span>{frame.emoji} {frame.label}</span>
+                <span><span className="ff-step-no">第{index + 1}关</span>{frame.emoji} {frame.label}</span>
                 <b>剩 {formatCount(frame.survivors)}</b>
               </div>
               <div className="ff-step-sub">

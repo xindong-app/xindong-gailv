@@ -76,7 +76,7 @@ export function ResultSummary({
               )}
             </div>
           )}
-          {showFunnel && <FunFunnel pool={base} frames={frames} />}
+          {showFunnel && <FunFunnel pool={base} frames={frames} cities={result.input.target.cities} />}
           <p className="result-boundary">
             {result.population.resolutionExceeded
               ? '不是宇宙没货，是数据分辨率到头了；现实中不等于绝对不存在。'
