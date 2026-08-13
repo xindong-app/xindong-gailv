@@ -7,6 +7,8 @@ import { EVIDENCE_REGISTRY } from '../data/evidence'
 import { computeModel } from '../engine/modelEngine'
 import { Confetti } from '../fun/Confetti'
 import { buildFunnelFrames } from '../fun/funnelFrames'
+import { IntroCurtain } from '../fun/IntroCurtain'
+import { Stage } from '../fun/Stage'
 import { CoreCriteriaStep } from '../features/steps/CoreCriteriaStep'
 import { DimensionLibraryStep } from '../features/steps/DimensionLibraryStep'
 import { PopulationStep } from '../features/steps/PopulationStep'
@@ -118,6 +120,10 @@ export default function Home() {
   const [privacyOpen, setPrivacyOpen] = useState(false)
   const [mobileResultOpen, setMobileResultOpen] = useState(false)
   const [shareOpen, setShareOpen] = useState(false)
+  // 幕布开场: 每会话只播一次, 减少动态用户直接跳过
+  const [introDone, setIntroDone] = useState(() => {
+    try { return sessionStorage.getItem('xindong.intro.seen') === '1' } catch { return true }
+  })
   const [online, setOnline] = useState(() => navigator.onLine)
   const { messages, push, dismiss } = useToasts()
   const initialFocusSkipped = useRef(false)
@@ -264,13 +270,9 @@ export default function Home() {
             </div>
           )}
         </div>
-
-        <aside aria-label="实时结果" className="desktop-result">
-          <div className="desktop-result-sticky">
-            <ResultSummary headingId="desktop-result-summary-title" result={result} onOpenDetails={() => navigate(5)} onShare={() => setShareOpen(true)} />
-          </div>
-        </aside>
       </main>
+
+      <Stage result={result} />
 
       <footer className="site-footer">
         <div><b>心动概率局</b><p>匿名、本地计算、有证据边界的轻娱乐条件分析。</p></div>
@@ -335,6 +337,12 @@ export default function Home() {
         />
       )}
       {celebrationSeed && <Confetti seed={celebrationSeed} />}
+      {!introDone && (
+        <IntroCurtain onDone={() => {
+          setIntroDone(true)
+          try { sessionStorage.setItem('xindong.intro.seen', '1') } catch { /* 私密模式写入失败就不标记 */ }
+        }} />
+      )}
       <ToastRegion messages={messages} onDismiss={dismiss} />
     </div>
   )

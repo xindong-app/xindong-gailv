@@ -29,7 +29,7 @@ export function ResultsStep({ result, selection, comparison, onChange, onRelax, 
     <section className="step-panel results-step" aria-labelledby="results-title">
       <div className="reveal-spotlight" aria-hidden="true" />
       <div className="step-heading"><span className="eyebrow">揭榜时刻</span><h2 id="results-title" tabIndex={-1}>先看战况，再看谁是守门员</h2><p>数字不是名单，范围不是置信区间，双向命中也不是爱情预测。每一层都能展开复核。</p></div>
-      <ResultSummary headingId="main-result-summary-title" result={result} onShare={onShare} revealKey={revealKey} />
+      <ResultSummary headingId="main-result-summary-title" result={result} onShare={onShare} revealKey={revealKey} showFunnel={false} />
       <article className="comparison-card">
         <div>
           <span className="eyebrow">方案 A / B</span>
