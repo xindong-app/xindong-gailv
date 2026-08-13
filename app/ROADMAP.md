@@ -1,0 +1,80 @@
+# 心动概率局 · 优化方案总览（30 条灵感 + 实现路径）
+
+> 配套文档：`DESIGN.md`（设计纲领与铁律）。本文档是全量优化项的台账与实施路线图。
+> 状态标记：✅ 已上线｜🚧 一期（骨架）｜📦 二期（装备）｜🥚 三期（彩蛋）｜🔮 远期
+
+---
+
+## 一、已完成并验证（前三轮迭代产物）
+
+| # | 项目 | 实现路径 |
+|---|------|---------|
+| ✅ | 游乐园质感层：Baloo 2+站酷快乐体展示字体、纸张噪点、按钮弹簧触感、chip 回弹、步骤条闯关地图、欢迎页贴纸 | `index.html` 字体引入；`src/index.css` 末尾覆盖层；纯 CSS |
+| ✅ | 揭榜仪式感：聚光灯扫过 + 钢印重新砸落 + tada 音效 | `ResultsStep.tsx` revealKey + `index.css` .reveal-spotlight + `fun/sound.ts` playTada |
+| ✅ | 战报卡二维码（uqr 矩阵直绘 canvas，静默降级）+ 双向命中分上卡 | `share/canvas.ts` / `dto.ts` / `types.ts` / `text.ts` |
+| ✅ | 音效默认开启（opt-out 存 localStorage） | `fun/sound.ts` |
+| ✅ | 25 城职业皮肤小人 + 遗言弹幕 + 刀光震屏 + 关卡横幅 | `fun/skins.tsx` / `fun/FunFunnel.tsx` |
+| ✅ | 稀有度六档钢印 + 毒舌总评 + 清华/双色球类比 | `fun/rarity.ts` |
+
+---
+
+## 二、🚧 一期：剧场骨架（当前待开工）
+
+| # | 想法 | 具体内容 | 实现路径 |
+|---|------|---------|---------|
+| 1 | **剧场式单栏骨架** | 砍两栏仪表盘 → 单栏居中叙事流（~760px）；顶部极简无框；关卡进度变虚线路径 ●──●──◍──○ | `Home.tsx` 布局重构（去掉 workspace 双栏 grid）；`index.css` 重写 .workspace/.step-nav；算法不动 |
+| 2 | **去框化** | 色块代替描边（玫瑰带=外貌、薄荷带=生活习惯…）；组内 1px 细分隔线；贴纸风每屏 ≤3 处 | `index.css` 重写 .criteria-card/.dimension-card/.step-panel；按维度分组加 data-band 属性 |
+| 3 | **底部常驻舞台带** | 全场唯一深色区：天鹅绒底+暖黄脚灯+聚光灯；80 小人实时淘汰赛常驻；超大数字字幕屏；手机端为底部抽屉可上滑全屏 | FunFunnel 从 ResultSummary 拆出 → 新组件 `fun/Stage.tsx` 全局粘性挂载于 Home；selection 变化即重渲染（frames 已有 WeakMap 缓存） |
+| 4 | **幕布开场** | 暗场→小人 stagger 跑入（0.02s 间隔）→标题逐字砸落→logo 钢印+tada→幕布向两侧拉开直接露出主界面；每会话首次播放、可跳过、reduced-motion 直跳 | 新组件 `fun/IntroCurtain.tsx`（CSS clip-path 幕布 + 逐字 animation-delay）；sessionStorage `xindong.intro.seen` 标记 |
+| 5 | **剪纸皮肤** | ⑰ 撕边分隔（SVG 锯齿+1px 深色纸厚度）⑱ 浮动软阴影 ⑲ 笔刷笔触按钮（clip-path 笔触遮罩 + seed 随机） | `index.css` 新增 .torn-edge 工具类 + SVG mask；按钮底色改笔触 |
+| 6 | **老虎机大数字** | 最终人数滚动到位（老虎机式），滚动时小人仰头 | 升级 `fun/useCountUp.ts` 为逐位滚动；ResultSummary/Stage 接入 |
+
+## 三、📦 二期：装备与氛围
+
+| # | 想法 | 实现路径 |
+|---|------|---------|
+| 7 | **道具卡插画**（AI 剪纸贴纸） | image_generation 插件统一 prompt 逐张生成 → `public/assets/stickers/*.webp` → 维度注册表加 sticker 字段（仅呈现层映射，不动数据数学）；Open Doodles（CC0）兜底；加载失败回落现状 |
+| 8 | **卡片翻面盖"已装备"章** | CSS 3D rotateY 翻面 + 印章 div；`criteria-card` 加 .equipped 态 |
+| 9 | **宝库卡片飞向舞台** | FLIP 动效：getBoundingClientRect 起止点 + transform 过渡 |
+| 10 | **开屏剧本卡四选一** | WelcomeStep 改四张横排剧本卡（含"我自己写"）；预设逻辑复用现有 PRESETS |
+| 11 | **音效 2.0**（chip 啵/按钮 click/翻页 whoosh/纸片声㉖/印章声㉗/幕布声㉘） | `fun/sound.ts` 扩展 WebAudio 合成器（振荡器+滤波白噪声），全局开关进 header |
+| 12 | **条件色带呼吸发光** | CSS 变量 --band-glow + focus-within 触发 |
+| 13 | **节日限定舞台㉓** | `fun/seasonal.ts` 按日期返回主题（七夕/520/圣诞），Stage 条件渲染皮肤层 |
+| 14 | **战报卡=演出票根⑫** | `share/canvas.ts` 重绘：撕线（虚线+半圆缺口）、座位号=稀有度、检票=现有二维码 |
+
+## 四、🥚 三期：彩蛋与爆发
+
+| # | 想法 | 实现路径 |
+|---|------|---------|
+| 15 | **0 人空舞台+追光+旁白+一键撤销** | Stage 检测 estimate≤0：追光 CSS + 旁白条 + 复用现有 onRelax/undo |
+| 16 | **COMBO 连击⑧** | FunFunnel 记录时间戳序列，10s 内 3 次 → 飘字层 + playLevelUp 升调 |
+| 17 | **小人回头看⑦** | Stage 给幸存者加 .stare 态（tilt 向条件卡方位）1s |
+| 18 | **SSR 二次揭幕⑩** | Stage 幕布合拢→拉开 + 金色 Confetti（复用 Confetti.tsx 换色）+ 灰尘粒子（CSS 粒子） |
+| 19 | **"就差一点"字幕⑪** | 复用 result.relaxations 数据，Stage 字幕条滚动播报 |
+| 20 | **修罗场模式⑭** | logo 连击计数（5 次/2s）→ body[data-mode=roast]，文案映射表切换 + 小人墨镜 SVG 层 |
+| 21 | **深夜档⑮** | `new Date().getHours() >= 23` → Stage 蓝调主题 + 旁白替换 |
+| 22 | **"全网最狠"烫金章⑯** | rarity.ts 已有神话级判定 → 追加隐藏章组件 + 战报卡烫金（canvas 渐变填充） |
+| 23 | **文字版彩蛋结尾⑬** | `share/text.ts` 追加一行 |
+
+## 五、🔮 远期（需要新能力/后端，先记录不排期）
+
+| # | 想法 | 依赖 |
+|---|------|------|
+| 24 | **双人合卡⑳** | 需链接携带条件摘要（URL 编码 selection 白名单字段），两张卡本地拼合；无后端可做 v1 |
+| 25 | **条件投票㉑** | 需后端存储票数（Supabase/Neon 已有插件可接） |
+| 26 | **盲盒开局㉒** | 纯前端：内置 3 套"热门组合"预设即可 v1 |
+| 27 | **视角反转㉔** | 算法已有双向命中，只是入口重构 |
+| 28 | **调音台推子㉕** | input[type=range] 皮肤 + WebAudio 纸带声 |
+| 29 | **池子记忆㉙** | sessionStorage 存上次 estimate，WelcomeStep 读 |
+| 30 | **每日一签㉚** | 纯前端文案池 + 日期 seed；可单独分享图（复用战报卡管线） |
+
+---
+
+## 执行铁律（全程有效）
+
+- 不改 `src/engine` / `src/data` / `src/model` 的数学与校验（Codex 领地）
+- 不改测试锚定的功能文案与组件名（106 个 vitest 必须保持绿）
+- 所有动效 prefers-reduced-motion 降级；手机 375px 优先验收
+- JS gzip ≤ 150 KiB、CSS ≤ 25 KiB 预算不破
+- 外部素材只进本地 `public/assets/`，许可优先 CC0 / 免费可商用 / AI 自生成
+- 每期完成：typecheck + test + lint + validate:model + build + scan:dist + 截图验收 + git commit，不主动部署
