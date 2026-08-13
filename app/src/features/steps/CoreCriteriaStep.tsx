@@ -125,7 +125,7 @@ export function CoreCriteriaStep({ selection, onChange, onNext }: {
         </article>
 
       </div>
-      <div className="step-actions"><button className="button button-primary" type="button" onClick={onNext}>打开进阶维度库</button></div>
+      <div className="step-actions"><button className="button button-primary" type="button" onClick={onNext}>下一关：维度寻宝 →</button></div>
     </section>
   )
 }

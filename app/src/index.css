@@ -3128,3 +3128,261 @@ input[aria-invalid="true"] {
     display: none !important;
   }
 }
+
+/* ============================================================
+   🎡 游乐园质感层 —— 有趣的皮, 严肃的核
+   只加表现层(字体/质感/微交互), 不动布局结构与算法
+   ============================================================ */
+
+:root {
+  --font-display: "Baloo 2", "ZCOOL KuaiLe", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --spring-soft: cubic-bezier(0.22, 1.2, 0.36, 1);
+}
+
+/* 纸张噪点: 极淡一层, 让奶油底色有"纸"的手感 */
+body {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.23 0 0 0 0 0.19 0 0 0 0 0.31 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='128' height='128' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(circle at 7% 8%, color-mix(in srgb, var(--rose) 62%, transparent) 0 7rem, transparent 7.1rem),
+    radial-gradient(circle at 94% 28%, color-mix(in srgb, var(--sky) 55%, transparent) 0 9rem, transparent 9.1rem),
+    var(--paper);
+}
+
+/* ---------- 标题字体: 圆润展示体, 中文回落到快乐体 ---------- */
+.brand b,
+.step-heading h2,
+.welcome-copy h2,
+.result-number,
+.rarity-stamp b,
+.ff-banner,
+.ff-step-no,
+.share-mini-poster h4 {
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
+}
+
+.step-heading h2 {
+  letter-spacing: 0;
+}
+
+.step-heading .eyebrow::before {
+  content: "✦ ";
+}
+
+/* ---------- 按钮: 弹簧触感 ---------- */
+.button {
+  font-family: var(--font-display);
+  letter-spacing: 0.03em;
+  transition:
+    transform 180ms var(--spring),
+    box-shadow 180ms var(--spring),
+    background 140ms ease;
+}
+
+.button:hover:not(:disabled) {
+  transform: translateY(-2px) rotate(-1deg);
+}
+
+.button-primary:hover:not(:disabled) {
+  box-shadow: 5px 5px 0 var(--rose-strong);
+}
+
+.button-secondary:hover:not(:disabled) {
+  box-shadow: 5px 5px 0 var(--line-strong);
+}
+
+.button-danger:hover:not(:disabled) {
+  box-shadow: 5px 5px 0 var(--ink);
+}
+
+.button:active:not(:disabled) {
+  transform: translate(2px, 2px) rotate(0deg);
+  transition-duration: 60ms;
+}
+
+/* ---------- Chip: 选中时"啵"一下 ---------- */
+.chip {
+  transition:
+    transform 200ms var(--spring),
+    box-shadow 200ms var(--spring),
+    background 140ms ease;
+}
+
+.chip:hover:not(:disabled) {
+  transform: translateY(-2px) rotate(-1.4deg);
+}
+
+.chip[aria-pressed="true"] {
+  animation: chip-pop 280ms var(--spring);
+}
+
+@keyframes chip-pop {
+  0% { transform: translateY(-1px) scale(0.82); }
+  55% { transform: translateY(-1px) scale(1.09); }
+  100% { transform: translateY(-1px) scale(1); }
+}
+
+/* ---------- 步骤条 → 闯关地图 ---------- */
+.step-number {
+  border: 2px solid var(--ink);
+  background: var(--surface-strong);
+  box-shadow: 2px 2px 0 var(--ink);
+  font-family: var(--font-display);
+  font-weight: 800;
+  transition: transform 200ms var(--spring), background 160ms ease;
+}
+
+.step-button:hover .step-number {
+  transform: rotate(-8deg) scale(1.1);
+}
+
+.step-button[aria-current="step"] {
+  background: var(--sun);
+}
+
+.step-button[aria-current="step"] .step-number {
+  border-color: var(--ink);
+  background: var(--rose-strong);
+  color: #fffdf8;
+  animation: node-bob 1.7s ease-in-out infinite;
+}
+
+.step-button[data-complete="true"] .step-number {
+  transform: rotate(-9deg);
+  box-shadow: 2px 2px 0 var(--success);
+}
+
+@keyframes node-bob {
+  0%, 100% { transform: translateY(0) scale(1.12); }
+  50% { transform: translateY(-3px) scale(1.12); }
+}
+
+/* 进度条尽头挂一颗爱心, 走到哪跟到哪 */
+.step-progress span {
+  position: relative;
+  transition: width 320ms var(--spring-soft);
+}
+
+.step-progress span::after {
+  content: "💖";
+  position: absolute;
+  right: -5px;
+  top: 50%;
+  font-size: 12px;
+  transform: translateY(-56%);
+}
+
+/* ---------- 卡片: 随手贴的便签感(极小角度, 不晕) ---------- */
+.criteria-card,
+.dimension-card,
+.preset-list button {
+  transition: transform 220ms var(--spring-soft), box-shadow 220ms var(--spring-soft);
+}
+
+.criteria-grid > .criteria-card:nth-child(odd),
+.dimension-grid > .dimension-card:nth-child(odd) {
+  transform: rotate(-0.5deg);
+}
+
+.criteria-grid > .criteria-card:nth-child(even),
+.dimension-grid > .dimension-card:nth-child(even) {
+  transform: rotate(0.5deg);
+}
+
+.criteria-card:hover,
+.dimension-card:hover,
+.preset-list button:hover {
+  transform: rotate(0deg) translateY(-3px);
+}
+
+/* ---------- 已选条件小药丸: 删除时先抖一下 ---------- */
+.selected-pill {
+  transition: transform 200ms var(--spring), box-shadow 200ms var(--spring);
+}
+
+.selected-pill:hover {
+  transform: rotate(-1.6deg) translateY(-1px);
+}
+
+/* ---------- 欢迎页: 漂浮贴纸 ---------- */
+.welcome-copy h2 {
+  font-size: clamp(1.9rem, 4.4vw, 2.85rem);
+  line-height: 1.22;
+}
+
+.welcome-copy h2 em {
+  padding: 0 0.18em;
+  border-radius: 0.35em;
+  background: linear-gradient(transparent 55%, var(--sun) 55% 92%, transparent 92%);
+  font-style: normal;
+}
+
+.welcome-stickers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.welcome-stickers span {
+  position: absolute;
+  font-size: 30px;
+  filter: drop-shadow(2px 2px 0 rgba(59, 48, 80, 0.25));
+  animation: sticker-float 3.6s ease-in-out infinite;
+}
+
+.welcome-stickers span:nth-child(1) { top: 4%; left: 6%; transform: rotate(-14deg); }
+.welcome-stickers span:nth-child(2) { top: 12%; right: 4%; animation-delay: 0.7s; transform: rotate(10deg); }
+.welcome-stickers span:nth-child(3) { bottom: 16%; left: 0%; animation-delay: 1.3s; transform: rotate(8deg); }
+.welcome-stickers span:nth-child(4) { bottom: 4%; right: 10%; animation-delay: 2s; transform: rotate(-9deg); }
+
+@keyframes sticker-float {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -9px; }
+}
+
+/* ---------- 手机端底部战况条: 呼吸一点存在感 ---------- */
+.mobile-result-bar > button {
+  transition: transform 200ms var(--spring), box-shadow 200ms var(--spring);
+}
+
+.mobile-result-bar > button:hover {
+  transform: translateY(-2px);
+}
+
+/* ---------- 窄屏收拾: 卡片回正, 贴纸收小 ---------- */
+@media (max-width: 640px) {
+  .criteria-grid > .criteria-card:nth-child(n),
+  .dimension-grid > .dimension-card:nth-child(n) {
+    transform: none;
+  }
+
+  .welcome-stickers span {
+    font-size: 22px;
+  }
+}
+
+/* ---------- 减少动态: 新动效全部降级 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .chip[aria-pressed="true"],
+  .step-button[aria-current="step"] .step-number,
+  .welcome-stickers span {
+    animation: none !important;
+  }
+
+  .button,
+  .chip,
+  .criteria-card,
+  .dimension-card,
+  .preset-list button,
+  .selected-pill,
+  .mobile-result-bar > button {
+    transition-duration: 0.01ms !important;
+  }
+
+  .criteria-grid > .criteria-card:nth-child(n),
+  .dimension-grid > .dimension-card:nth-child(n),
+  .step-button[data-complete="true"] .step-number {
+    transform: none !important;
+  }
+}

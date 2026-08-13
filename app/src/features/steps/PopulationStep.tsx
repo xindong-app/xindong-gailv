@@ -108,7 +108,7 @@ export function PopulationStep({
           <FieldHelp>{selection.target.maritalStatuses.length === 0 ? '当前为不限婚史；不会偷偷回退到“未婚”。' : '状态互斥，多选按并集计算；使用官方性别×五岁组率，组内年龄为同一比例。18–19 岁或 50 岁会降为 C 级边界近似。'}</FieldHelp>
         </fieldset>
       </div>
-      <div className="step-actions"><button className="button button-primary" type="button" onClick={onNext}>继续加核心条件</button></div>
+      <div className="step-actions"><button className="button button-primary" type="button" onClick={onNext}>下一关：上硬菜 →</button></div>
     </section>
   )
 }

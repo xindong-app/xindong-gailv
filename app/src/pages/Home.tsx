@@ -214,7 +214,7 @@ export default function Home() {
         <div className="workspace-main">
           {currentStep > 0 && (
             <section aria-labelledby="preset-title" className="preset-bar">
-              <div><span className="eyebrow">快捷预设</span><h2 id="preset-title">先借一套，再改成你的</h2></div>
+              <div><span className="eyebrow">懒人模板</span><h2 id="preset-title">先抄一套，再改成你的</h2></div>
               <div className="preset-list">
                 {PRESETS.map((preset) => (
                   <button key={preset.id} title={preset.description} type="button" onClick={() => applyPreset(preset)}>
@@ -257,10 +257,10 @@ export default function Home() {
 
           {currentStep > 0 && (
             <div className="page-step-footer" aria-label="步骤翻页">
-              <button className="button button-secondary" disabled={currentStep === 0} type="button" onClick={() => navigate(currentStep - 1)}>上一步</button>
+              <button className="button button-secondary" disabled={currentStep === 0} type="button" onClick={() => navigate(currentStep - 1)}>← 回上一关</button>
               {currentStep < STEPS.length - 1
-                ? <button className="button button-primary" type="button" onClick={() => navigate(currentStep + 1)}>下一步：{STEPS[currentStep + 1].label}</button>
-                : <button className="button button-primary" type="button" onClick={() => navigate(5)}>返回结果解释</button>}
+                ? <button className="button button-primary" type="button" onClick={() => navigate(currentStep + 1)}>冲！{STEPS[currentStep + 1].label} →</button>
+                : <button className="button button-primary" type="button" onClick={() => navigate(5)}>回揭榜现场</button>}
             </div>
           )}
         </div>

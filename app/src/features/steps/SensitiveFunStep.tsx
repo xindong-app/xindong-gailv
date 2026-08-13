@@ -29,7 +29,7 @@ export function SensitiveFunStep({ selection, onChange, onNext }: { selection: M
 
   return (
     <section className="step-panel" aria-labelledby="sensitive-title">
-      <div className="step-heading"><span className="eyebrow">第四关 · 彩蛋与边界</span><h2 id="sensitive-title" tabIndex={-1}>敏感话题有边界，娱乐彩蛋有隔离带</h2><p>敏感人口条件与敏感偏好都默认折叠、默认不分享；星座和 MBTI 只生成娱乐指数。</p></div>
+      <div className="step-heading"><span className="eyebrow">第四关 · 彩蛋与边界</span><h2 id="sensitive-title" tabIndex={-1}>彩蛋随便玩，敏感的有护栏</h2><p>敏感人口条件与敏感偏好都默认折叠、默认不分享；星座和 MBTI 只生成娱乐指数。</p></div>
       <section className="sensitive-box">
         <button aria-controls="sensitive-options" aria-expanded={sensitiveOpen} className="disclosure-button" type="button" onClick={() => setSensitiveOpen((value) => !value)}><span><b>敏感人口条件与偏好</b><small>房车、健康、外形、家庭财务、关系边界等 · 默认不分享</small></span><span aria-hidden="true">{sensitiveOpen ? '−' : '+'}</span></button>
         {sensitiveOpen && <div id="sensitive-options">
@@ -46,7 +46,7 @@ export function SensitiveFunStep({ selection, onChange, onNext }: { selection: M
         <fieldset><legend>星座</legend><div className="chip-row">{(Object.keys(ZODIAC_LABELS) as ZodiacId[]).map((zodiac) => <Chip key={zodiac} active={selection.entertainment.zodiacs.includes(zodiac)} tone="lilac" onClick={() => update((draft) => { draft.entertainment.zodiacs = toggleArrayValue(draft.entertainment.zodiacs, zodiac) })}>{ZODIAC_LABELS[zodiac]}</Chip>)}</div></fieldset>
         <fieldset><legend>MBTI 四轴</legend><div className="axis-grid">{MBTI_AXES.map((axis) => <div className="chip-row" key={axis.join('')}>{axis.map((pole) => <Chip key={pole} active={selection.entertainment.mbti.includes(pole)} tone="lilac" onClick={() => chooseMbti(pole)}>{pole}</Chip>)}</div>)}</div></fieldset>
       </section>
-      <div className="step-actions"><button className="button button-primary" type="button" onClick={onNext}>去看完整结果</button></div>
+      <div className="step-actions"><button className="button button-primary" type="button" onClick={onNext}>⚡ 揭榜！</button></div>
     </section>
   )
 }

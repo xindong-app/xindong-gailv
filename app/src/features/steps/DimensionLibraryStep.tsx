@@ -83,7 +83,7 @@ export function DimensionLibraryStep({ selection, onChange, onNext }: {
           })}
         </div>
       )}
-      <div className="step-actions"><button className="button button-primary" type="button" onClick={onNext}>查看敏感与娱乐条件</button></div>
+      <div className="step-actions"><button className="button button-primary" type="button" onClick={onNext}>下一关：彩蛋区 →</button></div>
     </section>
   )
 }
