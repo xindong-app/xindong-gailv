@@ -5227,3 +5227,104 @@ body {
     animation: none !important;
   }
 }
+
+/* ---------- 马戏团吊牌: 彩灯描边 + 轻微摆动 ---------- */
+.circus-sign {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  z-index: 1;
+  transform: translateX(-50%);
+}
+
+/* 两根吊绳 */
+.circus-string {
+  position: absolute;
+  top: -56px;
+  width: 2px;
+  height: 62px;
+  background: repeating-linear-gradient(180deg, #cdbceb 0 4px, transparent 4px 7px);
+}
+
+.circus-string-left {
+  left: 22px;
+  transform: rotate(9deg);
+  transform-origin: bottom;
+}
+
+.circus-string-right {
+  right: 22px;
+  transform: rotate(-9deg);
+  transform-origin: bottom;
+}
+
+.circus-board {
+  position: relative;
+  display: grid;
+  padding: 12px 30px 11px;
+  justify-items: center;
+  border: 3px solid #ffe9a8;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #3a2c52, #2b2140);
+  box-shadow: 0 0 26px rgba(255, 233, 168, 0.22), 4px 5px 0 rgba(18, 13, 29, 0.6);
+  animation: sign-sway 5.2s ease-in-out infinite;
+  transform-origin: center -46px;
+}
+
+@keyframes sign-sway {
+  0%, 100% { rotate: -1.1deg; }
+  50% { rotate: 1.1deg; }
+}
+
+.circus-board b {
+  color: #fff8e6;
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 3.4vw, 1.7rem);
+  letter-spacing: 0.14em;
+  text-shadow: 2px 2px 0 rgba(18, 13, 29, 0.6);
+}
+
+.circus-board small {
+  margin-top: 3px;
+  color: #cdbceb;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+}
+
+/* 彩灯: 板缘一圈暖灯泡, 交替眨眼; mask 抠掉中间, 只留边缘一圈灯带 */
+.circus-board::before {
+  content: "";
+  position: absolute;
+  inset: -9px;
+  padding: 9px;
+  border-radius: 19px;
+  background-image: radial-gradient(circle, #ffe9a8 0 2.4px, transparent 3.2px);
+  background-origin: border-box;
+  background-size: 18px 18px;
+  pointer-events: none;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
+  animation: bulbs-twinkle 1.4s steps(2, jump-none) infinite;
+}
+
+@keyframes bulbs-twinkle {
+  0% { filter: brightness(1) drop-shadow(0 0 3px rgba(255, 233, 168, 0.7)); background-position: 0 0; }
+  100% { filter: brightness(0.55) drop-shadow(0 0 1px rgba(255, 233, 168, 0.3)); background-position: 9px 9px; }
+}
+
+/* 手机端: 场景矮, 吊牌和标题挤不下 —— 窄屏收起来, 留给桌面端 */
+@media (max-width: 640px) {
+  .circus-sign {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .circus-board,
+  .circus-board::before {
+    animation: none !important;
+  }
+}

@@ -29,6 +29,14 @@ export function CoverShow() {
   return (
     <div className="cover-scene" aria-hidden="true">
       <div className="cover-scene-spotlight" />
+      <div className="circus-sign">
+        <span className="circus-string circus-string-left" />
+        <span className="circus-string circus-string-right" />
+        <div className="circus-board">
+          <b>心动淘汰赛</b>
+          <small>不预测爱情 · 只数人头</small>
+        </div>
+      </div>
       <div className="cover-scene-footlights" />
       <div className="cover-gate">
         <span className="cover-gate-heart">♡</span>

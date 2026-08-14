@@ -24,14 +24,8 @@ export interface FunnelFrame {
 const FRAME_EMOJI: Readonly<Record<string, string>> = {
   'appearance.height': '📏',
   'education.level': '🎓',
-  'economy.income': '💰',
-  'economy.wealth': '🏦',
-  'economy.house': '🏠',
-  'economy.vehicle': '🚗',
-  'appearance.body_type': '🍰',
   'lifestyle.smoking': '🚭',
   'lifestyle.drinking': '🍺',
-  'appearance.hair_full': '💇',
 }
 
 const clampProbability = (value: number): number =>
