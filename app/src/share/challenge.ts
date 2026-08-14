@@ -3,7 +3,7 @@
  * 铁律: 不携带任何用户条件与结果, 复制出去的就是这段固定文案 + 永久入口。
  */
 
-export const CHALLENGE_URL = 'https://lizhi129129-cmd.github.io/xindong-gailv/'
+export const CHALLENGE_URL = 'https://xindong-app.github.io/xindong-gailv/'
 
 export function buildChallengeText(): string {
   return [
