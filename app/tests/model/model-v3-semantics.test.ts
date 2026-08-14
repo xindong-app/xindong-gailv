@@ -50,12 +50,12 @@ describe('v3 availability and zero semantics', () => {
     expectAdditive(union.population.estimate, parts)
   })
 
-  it('distinguishes positive below one and numeric underflow to zero', () => {
+  it('keeps extreme but mathematically positive height tails above numeric zero', () => {
     const belowOne = computeModel(selection((draft) => {
       draft.target.gender = 'female'
       draft.target.heightCm = { min: 193, max: 193 }
     }))
-    const underflow = computeModel(selection((draft) => {
+    const fartherTail = computeModel(selection((draft) => {
       draft.target.gender = 'female'
       draft.target.heightCm = { min: 220, max: 220 }
     }))
@@ -64,9 +64,9 @@ describe('v3 availability and zero semantics', () => {
     expect(belowOne.population.zeroMeaning).toBe('positive_below_resolution')
     expect(belowOne.population.display).toContain('期望值低于 1 人')
 
-    expect(underflow.population.estimate).toBe(0)
-    expect(underflow.population.zeroMeaning).toBe('model_underflow')
-    expect(underflow.population.display).toContain('不能解释为现实中恰好 0 人')
+    expect(fartherTail.population.estimate).toBeGreaterThan(0)
+    expect(fartherTail.population.estimate).toBeLessThan(1)
+    expect(fartherTail.population.zeroMeaning).toBe('positive_below_resolution')
 
   })
 })
@@ -223,13 +223,21 @@ describe('relationship scenarios remain a separate second layer', () => {
     expect(scenario.explanation.join(' ')).toContain('不是 0 人')
   })
 
-  it('propagates main-model numeric underflow as unavailable, not a logical zero', () => {
+  it('propagates an explicit main-model numeric underflow as unavailable, not a logical zero', () => {
     const model = computeModel(selection((draft) => {
       draft.target.gender = 'female'
-      draft.target.heightCm = { min: 220, max: 220 }
     }))
-    expect(model.population.zeroMeaning).toBe('model_underflow')
-    const scenario = computeRelationshipScenarioFromModel(model, {
+    const underflowModel = {
+      ...model,
+      population: {
+        ...model.population,
+        estimate: 0,
+        range: { conservative: 0, baseline: 0, optimistic: 0 },
+        zeroMeaning: 'model_underflow' as const,
+        resolutionExceeded: true,
+      },
+    }
+    const scenario = computeRelationshipScenarioFromModel(underflowModel, {
       seekerGender: 'female',
       targetGender: 'female',
     })

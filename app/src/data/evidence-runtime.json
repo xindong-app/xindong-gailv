@@ -120,6 +120,30 @@
       "modelUse": "excluded"
     },
     {
+      "id": "evidence.economy.income.employed-census-2020",
+      "dimensionId": "economy.income",
+      "grade": "A",
+      "modelUse": "calibration"
+    },
+    {
+      "id": "evidence.economy.income.population-long-form-census-2020",
+      "dimensionId": "economy.income",
+      "grade": "A",
+      "modelUse": "calibration"
+    },
+    {
+      "id": "evidence.economy.income.employed-education-census-2020",
+      "dimensionId": "economy.income",
+      "grade": "A",
+      "modelUse": "calibration"
+    },
+    {
+      "id": "evidence.economy.income.education-population-long-form-census-2020",
+      "dimensionId": "economy.income",
+      "grade": "A",
+      "modelUse": "calibration"
+    },
+    {
       "id": "evidence.economy.income.wages-2025",
       "dimensionId": "economy.income",
       "grade": "A",

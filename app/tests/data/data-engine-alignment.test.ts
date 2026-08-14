@@ -35,7 +35,7 @@ describe('evidence registry to runtime alignment', () => {
       expect(policy.status === 'included_estimate' ? policy.mainEstimateEffect : 'do_not_apply')
         .toBe(policy.mainEstimateEffect)
       expect(dimensions.get(dimensionId)?.populationUse).toBe(
-        policy.mainEstimateEffect === 'apply' ? 'included' : 'unquantified',
+        policy.mainEstimateEffect === 'apply' ? 'included' : 'scenario',
       )
       const multiplierMethod = policy.scenarioMethod === 'city_structure_multiplier' ||
         policy.scenarioMethod === 'all_age_to_target_age_multiplier'

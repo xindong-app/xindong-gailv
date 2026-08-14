@@ -16,6 +16,7 @@ import { GOLDEN_SCENARIOS } from '../tests/model/scenarios'
 import { validateRelationshipData } from '../src/data/relationship'
 import { validateEducationTable } from '../src/data/education-validation'
 import { projectEvidenceRuntime } from './evidence-runtime-projection'
+import { validateDimensionProbabilityRegistry } from '../src/data/dimension-probability-validation'
 
 const buildDate = process.env.BUILD_DATE ?? new Intl.DateTimeFormat('en-CA', {
   timeZone: 'Asia/Shanghai',
@@ -30,6 +31,22 @@ if (!relationshipData.valid) {
   process.exitCode = 1
 } else {
   console.log(`Relationship evidence: ${relationshipData.sourceCount} sources; ${relationshipData.scenarioCount} scenarios; versions, dates, URLs, document paths and source references valid`)
+}
+
+const dimensionProbabilities = validateDimensionProbabilityRegistry(buildDate)
+if (!dimensionProbabilities.valid) {
+  console.error('All-dimension probability registry validation failed', dimensionProbabilities.issues)
+  process.exitCode = 1
+} else {
+  console.log([
+    `All-dimension probability registry: ${dimensionProbabilities.entryCount}/69 dimensions`,
+    `${dimensionProbabilities.directCount} delegated direct`,
+    `${dimensionProbabilities.modeledCount} modeled scenarios`,
+    `${dimensionProbabilities.correlationGroupCount} correlation groups`,
+    `${dimensionProbabilities.maxEntropyCount} explicit max-entropy priors`,
+    `${dimensionProbabilities.analystPriorCount} policies with analyst priors`,
+    'compact runtime synchronized',
+  ].join('; '))
 }
 
 // This is the release entry point, so validate against the real/injected build
@@ -101,7 +118,7 @@ const invalidPopulationPolicies = Object.entries(POPULATION_QUANTIFICATION_POLIC
     policy.scenarioMethod === 'all_age_to_target_age_multiplier'
   return policy.dimensionId !== dimensionId || dimension == null ||
     policy.evidenceIds.some((evidenceId) => !evidenceIds.has(evidenceId)) ||
-    dimension.populationUse !== (policy.mainEstimateEffect === 'apply' ? 'included' : 'unquantified') ||
+    dimension.populationUse !== (policy.mainEstimateEffect === 'apply' ? 'included' : 'scenario') ||
     (expectedScenarioMethods[dimensionId] != null &&
       policy.scenarioMethod !== expectedScenarioMethods[dimensionId]) ||
     multiplierMethod !== (range != null) ||
@@ -190,12 +207,21 @@ for (const scenario of GOLDEN_SCENARIOS) {
   const start = performance.now()
   const result = computeModel(scenario.input)
   timings.push(performance.now() - start)
+  const comprehensive = result.comprehensivePopulation
   if (result.population.status === 'unavailable' || !Number.isFinite(result.population.estimate) ||
     result.population.estimate < 0 || result.population.estimate > result.population.base ||
     result.population.range.conservative > result.population.estimate ||
     result.population.range.optimistic < result.population.estimate ||
+    comprehensive.status === 'unavailable' || !Number.isFinite(comprehensive.estimate) ||
+    comprehensive.estimate < 0 || comprehensive.estimate > result.population.estimate ||
+    comprehensive.range.conservative > comprehensive.estimate ||
+    comprehensive.range.optimistic < comprehensive.estimate ||
+    comprehensive.range.optimistic > comprehensive.scopeCeiling ||
     result.groups.some((group) => group.after > group.before + 1e-6 || group.factor < 0 || group.factor > 1)) {
-    console.error(`Invalid scenario result: ${scenario.id}`, result.population)
+    console.error(`Invalid scenario result: ${scenario.id}`, {
+      reliable: result.population,
+      comprehensive,
+    })
     process.exitCode = 1
   }
   console.log([
@@ -203,6 +229,9 @@ for (const scenario of GOLDEN_SCENARIOS) {
     `base=${Math.round(result.population.base).toLocaleString('en-US').padStart(14)}`,
     `estimate=${Math.round(result.population.estimate).toLocaleString('en-US').padStart(14)}`,
     `range=${Math.round(result.population.range.conservative).toLocaleString('en-US')}–${Math.round(result.population.range.optimistic).toLocaleString('en-US')}`,
+    `comprehensive=${Math.round(comprehensive.estimate).toLocaleString('en-US').padStart(14)}`,
+    `comprehensiveRange=${Math.round(comprehensive.range.conservative).toLocaleString('en-US')}–${Math.round(comprehensive.range.optimistic).toLocaleString('en-US')}`,
+    `modeled=${comprehensive.modeledConditionCount}`,
     `confidence=${result.confidence.grade}/${result.confidence.score.toFixed(2)}`,
     `resolution=${result.population.resolutionExceeded ? 'exceeded' : 'ok'}`,
   ].join(' | '))

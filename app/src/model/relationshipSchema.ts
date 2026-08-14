@@ -1,19 +1,26 @@
 import {
+  _default,
   discriminatedUnion,
   enum as enumSchema,
+  extend,
   literal,
+  maximum,
+  minLength,
+  minimum,
   number,
-  object,
+  optional,
+  strictObject,
   string,
+  superRefine,
   type infer as Infer,
-} from 'zod/v4'
+} from 'zod/v4/mini'
 import { GENDERS } from './schema'
 
-export const relationshipRateRangeSchema = object({
-  lower: number().min(0).max(1),
-  reference: number().min(0).max(1),
-  upper: number().min(0).max(1),
-}).strict().superRefine((range, context) => {
+export const relationshipRateRangeSchema = strictObject({
+  lower: number().check(minimum(0), maximum(1)),
+  reference: number().check(minimum(0), maximum(1)),
+  upper: number().check(minimum(0), maximum(1)),
+}).check(superRefine((range, context) => {
   if (range.lower > range.reference) {
     context.addIssue({
       code: 'custom',
@@ -28,49 +35,49 @@ export const relationshipRateRangeSchema = object({
       message: '上界不能低于参考比例',
     })
   }
-})
+}))
 
 export type RelationshipRateRange = Infer<typeof relationshipRateRangeSchema>
 
-export const relationshipCountRangeSchema = object({
-  lower: number().finite().min(0),
-  reference: number().finite().min(0),
-  upper: number().finite().min(0),
-}).strict().superRefine((range, context) => {
+export const relationshipCountRangeSchema = strictObject({
+  lower: number().check(minimum(0)),
+  reference: number().check(minimum(0)),
+  upper: number().check(minimum(0)),
+}).check(superRefine((range, context) => {
   if (range.lower > range.reference || range.reference > range.upper) {
     context.addIssue({
       code: 'custom',
       message: '人数范围必须满足下界 ≤ 参考值 ≤ 上界',
     })
   }
-})
+}))
 
 export type RelationshipCountRange = Infer<typeof relationshipCountRangeSchema>
 
-const availablePopulationSchema = object({
+const availablePopulationSchema = strictObject({
   status: literal('available'),
-  estimate: number().finite().min(0),
-  zeroMeaning: enumSchema([
+  estimate: number().check(minimum(0)),
+  zeroMeaning: optional(enumSchema([
     'not_zero',
     'positive_below_resolution',
     'model_underflow',
     'logical_zero',
-  ]).optional(),
-  range: object({
-    conservative: number().finite().min(0),
-    baseline: number().finite().min(0),
-    optimistic: number().finite().min(0),
-  }).strict().superRefine((range, context) => {
+  ])),
+  range: strictObject({
+    conservative: number().check(minimum(0)),
+    baseline: number().check(minimum(0)),
+    optimistic: number().check(minimum(0)),
+  }).check(superRefine((range, context) => {
     if (range.conservative > range.baseline || range.baseline > range.optimistic) {
       context.addIssue({
         code: 'custom',
         message: '主人口范围必须满足保守值 ≤ 基准值 ≤ 乐观值',
       })
     }
-  }),
-  modelVersion: string().min(1),
-  dataVersion: string().min(1),
-}).strict().superRefine((population, context) => {
+  })),
+  modelVersion: string().check(minLength(1)),
+  dataVersion: string().check(minLength(1)),
+}).check(superRefine((population, context) => {
   const tolerance = Math.max(
     Math.abs(population.estimate),
     Math.abs(population.range.baseline),
@@ -110,14 +117,14 @@ const availablePopulationSchema = object({
       message: '数值 0 不能标记为正数状态',
     })
   }
-})
+}))
 
-const unavailablePopulationSchema = object({
+const unavailablePopulationSchema = strictObject({
   status: literal('unavailable'),
-  reason: string().min(1),
-  modelVersion: string().min(1).optional(),
-  dataVersion: string().min(1).optional(),
-}).strict()
+  reason: string().check(minLength(1)),
+  modelVersion: optional(string().check(minLength(1))),
+  dataVersion: optional(string().check(minLength(1))),
+})
 
 export const relationshipPopulationLayerSchema = discriminatedUnion('status', [
   availablePopulationSchema,
@@ -126,21 +133,21 @@ export const relationshipPopulationLayerSchema = discriminatedUnion('status', [
 
 export type RelationshipPopulationLayer = Infer<typeof relationshipPopulationLayerSchema>
 
-const factorScenarioOverrideSchema = object({
+const factorScenarioOverrideSchema = strictObject({
   status: literal('scenario'),
   range: relationshipRateRangeSchema,
-  note: string().min(1).optional(),
-}).strict()
+  note: optional(string().check(minLength(1))),
+})
 
-const factorUnavailableOverrideSchema = object({
+const factorUnavailableOverrideSchema = strictObject({
   status: literal('unavailable'),
-  reason: string().min(1),
-}).strict()
+  reason: string().check(minLength(1)),
+})
 
-const factorNotEstimatedOverrideSchema = object({
+const factorNotEstimatedOverrideSchema = strictObject({
   status: literal('not_estimated'),
-  reason: string().min(1),
-}).strict()
+  reason: string().check(minLength(1)),
+})
 
 export const relationshipFactorOverrideSchema = discriminatedUnion('status', [
   factorScenarioOverrideSchema,
@@ -150,21 +157,21 @@ export const relationshipFactorOverrideSchema = discriminatedUnion('status', [
 
 export type RelationshipFactorOverride = Infer<typeof relationshipFactorOverrideSchema>
 
-export const relationshipScenarioOverridesSchema = object({
-  orientationCompatibility: relationshipFactorOverrideSchema.optional(),
-  currentlySingle: relationshipFactorOverrideSchema.optional(),
-  relationshipWillingness: relationshipFactorOverrideSchema.optional(),
-}).strict().default({})
+export const relationshipScenarioOverridesSchema = _default(strictObject({
+  orientationCompatibility: optional(relationshipFactorOverrideSchema),
+  currentlySingle: optional(relationshipFactorOverrideSchema),
+  relationshipWillingness: optional(relationshipFactorOverrideSchema),
+}), {})
 
-export const relationshipScenarioRequestSchema = object({
+export const relationshipScenarioRequestSchema = strictObject({
   seekerGender: enumSchema(GENDERS),
   targetGender: enumSchema(GENDERS),
   overrides: relationshipScenarioOverridesSchema,
-}).strict()
+})
 
-export const relationshipScenarioInputSchema = relationshipScenarioRequestSchema.extend({
+export const relationshipScenarioInputSchema = extend(relationshipScenarioRequestSchema, {
   targetPopulation: relationshipPopulationLayerSchema,
-}).strict()
+})
 
 export type RelationshipScenarioInput = Infer<typeof relationshipScenarioInputSchema>
 export type RelationshipScenarioRequest = Infer<typeof relationshipScenarioRequestSchema>

@@ -1,7 +1,7 @@
 # 数据更新流程
 
-> 当前 `dataVersion`：`2026.08.14.2`
-> 当前 `modelVersion`：`3.1.0`
+> 当前 `dataVersion`：`2026.08.14.3`
+> 当前 `modelVersion`：`4.0.0`
 
 本流程用于更新 [`app/src/data/evidence-registry.json`](../app/src/data/evidence-registry.json)、[`app/src/data/population-by-age.json`](../app/src/data/population-by-age.json)、[`app/src/data/city-population-sources.json`](../app/src/data/city-population-sources.json)、[`app/src/data/cities.ts`](../app/src/data/cities.ts)、[`app/src/data/population-policy.ts`](../app/src/data/population-policy.ts)、[`app/src/data/relationship.ts`](../app/src/data/relationship.ts) 及模型参数。目标不是“换个年份”，而是保证来源、分母、转换、量化准入、相关性、测试和页面说明一起更新。
 
@@ -21,6 +21,15 @@
 学历表采用相同边界：`education-by-age.json` 是包含来源元数据、SHA-256、总计、完整五岁组校验和全部原始计数格的权威/审计表；生产 `education.ts` 只加载紧凑 `education-runtime.json`。修改权威表后必须运行 `npm run generate:education-runtime`（脚本为 `scripts/generate-education-runtime.ts`），再运行 `npm run validate:model`。门禁会逐格比对权威表与投影，拒绝陈旧投影；不得手工维护投影或让生产代码直接加载全量审计JSON。
 
 关系情境层使用独立的低可信来源登记与版本，因为它不属于主人口证据、也不能回写主人口。修改 `relationship.ts` 时必须同步关系情境版本、数据版本、检索日、默认三点范围和方法文档。`validate:model` 同一发布入口会检查：研究来源 HTTPS、分析者情境仓库相对路径、未来日期、来源 ID 引用、默认范围有序且位于 0—1，以及输出版本是否与登记一致。
+
+全条件综合情境同样与可靠人口准入分层：[`dimension-probability-registry.json`](../app/src/data/dimension-probability-registry.json) 是69维完整审计源，记录依据类型、来源ID、三点情境、17个相关组、方法、转换参数、证据目录版本和局限；生产只加载紧凑 `dimension-probability-runtime.json`。学历是互斥分层母集，院校和收入在学历单元内条件化，不把学历再作为普通相关概率扣减。修改审计源后必须运行：
+
+```bash
+npm run generate:dimension-probability-runtime
+npm run validate:model
+```
+
+门禁必须逐一证明69维无遗漏、8个可靠层维度不重复扣减、61个非直接维度均可产生有序概率、48个最大熵项明确为D/NA及分析者先验、依据类型说明完整、来源ID存在、证据目录版本绑定、星座日数守恒、学历/房车类别并集单调、收入/资产阈值单调、完整审计源与紧凑投影完全同步。当前60个情境政策含显式分析者先验；运行结果还必须把实际启用的相关强度情景计入 `assumptionCount`。D/NA可以缩小“全条件综合情境”，但仍不得改变或冒充可靠人口层。
 
 ### 城市新增/更新规则
 
@@ -275,7 +284,7 @@ evidence.<dimensionId>.<short-source>
 - [ ] 每个进入人数计算的字段都能定位到登记表entry。
 - [ ] A/B/C/D徽章与JSON一致。
 - [ ] 没有家庭→个人、均值→中位数、流量→存量的未声明转换。
-- [ ] D级、软偏好和娱乐项没有改变硬条件人数。
+- [ ] D级、软偏好和娱乐项没有改变可靠人口层；如进入全条件综合情境，已明确标为分析者先验并给宽范围。
 - [ ] 相关簇没有重复连乘。
 - [ ] 典型场景影响报告已生成并人工审查荒谬结果。
 - [ ] 低于1人的结果显示分辨率说明，不显示“绝对不存在”。

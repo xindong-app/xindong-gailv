@@ -1,4 +1,14 @@
-import { array, object, string, type z } from 'zod/v4'
+import {
+  array,
+  enum as enumSchema,
+  maxLength,
+  minLength,
+  optional,
+  refine,
+  strictObject,
+  string,
+  type z,
+} from 'zod/v4/mini'
 import {
   drinkingRateScenario,
   HEIGHT_SD_SCENARIOS,
@@ -24,6 +34,13 @@ import { DIMENSION_BY_ID, type DimensionClass, type EvidenceGrade } from '../mod
 import { activeConditions } from '../model/selectionUtils'
 import { DATA_VERSION, MODEL_VERSION } from '../model/versions'
 import {
+  computeComprehensivePopulation,
+  type ComprehensiveAgeStratum,
+  type ComprehensivePopulationResult,
+} from './comprehensivePopulation'
+import {
+  GENDERS,
+  EDUCATION_LEVELS,
   parseSelection,
   selectionSchema,
   type ModelSelection,
@@ -78,6 +95,11 @@ export interface GroupResult {
 export interface ModelResult {
   versions: { modelVersion: string; dataVersion: string }
   input: ModelSelection
+  /** Parsed non-selection options required to reproduce this exact result. */
+  computationContext: {
+    seekerGender?: 'male' | 'female'
+    hardRequirementIds: string[]
+  }
   population: {
     base: number
     /** Full resident-population ceiling for the selected geography. */
@@ -93,6 +115,11 @@ export interface ModelResult {
     display: string
     displayShort: string
   }
+  /**
+   * Scenario layer in which every explicitly selected condition participates.
+   * `population` remains the evidence-strong reliable layer for compatibility.
+   */
+  comprehensivePopulation: ComprehensivePopulationResult
   coverage: {
     includedHardConditions: string[]
     unquantifiedHardConditions: Array<{
@@ -129,7 +156,7 @@ export interface ModelResult {
 export class ModelInputError extends Error {
   readonly issues: z.core.$ZodIssue[]
 
-  constructor(error: z.ZodError) {
+  constructor(error: z.core.$ZodError) {
     super('模型输入未通过运行时校验')
     this.name = 'ModelInputError'
     this.issues = error.issues
@@ -146,6 +173,8 @@ interface RawPopulationResult {
   availability: 'available' | 'unavailable'
   unsupportedCities: string[]
   structuralRange: PopulationRange
+  /** Final reliable-layer contribution per single age, before weak scenarios. */
+  reliableAgeStrata: ComprehensiveAgeStratum[]
 }
 
 export interface ModelComputationOptions {
@@ -155,20 +184,23 @@ export interface ModelComputationOptions {
    * has a reliable compatible denominator; no guessed prevalence is applied.
    */
   hardRequirementIds?: readonly string[]
+  /** Optional seeker context used only by pairing-dependent scenario policies. */
+  seekerGender?: 'male' | 'female'
 }
 
-const modelComputationOptionsSchema = object({
-  hardRequirementIds: array(string().min(1))
-    .max(DIMENSION_BY_ID.size)
-    .refine((ids) => new Set(ids).size === ids.length, { message: '硬条件 ID 不能重复' })
-    .refine((ids) => ids.every((id) => DIMENSION_BY_ID.has(id)), { message: '包含未登记的硬条件 ID' })
-    .optional(),
-}).strict()
+const modelComputationOptionsSchema = strictObject({
+  hardRequirementIds: optional(array(string().check(minLength(1))).check(
+    maxLength(DIMENSION_BY_ID.size),
+    refine((ids) => new Set(ids).size === ids.length, { message: '硬条件 ID 不能重复' }),
+    refine((ids) => ids.every((id) => DIMENSION_BY_ID.has(id)), { message: '包含未登记的硬条件 ID' }),
+  )),
+  seekerGender: optional(enumSchema(GENDERS)),
+})
 
 export class ModelOptionsError extends Error {
   readonly issues: z.core.$ZodIssue[]
 
-  constructor(error: z.ZodError) {
+  constructor(error: z.core.$ZodError) {
     super('模型计算选项未通过运行时校验')
     this.name = 'ModelOptionsError'
     this.issues = error.issues
@@ -195,9 +227,15 @@ function normalCdf(z: number): number {
 }
 
 function probabilityInNormalRange(minimum: number, maximum: number, mean: number, standardDeviation: number): number {
-  return clampProbability(
-    normalCdf((maximum - mean) / standardDeviation) - normalCdf((minimum - mean) / standardDeviation),
-  )
+  const minimumZ = (minimum - mean) / standardDeviation
+  const maximumZ = (maximum - mean) / standardDeviation
+  if (minimumZ >= 0) {
+    // In the positive tail, subtract survival probabilities rather than two
+    // values rounded to 1. This keeps a mathematically positive interval from
+    // collapsing to a false zero through floating-point cancellation.
+    return clampProbability(normalCdf(-minimumZ) - normalCdf(-maximumZ))
+  }
+  return clampProbability(normalCdf(maximumZ) - normalCdf(minimumZ))
 }
 
 interface PopulationStratum {
@@ -289,8 +327,8 @@ function heightProbabilityAtAge(selection: ModelSelection, age: number): Probabi
   requireScenarioMethod('appearance.height', 'height_parameter_endpoints')
   // Integer UI values denote inclusive one-centimetre bins. Without the
   // half-centimetre continuity correction, 180–180 cm was an empty interval.
-  const minimum = range.min == null ? 130 : range.min - 0.5
-  const maximum = range.max == null ? 220 : range.max + 0.5
+  const minimum = range.min == null ? Number.NEGATIVE_INFINITY : range.min - 0.5
+  const maximum = range.max == null ? Number.POSITIVE_INFINITY : range.max + 0.5
   const distribution = heightDist(age, selection.target.gender)
   const sdScenarios = HEIGHT_SD_SCENARIOS[selection.target.gender]
   const probabilities = [
@@ -413,6 +451,7 @@ function calculatePopulation(selection: ModelSelection): RawPopulationResult {
       availability: 'unavailable',
       unsupportedCities,
       structuralRange: { conservative: 0, baseline: 0, optimistic: 0 },
+      reliableAgeStrata: [],
     }
   }
 
@@ -443,6 +482,7 @@ function calculatePopulation(selection: ModelSelection): RawPopulationResult {
   const heightActive = selection.target.heightCm != null &&
     (selection.target.heightCm.min != null || selection.target.heightCm.max != null)
   const educationActive = selection.correlated.educationLevels.length > 0
+  const schoolActive = selection.correlated.schoolTier != null
   const lifestyleDimensions = [...new Set(
     strata.flatMap((stratum) => lifestyleProbabilitiesAtAge(selection, stratum.age).map((item) => item.dimensionId)),
   )]
@@ -452,6 +492,7 @@ function calculatePopulation(selection: ModelSelection): RawPopulationResult {
   let optimistic = 0
   let afterHeight = 0
   let afterEducation = 0
+  const reliableAgeStrata: ComprehensiveAgeStratum[] = []
   for (const stratum of strata) {
     const maritalProbability = maritalShareScenarioAtAge(selection, stratum.age)
     const heightProbability = heightProbabilityAtAge(selection, stratum.age) ?? {
@@ -459,7 +500,8 @@ function calculatePopulation(selection: ModelSelection): RawPopulationResult {
       baseline: 1,
       optimistic: 1,
     }
-    const lifestyleProbabilities = lifestyleProbabilitiesAtAge(selection, stratum.age).map((item) => item.probability)
+    const lifestyleAtAge = lifestyleProbabilitiesAtAge(selection, stratum.age)
+    const lifestyleProbabilities = lifestyleAtAge.map((item) => item.probability)
     const educationProbability = educationProbabilityAtAge(selection, stratum.age) ?? {
       conservative: 1,
       baseline: 1,
@@ -475,9 +517,57 @@ function calculatePopulation(selection: ModelSelection): RawPopulationResult {
     const heightPeople = stratum.residents.baseline * maritalProbability.baseline * heightProbability.baseline
     afterHeight += heightPeople
     afterEducation += heightPeople * educationProbability.baseline
-    baseline += stratum.residents.baseline * combinedBounds.baseline
-    conservative += stratum.residents.conservative * combinedBounds.conservative
-    optimistic += stratum.residents.optimistic * combinedBounds.optimistic
+    const reliableAtAge = {
+      conservative: stratum.residents.conservative * combinedBounds.conservative,
+      baseline: stratum.residents.baseline * combinedBounds.baseline,
+      optimistic: stratum.residents.optimistic * combinedBounds.optimistic,
+    }
+    const directProbabilities: NonNullable<ComprehensiveAgeStratum['directProbabilities']> = [
+      ...lifestyleAtAge,
+    ]
+    if ((educationActive || schoolActive) && educationProbability.baseline > 0) {
+      const selectedCellLevels = educationActive
+        ? selection.correlated.educationLevels
+        : [...EDUCATION_LEVELS]
+      const educationCells = selectedCellLevels.map((level) => ({
+        level,
+        share: educationShareAtAge(stratum.age, selection.target.gender, [level]),
+      }))
+      const selectedEducationShare = educationCells.reduce((sum, cell) => sum + cell.share, 0)
+      for (const cell of educationCells) {
+        const weight = educationActive
+          ? selectedEducationShare > 0 ? cell.share / selectedEducationShare : 0
+          : cell.share
+        reliableAgeStrata.push({
+          age: stratum.age,
+          educationLevels: [cell.level],
+          range: {
+            conservative: reliableAtAge.conservative * weight,
+            baseline: reliableAtAge.baseline * weight,
+            optimistic: reliableAtAge.optimistic * weight,
+          },
+          directProbabilities,
+        })
+      }
+      if (!educationActive && schoolActive) {
+        const residualWeight = Math.max(0, 1 - selectedEducationShare)
+        reliableAgeStrata.push({
+          age: stratum.age,
+          educationLevels: [],
+          range: {
+            conservative: reliableAtAge.conservative * residualWeight,
+            baseline: reliableAtAge.baseline * residualWeight,
+            optimistic: reliableAtAge.optimistic * residualWeight,
+          },
+          directProbabilities,
+        })
+      }
+    } else {
+      reliableAgeStrata.push({ age: stratum.age, range: reliableAtAge, directProbabilities })
+    }
+    baseline += reliableAtAge.baseline
+    conservative += reliableAtAge.conservative
+    optimistic += reliableAtAge.optimistic
   }
 
   if (heightActive) {
@@ -536,6 +626,7 @@ function calculatePopulation(selection: ModelSelection): RawPopulationResult {
       baseline,
       optimistic: Math.max(baseline, optimistic),
     },
+    reliableAgeStrata,
   }
 }
 
@@ -752,35 +843,45 @@ export function computeModel(input: unknown, options: unknown = {}): ModelResult
       : resolutionExceeded
         ? 'positive_below_resolution'
         : 'not_zero'
+  const population: ModelResult['population'] = {
+    base: raw.base,
+    scopeCeiling: raw.scopeCeiling,
+    estimate: raw.estimate,
+    range,
+    status: isUnavailable ? 'unavailable' : isUpperBound ? 'upper_bound' : 'estimated',
+    interpretation: isUnavailable ? 'not_available' : isUpperBound ? 'quantified_conditions_only' : 'all_selected_hard_conditions',
+    numericStatus: isUnavailable ? 'unavailable' : 'available',
+    zeroMeaning,
+    resolutionFloor,
+    resolutionExceeded,
+    display: isUnavailable
+      ? `当前无法可靠估算：${raw.unsupportedCities.join('、')}尚无本数据版本已登记的一手常住人口锚点；这不表示当地无人。`
+      : isUpperBound
+      ? `${formatCount(raw.estimate)}（仅满足已计入条件的人数上限；${unquantifiedHardConditions.length} 项硬条件因证据不足未计入）`
+      : raw.estimate === 0
+      ? '模型数值已下溢到 0，低于当前数据分辨能力；不能解释为现实中恰好 0 人。'
+      : resolutionExceeded
+      ? `${formatCount(raw.estimate)}，已低于当前数据 ${formatCount(resolutionFloor)} 的可靠分辨能力；不代表现实中绝对不存在。`
+      : formatCount(raw.estimate),
+    displayShort: isUnavailable
+      ? '无法可靠估算'
+      : isUpperBound
+      ? `≤ ${formatCountShort(raw.estimate)}`
+      : resolutionExceeded ? '低于模型分辨率' : formatCountShort(raw.estimate),
+  }
+  const comprehensivePopulation = computeComprehensivePopulation(selection, population, {
+    seekerGender: parsedOptions.data.seekerGender,
+    ageStrata: raw.reliableAgeStrata,
+  })
   return {
     versions: { modelVersion: MODEL_VERSION, dataVersion: DATA_VERSION },
     input: selection,
-    population: {
-      base: raw.base,
-      scopeCeiling: raw.scopeCeiling,
-      estimate: raw.estimate,
-      range,
-      status: isUnavailable ? 'unavailable' : isUpperBound ? 'upper_bound' : 'estimated',
-      interpretation: isUnavailable ? 'not_available' : isUpperBound ? 'quantified_conditions_only' : 'all_selected_hard_conditions',
-      numericStatus: isUnavailable ? 'unavailable' : 'available',
-      zeroMeaning,
-      resolutionFloor,
-      resolutionExceeded,
-      display: isUnavailable
-        ? `当前无法可靠估算：${raw.unsupportedCities.join('、')}尚无本数据版本已登记的一手常住人口锚点；这不表示当地无人。`
-        : isUpperBound
-        ? `${formatCount(raw.estimate)}（仅满足已计入条件的人数上限；${unquantifiedHardConditions.length} 项硬条件因证据不足未计入）`
-        : raw.estimate === 0
-        ? '模型数值已下溢到 0，低于当前数据分辨能力；不能解释为现实中恰好 0 人。'
-        : resolutionExceeded
-        ? `${formatCount(raw.estimate)}，已低于当前数据 ${formatCount(resolutionFloor)} 的可靠分辨能力；不代表现实中绝对不存在。`
-        : formatCount(raw.estimate),
-      displayShort: isUnavailable
-        ? '无法可靠估算'
-        : isUpperBound
-        ? `≤ ${formatCountShort(raw.estimate)}`
-        : resolutionExceeded ? '低于模型分辨率' : formatCountShort(raw.estimate),
+    computationContext: {
+      ...(parsedOptions.data.seekerGender == null ? {} : { seekerGender: parsedOptions.data.seekerGender }),
+      hardRequirementIds: [...(parsedOptions.data.hardRequirementIds ?? [])],
     },
+    population,
+    comprehensivePopulation,
     coverage: {
       includedHardConditions,
       unquantifiedHardConditions,

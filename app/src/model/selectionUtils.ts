@@ -1,5 +1,12 @@
 import { DIMENSION_BY_ID, DIMENSION_REGISTRY } from './dimensions'
-import { DEFAULT_SELECTION, type ModelSelection, type SoftPreferenceId } from './schema'
+import {
+  BODY_TYPES,
+  DEFAULT_SELECTION,
+  MBTI_POLES,
+  ZODIACS,
+  type ModelSelection,
+  type SoftPreferenceId,
+} from './schema'
 
 export interface ActiveCondition {
   dimensionId: string
@@ -70,14 +77,16 @@ export function activeConditions(selection: ModelSelection): ActiveCondition[] {
   add('base.age', `${selection.target.age.min}–${selection.target.age.max} 岁`)
   add('base.region', selection.target.cities.length === 0 ? '全国' : selection.target.cities.join('、'))
   if (selection.target.maritalStatuses.length > 0) add('base.marital', `${selection.target.maritalStatuses.length} 个状态`)
-  if (selection.target.heightCm) {
+  if (selection.target.heightCm?.min != null || selection.target.heightCm?.max != null) {
     add('appearance.height', `${selection.target.heightCm.min ?? '不限'}–${selection.target.heightCm.max ?? '不限'} cm`)
   }
-  if (selection.correlated.bodyTypes.length > 0) add('appearance.body_type', `${selection.correlated.bodyTypes.length} 档`)
+  if (selection.correlated.bodyTypes.length > 0 && selection.correlated.bodyTypes.length < BODY_TYPES.length) {
+    add('appearance.body_type', `${selection.correlated.bodyTypes.length} 档`)
+  }
   if (selection.correlated.educationLevels.length > 0) add('education.level', `${selection.correlated.educationLevels.length} 档`)
   if (selection.correlated.schoolTier) add('education.school', `${selection.correlated.schoolTier.toUpperCase()} 偏好`)
-  if (selection.correlated.minAnnualIncomeWan != null) add('economy.income', `${selection.correlated.minAnnualIncomeWan} 万+/年`)
-  if (selection.correlated.minHouseholdWealthWan != null) add('economy.wealth', `${selection.correlated.minHouseholdWealthWan} 万+`)
+  if ((selection.correlated.minAnnualIncomeWan ?? 0) > 0) add('economy.income', `${selection.correlated.minAnnualIncomeWan} 万+/年`)
+  if ((selection.correlated.minHouseholdWealthWan ?? 0) > 0) add('economy.wealth', `${selection.correlated.minHouseholdWealthWan} 万+`)
   const housing = selection.correlated.housing
   if (housing.required || housing.location != null || housing.minAreaSqm != null || housing.type != null) {
     add('economy.house', [housing.required ? '要求有住房' : '', housing.location ?? '', housing.minAreaSqm ? `${housing.minAreaSqm}㎡+` : '', housing.type ?? ''].filter(Boolean).join(' · '))
@@ -91,8 +100,17 @@ export function activeConditions(selection: ModelSelection): ActiveCondition[] {
   if (selection.correlated.healthCriteria.includes('no_myopia')) add('health.myopia', '软偏好')
   if (selection.correlated.hairCriteria.length > 0) add('appearance.hair_full', '无雄激素性脱发')
   for (const id of selection.softPreferenceIds) add(id, '偏好')
-  if (selection.entertainment.zodiacs.length > 0) add('entertainment.zodiac', `${selection.entertainment.zodiacs.length} 个`)
-  if (selection.entertainment.mbti.length > 0) add('entertainment.mbti', selection.entertainment.mbti.join(''))
+  if (selection.entertainment.zodiacs.length > 0 && selection.entertainment.zodiacs.length < ZODIACS.length) {
+    add('entertainment.zodiac', `${selection.entertainment.zodiacs.length} 个`)
+  }
+  const selectedMbti = new Set(selection.entertainment.mbti)
+  const constrainedMbtiAxes = [
+    [MBTI_POLES[0], MBTI_POLES[1]],
+    [MBTI_POLES[2], MBTI_POLES[3]],
+    [MBTI_POLES[4], MBTI_POLES[5]],
+    [MBTI_POLES[6], MBTI_POLES[7]],
+  ].filter(([left, right]) => selectedMbti.has(left) !== selectedMbti.has(right)).length
+  if (constrainedMbtiAxes > 0) add('entertainment.mbti', selection.entertainment.mbti.join(''))
   return items
 }
 

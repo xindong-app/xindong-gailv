@@ -213,10 +213,14 @@ export function drinkingRateScenario(
 
 // ---------- Hair -----------------------------------------------------------
 // Complement of age-specific androgenetic alopecia prevalence in the six-city
-// community study. Female age-specific values are unavailable, so the female
-// branch uses the reported overall complement and remains C-grade in runtime.
+// community study. The paper reports the same four age bands for both sexes.
 export function fullHairRate(age: number, gender: Gender): number {
-  if (gender === 'female') return 0.94
+  if (gender === 'female') {
+    if (age < 30) return 0.987
+    if (age < 40) return 0.977
+    if (age < 50) return 0.946
+    return 0.925
+  }
   if (age < 30) return 0.972
   if (age < 40) return 0.867
   if (age < 50) return 0.786

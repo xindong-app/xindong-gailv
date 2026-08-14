@@ -1,4 +1,4 @@
-import type { z } from 'zod'
+import type { z } from 'zod/v4/mini'
 import {
   CURRENTLY_SINGLE_SCENARIO,
   ORIENTATION_COMPATIBILITY_SCENARIOS,
@@ -313,7 +313,7 @@ function assertRegisteredSources(factors: RelationshipScenarioResult['factors'])
 export class RelationshipScenarioInputError extends Error {
   readonly issues: z.core.$ZodIssue[]
 
-  constructor(error: z.ZodError) {
+  constructor(error: z.core.$ZodError) {
     super('关系情境输入未通过运行时校验')
     this.name = 'RelationshipScenarioInputError'
     this.issues = error.issues

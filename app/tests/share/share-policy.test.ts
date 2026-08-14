@@ -146,9 +146,21 @@ describe('share privacy policy', () => {
   it('derives no fun block at all when the model reports numeric underflow', () => {
     const selection = structuredClone(DEFAULT_SELECTION)
     selection.target.gender = 'female'
-    selection.target.heightCm = { min: 220, max: 220 } // 极端尾部 → 引擎返回 model_underflow
-    const result = computeModel(selection)
-    expect(result.population.zeroMeaning).toBe('model_underflow')
+    selection.target.heightCm = { min: 220, max: 220 }
+    const computed = computeModel(selection)
+    // Stable Gaussian tails keep this legal extreme strictly positive. This
+    // share-policy test therefore injects the engine contract state directly
+    // instead of depending on a particular input to underflow in IEEE-754.
+    const result = {
+      ...computed,
+      population: {
+        ...computed.population,
+        estimate: 0,
+        range: { conservative: 0, baseline: 0, optimistic: 0 },
+        zeroMeaning: 'model_underflow' as const,
+        resolutionExceeded: true,
+      },
+    }
 
     const dto = buildShareDto(selection, result, createDefaultShareSettings(selection))
     // 下溢不是现实零人: 稀有度/幸存者/毒舌一个都不许派生

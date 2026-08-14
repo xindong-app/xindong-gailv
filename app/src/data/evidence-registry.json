@@ -561,6 +561,158 @@
       "modelUse": "excluded"
     },
     {
+      "id": "evidence.economy.income.employed-census-2020",
+      "dimensionId": "economy.income",
+      "dimensionName": "就业状态门槛分子",
+      "definition": "第七次全国人口普查长表中各地区分性别、年龄的就业人口。",
+      "classification": "correlated_hard",
+      "applicablePopulation": "中国大陆31省份第七次全国人口普查长表抽样中16岁及以上就业人口",
+      "geography": "全国及城市、镇、乡村",
+      "ageRange": {
+        "min": 16,
+        "max": null
+      },
+      "sexBasis": "male_female",
+      "dataYear": "2020",
+      "publisher": "国家统计局、国务院第七次全国人口普查领导小组办公室",
+      "sourceTitle": "中国人口普查年鉴-2020 表4-1 各地区分性别、年龄的就业人口",
+      "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/B0401.xls",
+      "retrievedAt": "2026-08-14",
+      "denominator": "与B0104一致的七普长表抽样框；模型分母取B0104同城乡、同年龄组、同性别人口",
+      "directValue": "B0401.xls SHA-256=6BE107E4CE2BE628FD7047EDCC5983581F5949474040537614CE9678A06754F9；全国男性16-19至50-54岁八组就业人数=482044/2220127/4037493/5787715/4650831/4294238/5114136/5042613，女性=288914/1640946/2943601/4221569/3446741/3270849/3826781/3090139。",
+      "transformation": "每个年龄×性别单元先计算B0401就业人数/B0104同抽样框人数；lower/reference/upper分别取城市、镇、乡村三个比例的最小值、全国比例、最大值；收入尾部只在该就业门槛之后计算。",
+      "adjustments": [
+        "18—19岁沿用原表16—19岁组率；50岁沿用原表50—54岁组率。",
+        "B0403/B0302可用于20—49岁×性别×专科/本科/硕士/博士的学历差异校准，不与A0401全量短表直接相除。"
+      ],
+      "estimate": {
+        "baseline": 0.737340085,
+        "optimistic": 0.834201,
+        "conservative": 0.623753,
+        "unit": "share"
+      },
+      "grade": "A",
+      "limitations": [
+        "该表是七普长表抽样计数，必须与同抽样框B0104配对，不得直接除以A0301/A0401全量短表。",
+        "就业时点状态不等于全年持续就业，也不保证有正的个人税前年收入。",
+        "三点反映城乡结构敏感性，不是统计学置信区间；2020时点外推到2026存在时间差。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "calibration"
+    },
+    {
+      "id": "evidence.economy.income.population-long-form-census-2020",
+      "dimensionId": "economy.income",
+      "dimensionName": "就业状态门槛分母",
+      "definition": "第七次全国人口普查长表中全国分年龄、性别的人口。",
+      "classification": "correlated_hard",
+      "applicablePopulation": "中国大陆31省份第七次全国人口普查长表抽样人口",
+      "geography": "全国及城市、镇、乡村",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "male_female",
+      "dataYear": "2020",
+      "publisher": "国家统计局、国务院第七次全国人口普查领导小组办公室",
+      "sourceTitle": "中国人口普查年鉴-2020 表1-4 全国分年龄、性别的人口",
+      "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/B0104.xls",
+      "retrievedAt": "2026-08-14",
+      "denominator": "七普长表抽样人口；与B0401就业人数同抽样框",
+      "directValue": "B0104.xls SHA-256=7A78C07E35103600AB23685C6E177411D999EC69E1CADA8E5EC47E60C7D7860B；全国男性16-19至50-54岁八组人数=3292536/3799538/4611843/6354314/5108028/4758438/5774455/6019802，女性=2909402/3503735/4282074/6044337/4807252/4487894/5511824/5906378。",
+      "transformation": "将单岁男女人数汇总到B0401的16—19、20—24、…、50—54岁组，只作为同抽样框就业率分母。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": null,
+        "optimistic": null,
+        "conservative": null,
+        "unit": "people"
+      },
+      "grade": "A",
+      "limitations": [
+        "该长表样本总数不是全量人口，不能替代A0301作为产品主人口分母。",
+        "年龄×性别不同时包含个人收入分布。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "calibration"
+    },
+    {
+      "id": "evidence.economy.income.employed-education-census-2020",
+      "dimensionId": "economy.income",
+      "dimensionName": "就业率学历校准分子",
+      "definition": "第七次全国人口普查长表中全国分年龄、性别、受教育程度的就业人口。",
+      "classification": "correlated_hard",
+      "applicablePopulation": "中国大陆31省份第七次全国人口普查长表抽样中16岁及以上就业人口",
+      "geography": "全国",
+      "ageRange": {
+        "min": 16,
+        "max": null
+      },
+      "sexBasis": "male_female",
+      "dataYear": "2020",
+      "publisher": "国家统计局、国务院第七次全国人口普查领导小组办公室",
+      "sourceTitle": "中国人口普查年鉴-2020 表4-3 全国分年龄、性别、受教育程度的就业人口",
+      "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/B0403.xls",
+      "retrievedAt": "2026-08-14",
+      "denominator": "与B0302一致的七普长表抽样框；只能除以B0302同年龄组、性别、学历人口",
+      "directValue": "B0403.xls SHA-256=328B919691320BD8187BA39FADAD438FBFB45A7BFC4AF9F14B4DF7CE6C1429AC；表区域A1:K52，列为年龄组/合计/未上过学/学前/小学/初中/高中/专科/本科/硕士/博士，行为总计及16-19至75+岁组、男同组、女同组。",
+      "transformation": "仅用B0403/B0302在同长表样本内校准20—49岁×性别×专科/本科/硕士/博士就业率；当前稳定主门槛仍使用B0401/B0104年龄×性别率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": null,
+        "optimistic": null,
+        "conservative": null,
+        "unit": "people"
+      },
+      "grade": "A",
+      "limitations": [
+        "B0302将50岁及以上合并，无法与B0403的50—54岁学历分子闭环。",
+        "16—19岁组无法精确拆出产品的18—19岁；长表计数不得与A0401全量短表直接相除。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "calibration"
+    },
+    {
+      "id": "evidence.economy.income.education-population-long-form-census-2020",
+      "dimensionId": "economy.income",
+      "dimensionName": "就业率学历校准分母",
+      "definition": "第七次全国人口普查长表中全国分年龄、性别、学业完成情况的各种受教育程度人口。",
+      "classification": "correlated_hard",
+      "applicablePopulation": "中国大陆31省份第七次全国人口普查长表抽样人口",
+      "geography": "全国",
+      "ageRange": {
+        "min": 3,
+        "max": null
+      },
+      "sexBasis": "male_female",
+      "dataYear": "2020",
+      "publisher": "国家统计局、国务院第七次全国人口普查领导小组办公室",
+      "sourceTitle": "中国人口普查年鉴-2020 表3-2 全国分年龄、性别、学业完成情况的3岁及以上各种受教育程度人口",
+      "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/B0302.xls",
+      "retrievedAt": "2026-08-14",
+      "denominator": "七普长表抽样人口；与B0403就业人数同抽样框",
+      "directValue": "B0302.xls SHA-256=484D94CD7272A281847A7A429C84EACF41327428FA2CD3D510F5AACCCDAD5177；表区域A1:EQ77，专科/本科/硕士/博士各含合计、在校、毕业、肄业、辍学、其他六组，每组列为合计/男/女。",
+      "transformation": "取每个学历块的合计/男/女列，按B0403五岁组汇总单岁人数，作为学历校准的同抽样分母。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": null,
+        "optimistic": null,
+        "conservative": null,
+        "unit": "people"
+      },
+      "grade": "A",
+      "limitations": [
+        "50岁及以上只给合并行，无法直接得到50—54岁学历分母。",
+        "样本占A0401全量单元的比例随年龄、性别、学历变动，不能用统一约10%常数硬放大。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "calibration"
+    },
+    {
       "id": "evidence.economy.income.wages-2025",
       "dimensionId": "economy.income",
       "dimensionName": "城镇单位就业人员工资",
@@ -1199,9 +1351,9 @@
       "publisher": "同行评议社区研究",
       "sourceTitle": "Prevalence of androgenetic alopecia in China: a community-based study in six cities",
       "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/20105167/",
-      "retrievedAt": "2026-08-13",
+      "retrievedAt": "2026-08-14",
       "denominator": "六城市社区样本",
-      "directValue": "男性总体21.3%；18—29岁2.8%、30—39岁13.3%、40—49岁21.4%、50—59岁31.9%。女性总体约6.0%（旧参数，论文全文需复核年龄细分）。",
+      "directValue": "男性总体21.3%；男性18—29岁2.8%、30—39岁13.3%、40—49岁21.4%、50—59岁31.9%；女性总体6.0%，女性对应年龄组为1.3%、2.3%、5.4%、7.5%。",
       "transformation": "若UI精确定义为‘无雄激素性脱发’，按性别年龄组取补集；‘发量王者’不是医学诊断同义词，不应以此比例硬砍人口。",
       "adjustments": [
         "与年龄高度相关，不能再和发际线/少白头的无来源边际率连乘。"

@@ -25,9 +25,10 @@ describe('runtime schema boundary', () => {
     expect(() => computeModel({ ...DEFAULT_SELECTION, entertainment: { zodiacs: ['not-a-zodiac'], mbti: [] } })).toThrow(ModelInputError)
   })
 
-  it('rejects 全国 mixed with a city and contradictory MBTI axes', () => {
+  it('rejects 全国 mixed with a city and accepts both MBTI poles as an unconstrained axis', () => {
     expect(() => computeModel(selection({ target: { ...DEFAULT_SELECTION.target, cities: ['全国', '北京'] } }))).toThrow(ModelInputError)
-    expect(() => computeModel(selection({ entertainment: { zodiacs: [], mbti: ['E', 'I'] } }))).toThrow(ModelInputError)
+    const result = computeModel(selection({ entertainment: { zodiacs: [], mbti: ['E', 'I'] } }))
+    expect(result.comprehensivePopulation.modeledConditionIds).not.toContain('entertainment.mbti')
   })
 })
 

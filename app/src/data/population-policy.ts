@@ -111,8 +111,8 @@ export const POPULATION_QUANTIFICATION_POLICY: Readonly<Record<string, Populatio
   ),
   'economy.income': policy(
     'economy.income', 'research_only', 'do_not_apply', 'research_scenario_only',
-    ['evidence.economy.income.wages-2025', 'evidence.economy.income.household-2025', 'evidence.economy.income.migrant-workers-2025'],
-    '单位就业者平均工资、居民人均可支配收入和农民工月均收入均不是18—50岁目标个人税前年收入分布。',
+    ['evidence.economy.income.employed-census-2020', 'evidence.economy.income.population-long-form-census-2020', 'evidence.economy.income.wages-2025', 'evidence.economy.income.household-2025', 'evidence.economy.income.migrant-workers-2025'],
+    '七普长表年龄×性别就业率可先建就业状态门槛，但单位就业者平均工资、居民人均可支配收入和农民工月均收入仍不是18—50岁目标个人税前年收入分布；因此只用于全条件研究情境，不削减主人口。',
   ),
   'economy.wealth': policy(
     'economy.wealth', 'research_only', 'do_not_apply', 'research_scenario_only',

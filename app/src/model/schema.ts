@@ -2,13 +2,20 @@ import {
   array,
   boolean,
   enum as enumSchema,
+  int,
+  maxLength,
+  maximum,
+  minimum,
+  nullable,
   number,
-  object,
-  preprocess,
+  pipe,
+  refine,
+  strictObject,
   string,
+  transform,
   type infer as Infer,
-  type ZodType,
-} from 'zod/v4'
+  type ZodMiniType,
+} from 'zod/v4/mini'
 import { CITIES } from '../data/cities'
 import { MAX_MODEL_AGE, MIN_MODEL_AGE } from '../data/population'
 
@@ -92,66 +99,68 @@ export const SOFT_PREFERENCE_IDS = [
   'interest.shared_activities',
 ] as const
 
-const uniqueArray = <T extends ZodType>(item: T, maximum: number) =>
-  array(item).max(maximum).refine((values) => new Set(values).size === values.length, {
-    message: '不能包含重复值',
-  })
+const uniqueArray = <T extends ZodMiniType>(item: T, maximumItems: number) =>
+  array(item).check(
+    maxLength(maximumItems),
+    refine((values) => new Set(values).size === values.length, {
+      message: '不能包含重复值',
+    }),
+  )
 
 const cityNames = new Set(['全国', ...CITIES.map((city) => city.name)])
-const citySchema = string().refine((city) => cityNames.has(city), { message: '不支持的城市' })
+const citySchema = string().check(refine((city) => cityNames.has(city), { message: '不支持的城市' }))
 
-const targetSchema = object({
+const targetSchema = strictObject({
   gender: enumSchema(GENDERS),
-  age: object({
-    min: number().int().min(MIN_MODEL_AGE).max(MAX_MODEL_AGE),
-    max: number().int().min(MIN_MODEL_AGE).max(MAX_MODEL_AGE),
-  }).refine((age) => age.min <= age.max, {
+  age: strictObject({
+    min: int().check(minimum(MIN_MODEL_AGE), maximum(MAX_MODEL_AGE)),
+    max: int().check(minimum(MIN_MODEL_AGE), maximum(MAX_MODEL_AGE)),
+  }).check(refine((age) => age.min <= age.max, {
     message: '最小年龄不能大于最大年龄',
     path: ['max'],
-  }),
-  cities: uniqueArray(citySchema, CITIES.length + 1).refine(
+  })),
+  cities: uniqueArray(citySchema, CITIES.length + 1).check(refine(
     (cities) => !cities.includes('全国') || cities.length === 1,
     { message: '选择全国时不能同时选择城市' },
-  ),
+  )),
   maritalStatuses: uniqueArray(enumSchema(MARITAL_STATUSES), MARITAL_STATUSES.length),
-  heightCm: object({
-    min: number().int().min(130).max(220).nullable(),
-    max: number().int().min(130).max(220).nullable(),
-  }).refine(
+  heightCm: nullable(strictObject({
+    min: nullable(int().check(minimum(130), maximum(220))),
+    max: nullable(int().check(minimum(130), maximum(220))),
+  }).check(refine(
     (height) => height.min == null || height.max == null || height.min <= height.max,
     { message: '最低身高不能大于最高身高', path: ['max'] },
-  ).nullable(),
-}).strict()
+  ))),
+})
 
-const correlatedSchema = object({
+const correlatedSchema = strictObject({
   bodyTypes: uniqueArray(enumSchema(BODY_TYPES), BODY_TYPES.length),
-  minAnnualIncomeWan: number().min(0).max(10_000).nullable(),
-  minHouseholdWealthWan: number().min(0).max(1_000_000).nullable(),
+  minAnnualIncomeWan: nullable(number().check(minimum(0), maximum(10_000))),
+  minHouseholdWealthWan: nullable(number().check(minimum(0), maximum(1_000_000))),
   educationLevels: uniqueArray(enumSchema(EDUCATION_LEVELS), EDUCATION_LEVELS.length),
-  schoolTier: enumSchema(SCHOOL_TIERS).nullable(),
-  housing: object({
+  schoolTier: nullable(enumSchema(SCHOOL_TIERS)),
+  housing: strictObject({
     required: boolean(),
-    location: enumSchema(HOUSE_LOCATIONS).nullable(),
-    minAreaSqm: number().int().min(1).max(2_000).nullable(),
-    type: enumSchema(HOUSE_TYPES).nullable(),
-  }).strict(),
-  vehicle: object({
+    location: nullable(enumSchema(HOUSE_LOCATIONS)),
+    minAreaSqm: nullable(int().check(minimum(1), maximum(2_000))),
+    type: nullable(enumSchema(HOUSE_TYPES)),
+  }),
+  vehicle: strictObject({
     required: boolean(),
     priceBands: uniqueArray(enumSchema(CAR_PRICE_BANDS), CAR_PRICE_BANDS.length),
-  }).strict(),
+  }),
   smoking: enumSchema(['any', 'non_smoker']),
   drinking: enumSchema(['any', 'not_regular', 'none']),
   healthCriteria: uniqueArray(enumSchema(HEALTH_CRITERIA), HEALTH_CRITERIA.length),
   hairCriteria: uniqueArray(enumSchema(HAIR_CRITERIA), HAIR_CRITERIA.length),
-}).strict()
+})
 
-const entertainmentSchema = object({
+const entertainmentSchema = strictObject({
   zodiacs: uniqueArray(enumSchema(ZODIACS), ZODIACS.length),
-  mbti: uniqueArray(enumSchema(MBTI_POLES), MBTI_POLES.length).refine((poles) => {
-    const axes = [['E', 'I'], ['S', 'N'], ['T', 'F'], ['J', 'P']] as const
-    return axes.every(([left, right]) => !(poles.includes(left) && poles.includes(right)))
-  }, { message: '同一 MBTI 轴只能选择一端' }),
-}).strict()
+  // Selecting both poles on one axis means that axis is unconstrained. This
+  // keeps the runtime contract consistent with the OR/neutral set semantics.
+  mbti: uniqueArray(enumSchema(MBTI_POLES), MBTI_POLES.length),
+})
 
 const LEGACY_MARITAL_STATUS_MAP: Readonly<Record<string, (typeof MARITAL_STATUSES)[number] | undefined>> = {
   divorced_no_children: 'divorced',
@@ -179,15 +188,18 @@ export function migrateLegacySelectionInput(input: unknown): unknown {
   }
 }
 
-const currentSelectionSchema = object({
+const currentSelectionSchema = strictObject({
   target: targetSchema,
   correlated: correlatedSchema,
   softPreferenceIds: uniqueArray(enumSchema(SOFT_PREFERENCE_IDS), SOFT_PREFERENCE_IDS.length),
   entertainment: entertainmentSchema,
   selfPreferenceIds: uniqueArray(enumSchema(SOFT_PREFERENCE_IDS), SOFT_PREFERENCE_IDS.length),
-}).strict()
+})
 
-export const selectionSchema = preprocess(migrateLegacySelectionInput, currentSelectionSchema)
+export const selectionSchema = pipe(
+  transform(migrateLegacySelectionInput),
+  currentSelectionSchema,
+)
 
 export type ModelSelection = Infer<typeof selectionSchema>
 export type GenderId = ModelSelection['target']['gender']
