@@ -29,9 +29,16 @@
   --shadow-sm: 0 2px 0 rgba(59, 48, 80, 0.12);
   --shadow-md: 0 12px 32px rgba(59, 48, 80, 0.11);
   --shadow-sticker: 5px 5px 0 var(--ink);
+  --radius-xs: 8px;
   --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 24px;
+  --dur-fast: 140ms;
+  --dur-med: 260ms;
+  --dur-slow: 560ms;
+  --dur-reveal: 900ms;
+  --shadow-hover: 0 16px 36px rgba(59, 48, 80, 0.14);
+  --ring: 0 0 0 3px rgba(140, 47, 93, 0.35);
   --content: 1240px;
 }
 
@@ -5429,4 +5436,243 @@ body {
   .circus-board::before {
     animation: none !important;
   }
+}
+
+/* ================= 批次1扩容: A1 纸感 / A2 微交互 / B6 图鉴卡 / B7 团灭 / 城市榜 / 类比 ================= */
+
+/* ---------- A1 全局纸质噪点: 薄薄一层手作质感, 不抢戏 ---------- */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix type='saturate' values='0'/></filter><rect width='160' height='160' filter='url(%23n)' opacity='0.55'/></svg>");
+}
+
+/* ---------- ⑤ 具象化类比小胶囊: 「约等于坐满 x 节地铁车厢」 ---------- */
+.result-analogy {
+  margin: 8px 0 0;
+  padding: 4px 14px;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: var(--sky);
+  color: var(--sky-strong);
+  font-size: 12.5px;
+  font-weight: 800;
+  transform: rotate(-0.6deg);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
+/* ---------- B6 稀有度图鉴卡: 六档卡框 + 压轴幸存者登场 ---------- */
+.rarity-card { min-width: 196px; }
+.rarity-card-label { font-size: 1.1rem; font-weight: 900; letter-spacing: 0.05em; }
+.rarity-card-text { font-size: 0.78rem; font-weight: 800; opacity: 0.82; }
+.rarity-card-survivor {
+  display: flex;
+  margin: 3px 0 1px;
+  filter: drop-shadow(2px 3px 0 rgba(59, 48, 80, 0.25));
+  animation: survivorPop 0.6s var(--spring, cubic-bezier(0.34, 1.56, 0.64, 1)) 0.28s both;
+}
+@keyframes survivorPop {
+  0% { transform: translateY(16px) scale(0.35); opacity: 0; }
+  70% { transform: translateY(-2px) scale(1.08); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+/* N 素框: 虚线, 不配扫光 */
+.tier-N { border-style: dashed; }
+.tier-N::after { display: none; }
+.tier-R { border-color: var(--sky-strong); box-shadow: 4px 4px 0 var(--sky-strong); }
+.tier-SR { border-color: var(--lilac-strong); box-shadow: 4px 4px 0 var(--lilac-strong); }
+.tier-SSR {
+  border-color: var(--rose-strong);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.85), 4px 4px 0 var(--rose-strong);
+}
+.tier-UR { border: 4px double #a67c00; box-shadow: 4px 4px 0 var(--ink); }
+/* M 神话级: 烫金呼吸光晕 */
+.tier-M {
+  animation:
+    stampIn 0.55s cubic-bezier(0.2, 1.3, 0.4, 1) both,
+    mythicGlow 2.2s ease-in-out 0.6s infinite;
+}
+@keyframes mythicGlow {
+  0%, 100% { box-shadow: 4px 4px 0 var(--ink), 0 0 12px 2px rgba(255, 200, 60, 0.45); }
+  50% { box-shadow: 4px 4px 0 var(--ink), 0 0 26px 8px rgba(255, 200, 60, 0.8); }
+}
+
+/* ---------- B7 团灭专场: 三盏灯依次熄灭 + 灵魂飘过 ---------- */
+.wipeout-stage {
+  margin: 14px 0 4px;
+  padding: 20px 18px 16px;
+  border: 3px dashed var(--ink);
+  border-radius: var(--radius-lg);
+  background: repeating-linear-gradient(-45deg, #f3ece0 0 14px, #ece2d2 14px 28px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+.wipeout-lamps { display: flex; gap: 14px; margin-bottom: 2px; }
+.wipeout-lamps i {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--sun);
+  box-shadow: 0 0 10px 3px rgba(255, 230, 140, 0.9);
+  animation: lampOut 0.5s ease forwards;
+}
+.wipeout-lamps i:nth-child(2) { animation-delay: 0.35s; }
+.wipeout-lamps i:nth-child(3) { animation-delay: 0.7s; }
+@keyframes lampOut {
+  to { background: #cfc6ba; box-shadow: none; transform: translateY(2px); }
+}
+.wipeout-ghost { opacity: 0.85; animation: ghostDrift 3.2s ease-in-out infinite; }
+@keyframes ghostDrift {
+  0%, 100% { transform: translate(-14px, 0); }
+  50% { transform: translate(14px, -8px); }
+}
+.wipeout-stage b { font-size: 1.15rem; font-weight: 900; letter-spacing: 0.03em; }
+.wipeout-stage p {
+  margin: 0;
+  max-width: 46ch;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+
+/* ---------- ① 城市分布榜: 排名条形 + 你选的高亮 + 垫底彩蛋 ---------- */
+.city-board {
+  margin-top: 14px;
+  padding: 14px 16px 12px;
+  border: 2.5px solid var(--ink);
+  border-radius: var(--radius-md);
+  background: var(--surface-strong);
+  box-shadow: 4px 4px 0 var(--ink);
+  transform: rotate(0.4deg);
+}
+.city-board h3 { margin: 0 0 10px; font-size: 1rem; font-weight: 900; }
+.city-board-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.city-board-list li {
+  display: grid;
+  grid-template-columns: 26px minmax(72px, auto) 1fr auto;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  animation: cityRowIn 0.5s var(--spring, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
+}
+.city-board-list li:nth-child(2) { animation-delay: 0.06s; }
+.city-board-list li:nth-child(3) { animation-delay: 0.12s; }
+.city-board-list li:nth-child(4) { animation-delay: 0.18s; }
+.city-board-list li:nth-child(5) { animation-delay: 0.24s; }
+.city-board-list li:nth-child(6) { animation-delay: 0.3s; }
+.city-board-list li:nth-child(n+7) { animation-delay: 0.36s; }
+@keyframes cityRowIn {
+  from { opacity: 0; transform: translateX(-14px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.city-board-list li[data-picked] {
+  margin: -3px -6px;
+  padding: 3px 6px;
+  border-radius: 10px;
+  background: var(--rose);
+}
+.city-board-rank {
+  font-family: var(--font-display);
+  font-weight: 900;
+  color: var(--ink-faint);
+  text-align: center;
+}
+.city-board-list li:first-child .city-board-rank { color: #b8860b; font-size: 16px; }
+.city-board-name em { font-style: normal; margin-right: 2px; }
+.city-board-name i {
+  font-style: normal;
+  margin-left: 5px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--rose-strong);
+  color: #fffdf8;
+  font-size: 10px;
+  font-weight: 800;
+}
+.city-board-bar {
+  height: 10px;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: var(--paper-deep);
+  overflow: hidden;
+}
+.city-board-bar b {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ffd9e2, #ff9ebb);
+  transform-origin: left;
+  animation: barGrow 0.8s var(--spring, cubic-bezier(0.34, 1.56, 0.64, 1)) 0.2s both;
+}
+@keyframes barGrow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+.city-board-count { font-weight: 900; font-variant-numeric: tabular-nums; }
+.city-board-tail { margin: 10px 0 0; font-size: 12px; font-weight: 700; color: var(--ink-soft); }
+.city-board-note { display: block; margin-top: 4px; font-size: 10.5px; font-weight: 600; color: var(--ink-soft); }
+
+/* ---------- A2 chip 选中扫光(在 chip-pop 之上叠一道) ---------- */
+.chip { position: relative; overflow: hidden; }
+.chip[aria-pressed="true"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.55) 50%, transparent 65%);
+  animation: chipShimmer 0.9s ease 0.05s both;
+}
+@keyframes chipShimmer {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+
+/* ---------- A3 财神小人: 金光 + 可点反馈 ---------- */
+.person.is-caishen { cursor: pointer; }
+.person.is-caishen > svg {
+  filter: drop-shadow(0 0 6px rgba(255, 200, 60, 0.9));
+  transition: transform var(--dur-fast) var(--spring, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+.person.is-caishen:hover > svg { transform: scale(1.14) rotate(-4deg); }
+.person.is-caishen:active > svg { transform: scale(0.94); }
+.person.is-caishen:focus-visible {
+  outline: 3px solid var(--sun-strong);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* ---------- 批次1扩容 降级登记: 减弱动态效果时全部安静 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .rarity-card-survivor,
+  .wipeout-lamps i,
+  .wipeout-ghost,
+  .city-board-list li,
+  .city-board-bar b,
+  .tier-M,
+  .person.is-caishen > svg {
+    animation: none !important;
+    transition: none !important;
+  }
+  .chip[aria-pressed="true"]::after { display: none !important; }
+  .wipeout-lamps i { background: #cfc6ba; box-shadow: none; transform: translateY(2px); }
+  .tier-M { box-shadow: 4px 4px 0 var(--ink), 0 0 14px 3px rgba(255, 200, 60, 0.5); }
+  .person.is-caishen:hover > svg { transform: none; }
 }

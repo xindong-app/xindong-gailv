@@ -2,10 +2,13 @@ import { useMemo } from 'react'
 import type { ModelResult } from '../engine/modelEngine'
 import { formatCount, formatCountShort } from '../engine/modelEngine'
 import { FunFunnel } from '../fun/FunFunnel'
+import { buildAnalogy } from '../fun/analogy'
 import { buildFunnelFrames } from '../fun/funnelFrames'
 import { RarityStamp } from '../fun/RarityStamp'
+import { WipeoutShow } from '../fun/WipeoutShow'
 import { buildComparisons, buildVerdict, fmtRarity, rarityTier } from '../fun/rarity'
 import { useCountUp } from '../fun/useCountUp'
+import { CityLeaderboard } from './CityLeaderboard'
 import { ModelConfidenceBadge } from './ui'
 
 /** 人口主数的三种 v3 状态说明卡: 不可用 / 上限 / 低于分辨率(可与上限叠加) */
@@ -72,14 +75,22 @@ export function ResultSummary({
   const upperBound = result.population.status === 'upper_bound'
   // 数值下溢不是现实零人: 稀有度/毒舌/漏斗等人数派生趣味全部不演
   const funAllowed = available && result.population.zeroMeaning !== 'model_underflow'
+  // 逻辑空集(条件互相打架, 上下界均为 0): 上演团灭专场, 不演稀有度
+  const logicalZero = result.population.zeroMeaning === 'logical_zero'
   const animated = useCountUp(available ? result.population.estimate : 0)
   // 帧拆解走趣味层(渐进调用引擎公开接口), result.input 身份不变时命中缓存
   const frames = useMemo(() => buildFunnelFrames(result.input), [result.input])
   const base = result.population.base
   const probability = funAllowed && base > 0 ? result.population.estimate / base : 0
   const tier = rarityTier(probability * 10_000)
-  const verdict = funAllowed ? buildVerdict(frames) : null
-  const comparisons = funAllowed ? buildComparisons(probability) : []
+  const verdict = funAllowed && !logicalZero ? buildVerdict(frames) : null
+  const comparisons = funAllowed && !logicalZero ? buildComparisons(probability) : []
+  const analogy = funAllowed && !logicalZero ? buildAnalogy(result.population.estimate) : null
+  // 图鉴卡幸存者: 与漏斗阵列同一份确定性数学
+  const FUNNEL_TOTAL = 80
+  const survivorCount = frames.length > 0 && base > 0
+    ? Math.round((FUNNEL_TOTAL * frames[frames.length - 1].survivors) / Math.max(1, base))
+    : FUNNEL_TOTAL
   const cities = result.input.target.cities
   const scope = `${cities.includes('全国') ? '全国' : cities.join('、')} · ${result.input.target.age.min}–${result.input.target.age.max} 岁 · ${result.input.target.gender === 'male' ? '男生' : '女生'}`
   const numberText = !available || result.population.resolutionExceeded
@@ -105,9 +116,13 @@ export function ResultSummary({
           {numberText}
         </div>
         <p className="result-scope">在「{scope}」的池子里捞</p>
-        {!compact && funAllowed && base > 0 && (
-          <RarityStamp tier={tier} rarityText={upperBound ? `最多 ${fmtRarity(probability)} · 仅按已计入条件` : fmtRarity(probability)} revealKey={revealKey} />
+        {!compact && analogy && (
+          <p className="result-analogy">{analogy.emoji} {analogy.text}</p>
         )}
+        {!compact && funAllowed && !logicalZero && base > 0 && (
+          <RarityStamp tier={tier} rarityText={upperBound ? `最多 ${fmtRarity(probability)} · 仅按已计入条件` : fmtRarity(probability)} revealKey={revealKey} survivorCount={survivorCount} />
+        )}
+        {logicalZero && <WipeoutShow />}
         {!compact && funAllowed && upperBound && (
           <p className="rarity-cap-note">加入尚未量化的硬条件后，真实稀有度只会更高——这是最低稀有程度，不是最终评级。</p>
         )}
@@ -132,6 +147,7 @@ export function ResultSummary({
               )}
             </div>
           )}
+          {funAllowed && !logicalZero && <CityLeaderboard result={result} />}
           {funAllowed && showFunnel && <FunFunnel pool={base} frames={frames} cities={result.input.target.cities} />}
           <p className="result-boundary">
             {!available

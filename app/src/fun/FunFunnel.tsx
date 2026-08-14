@@ -6,7 +6,7 @@ import type { FunnelFrame } from './funnelFrames'
 import { rnd, type Prof } from './roster'
 import { PersonSvg, SoulGhost } from './person'
 import { pickProf } from './skins'
-import { isSoundOn, playLevelUp, playSlash, setSoundOn } from './sound'
+import { isSoundOn, playCaishen, playCrowdMurmur, playLevelUp, playSlash, setSoundOn } from './sound'
 
 const TOTAL = 80
 const PALETTE = ['#ffd9e2', '#ffd9b8', '#cdeafa', '#e6dbf7', '#ddefd3', '#ffeeb0', '#f5c1d4']
@@ -42,7 +42,9 @@ function Person({ color, prof, out, delay, fx, fr, hopClass, hopDelay, nervous, 
   return (
     <div
       className={`person ${out ? 'out' : `alive ${hopClass}`} ${prof.hidden && !out ? 'is-caishen' : ''}`}
-      title={prof.name}
+      title={prof.hidden && !out ? `${prof.name} · 点我沾财气` : prof.name}
+      onClick={prof.hidden && !out ? playCaishen : undefined}
+      role={prof.hidden && !out ? 'button' : undefined}
       style={{
         transitionDelay: `${delay}ms`,
         animationDelay: `${hopDelay}ms`,
@@ -121,6 +123,7 @@ export function FunFunnel({ pool, frames, cities }: { pool: number; frames: read
         setGhosts((g) => [...g.slice(-4), ...spawned])
         setSlashId((id) => id + 1) // 刀光 + 震屏
         playSlash()
+        playCrowdMurmur(finalCount / TOTAL) // 人越少, 嗡嗡声越轻
       }, 0)
       const t = setTimeout(() => {
         setGhosts((g) => g.filter((x) => !spawned.some((n) => n.id === x.id)))

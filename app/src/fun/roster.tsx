@@ -260,3 +260,10 @@ export function survivorProf(survivorCount: number): { name: string; emoji: stri
   const p = ROSTER[Math.floor(rnd(i, 9) * ROSTER.length)]
   return { name: p.name, emoji: p.emoji }
 }
+
+/** 完整版: 稀有度图鉴卡要让幸存者本人登场(带帽子和衣服) */
+export function survivorProfFull(survivorCount: number): Prof | null {
+  if (!Number.isFinite(survivorCount) || survivorCount <= 0) return null
+  const i = survivorCount - 1
+  return ROSTER[Math.floor(rnd(i, 9) * ROSTER.length)]
+}

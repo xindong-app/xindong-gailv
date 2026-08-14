@@ -201,3 +201,97 @@ export function playLevelUp(): void {
     })
   } catch { /* 静默 */ }
 }
+
+/** 财神爷彩蛋: 小金锣 —— 金属双音 + 亮噪, 敲一下财气到外溢 */
+export function playCaishen(): void {
+  if (!isSoundOn()) return
+  const context = ensureContext()
+  if (!context) return
+  try {
+    const now = context.currentTime
+    ;[659.25, 987.77].forEach((freq) => {
+      const osc = context.createOscillator()
+      osc.type = 'triangle'
+      osc.frequency.value = freq
+      const gain = context.createGain()
+      gain.gain.setValueAtTime(0.0001, now)
+      gain.gain.exponentialRampToValueAtTime(0.1, now + 0.008)
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.9)
+      osc.connect(gain).connect(context.destination)
+      osc.start(now)
+      osc.stop(now + 0.95)
+    })
+    const shine = context.createBufferSource()
+    shine.buffer = noiseBuffer(context, 0.3)
+    const highpass = context.createBiquadFilter()
+    highpass.type = 'highpass'
+    highpass.frequency.value = 3200
+    const shineGain = context.createGain()
+    shineGain.gain.setValueAtTime(0.0001, now)
+    shineGain.gain.exponentialRampToValueAtTime(0.05, now + 0.01)
+    shineGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3)
+    shine.connect(highpass).connect(shineGain).connect(context.destination)
+    shine.start(now)
+    shine.stop(now + 0.32)
+  } catch { /* 静默 */ }
+}
+
+/** 团灭(逻辑空集): 低频「咚」+ 长尾空场回音 —— 灯灭了 */
+export function playWipeout(): void {
+  if (!isSoundOn()) return
+  const context = ensureContext()
+  if (!context) return
+  try {
+    const now = context.currentTime
+    const boom = context.createOscillator()
+    boom.type = 'sine'
+    boom.frequency.setValueAtTime(110, now)
+    boom.frequency.exponentialRampToValueAtTime(38, now + 0.7)
+    const boomGain = context.createGain()
+    boomGain.gain.setValueAtTime(0.0001, now)
+    boomGain.gain.exponentialRampToValueAtTime(0.2, now + 0.02)
+    boomGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.1)
+    boom.connect(boomGain).connect(context.destination)
+    boom.start(now)
+    boom.stop(now + 1.15)
+
+    const hall = context.createBufferSource()
+    hall.buffer = noiseBuffer(context, 1.2)
+    const lowpass = context.createBiquadFilter()
+    lowpass.type = 'lowpass'
+    lowpass.frequency.setValueAtTime(700, now)
+    lowpass.frequency.exponentialRampToValueAtTime(140, now + 1.1)
+    const hallGain = context.createGain()
+    hallGain.gain.setValueAtTime(0.0001, now)
+    hallGain.gain.exponentialRampToValueAtTime(0.06, now + 0.05)
+    hallGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2)
+    hall.connect(lowpass).connect(hallGain).connect(context.destination)
+    hall.start(now)
+    hall.stop(now + 1.25)
+  } catch { /* 静默 */ }
+}
+
+/** 人群氛围: 一刀之后幸存量越少, 嗡嗡声越轻越短 —— 听得见的人数 */
+export function playCrowdMurmur(ratio: number): void {
+  if (!isSoundOn()) return
+  const context = ensureContext()
+  if (!context) return
+  const safe = Math.min(1, Math.max(0, ratio))
+  try {
+    const now = context.currentTime
+    const seconds = 0.25 + safe * 0.55
+    const noise = context.createBufferSource()
+    noise.buffer = noiseBuffer(context, seconds)
+    const bandpass = context.createBiquadFilter()
+    bandpass.type = 'bandpass'
+    bandpass.Q.value = 0.6
+    bandpass.frequency.value = 320 + safe * 480
+    const gain = context.createGain()
+    gain.gain.setValueAtTime(0.0001, now)
+    gain.gain.exponentialRampToValueAtTime(0.015 + safe * 0.05, now + 0.06)
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + seconds)
+    noise.connect(bandpass).connect(gain).connect(context.destination)
+    noise.start(now)
+    noise.stop(now + seconds + 0.02)
+  } catch { /* 静默 */ }
+}
