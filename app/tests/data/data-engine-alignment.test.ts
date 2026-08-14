@@ -111,7 +111,7 @@ describe('evidence registry to runtime alignment', () => {
   })
 })
 
-describe('registered 2025 anchors', () => {
+describe('registered national and city anchors', () => {
   const cityAnchors = [
     ['北京', 2180, 'evidence.base.region.beijing-2025'],
     ['上海', 2485.41, 'evidence.base.region.shanghai-2025'],
@@ -150,10 +150,10 @@ describe('registered 2025 anchors', () => {
 
   it('keeps every supported city transformation on the same census denominator', () => {
     const supportedCities = CITIES.filter((city) => city.mainEstimateStatus === 'included_estimate')
-    expect(supportedCities).toHaveLength(20)
+    expect(supportedCities).toHaveLength(56)
 
     for (const city of supportedCities) {
-      const evidence = evidenceById(city.sourceEvidenceId!)
+      const evidence = evidenceById(city.sourceEvidenceId)
       expect(evidence?.modelUse, city.name).toBe('anchor')
       expect(evidence?.transformation, city.name).toContain('140,977.8724万人')
       expect(evidence?.transformation, city.name).toContain('1,409,778,724人')

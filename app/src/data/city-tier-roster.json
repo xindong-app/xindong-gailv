@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "dataVersion": "2026.08.14.2",
+  "rosterId": "yicai-city-tier-2025-05-28",
+  "publishedAt": "2025-05-28",
+  "retrievedAt": "2026-08-14",
+  "publisher": "第一财经·新一线城市研究所",
+  "sourceTitle": "2025新一线城市魅力排行榜",
+  "sourceUrl": "https://www.yicai.com/news/102638963.html",
+  "sourceImageUrl": "https://imgcdn.yicai.com/uppics/images/2025/05/64daefdf154d5b39e23c5a345cadd7df.jpg",
+  "sourceImageSha256": "3510B5BEBA917D562E51A01DA8F87173C3748C0BE5E952B13C0496D652023986",
+  "latestMethodNotice": {
+    "publishedAt": "2026-05-28",
+    "sourceUrl": "https://www.yicai.com/news/103204902.html",
+    "note": "发布方自2026年起不再发布337城总分、排名和分级结果，因此2025版是截至本数据检索日最新可复现的完整分级名单。"
+  },
+  "classificationStatus": "commercial_roster_not_official_administrative_classification",
+  "tiers": {
+    "first": ["上海", "北京", "深圳", "广州"],
+    "newFirst": ["成都", "杭州", "重庆", "武汉", "苏州", "西安", "南京", "长沙", "郑州", "天津", "合肥", "青岛", "东莞", "宁波", "佛山"],
+    "second": ["济南", "无锡", "沈阳", "昆明", "福州", "厦门", "温州", "石家庄", "大连", "哈尔滨", "金华", "泉州", "南宁", "长春", "常州", "南昌", "南通", "贵阳", "嘉兴", "徐州", "惠州", "太原", "烟台", "临沂", "保定", "台州", "绍兴", "珠海", "洛阳", "潍坊"]
+  },
+  "retainedAdditionalCities": ["兰州", "乌鲁木齐", "海口", "银川", "西宁", "呼和浩特", "拉萨"],
+  "selectionPolicy": "完整收录2025版一线、新一线、二线49城；为保持已有选择兼容性，另保留原产品中的7城。城市分级只决定收录范围，人口估算只使用各市政府或统计局的一手常住人口锚点。"
+}

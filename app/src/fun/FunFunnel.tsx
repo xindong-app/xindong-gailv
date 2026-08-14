@@ -4,11 +4,11 @@ import { useEffect, useRef, useState } from 'react'
 import { formatCount } from '../engine/modelEngine'
 import type { FunnelFrame } from './funnelFrames'
 import { rnd, type Prof } from './roster'
+import { PersonSvg, SoulGhost } from './person'
 import { pickProf } from './skins'
 import { isSoundOn, playLevelUp, playSlash, setSoundOn } from './sound'
 
 const TOTAL = 80
-const INK = '#3b3050'
 const PALETTE = ['#ffd9e2', '#ffd9b8', '#cdeafa', '#e6dbf7', '#ddefd3', '#ffeeb0', '#f5c1d4']
 
 // ---------- 各关卡遗言弹幕 ----------
@@ -35,45 +35,24 @@ function roast(factor: number): string {
   return '全员通过, 气氛组狂喜'
 }
 
-function Person({ color, prof, out, delay, fx, fr, hopClass, hopDelay }: {
+function Person({ color, prof, out, delay, fx, fr, hopClass, hopDelay, nervous, seed }: {
   color: string; prof: Prof; out: boolean; delay: number; fx: number; fr: number
-  hopClass: string; hopDelay: number
+  hopClass: string; hopDelay: number; nervous: boolean; seed: number
 }) {
   return (
     <div
-      className={`person ${out ? 'out' : `alive ${hopClass}`}`}
+      className={`person ${out ? 'out' : `alive ${hopClass}`} ${prof.hidden && !out ? 'is-caishen' : ''}`}
       title={prof.name}
       style={{
         transitionDelay: `${delay}ms`,
         animationDelay: `${hopDelay}ms`,
         ['--fx' as string]: `${fx}px`,
         ['--fr' as string]: `${fr}deg`,
+        ['--soul-delay' as string]: `${delay}ms`,
       }}
     >
-      <svg width="32" height="44" viewBox="0 0 34 46">
-        <path d="M5 44 Q5 24 17 24 Q29 24 29 44 Z" fill={color} stroke={INK} strokeWidth="1.7" />
-        <circle cx="17" cy="13" r="7.5" fill={color} stroke={INK} strokeWidth="1.7" />
-        {!out && (
-          <>
-            {prof.face ?? (
-              <>
-                <circle cx="14" cy="12" r="1" fill={INK} />
-                <circle cx="20" cy="12" r="1" fill={INK} />
-              </>
-            )}
-            <path d="M14 16 Q17 18.2 20 16" stroke={INK} strokeWidth="1.1" fill="none" strokeLinecap="round" />
-            {prof.hat}
-            {prof.body}
-          </>
-        )}
-        {out && (
-          <g stroke={INK} strokeWidth="1.2" strokeLinecap="round">
-            <path d="M12.5 10.5 L15.5 13.5 M15.5 10.5 L12.5 13.5" />
-            <path d="M18.5 10.5 L21.5 13.5 M21.5 10.5 L18.5 13.5" />
-            <path d="M14 17.5 Q17 15.8 20 17.5" fill="none" />
-          </g>
-        )}
-      </svg>
+      <PersonSvg color={color} prof={prof} out={out} seed={seed} nervous={nervous && !out} />
+      {out && <SoulGhost />}
     </div>
   )
 }
@@ -129,9 +108,11 @@ export function FunFunnel({ pool, frames, cities }: { pool: number; frames: read
       const lines = LAST_WORDS[culprit.dimensionId] ?? GENERIC_LAST_WORDS
       const spawned: Ghost[] = Array.from({ length: 3 }, (_, k) => {
         const prof = pickProf(Math.floor(Math.random() * TOTAL), cities)
+        // 一半概率说职业遗言, 一半概率说关卡吐槽
+        const linePool = prof.bye && Math.random() < 0.55 ? prof.bye : lines
         return {
           id: Date.now() + k,
-          text: `${prof.emoji} ${prof.name}: ${lines[Math.floor(Math.random() * lines.length)]}`,
+          text: `${prof.emoji} ${prof.name}: ${linePool[Math.floor(Math.random() * linePool.length)]}`,
           x: 4 + Math.random() * 62,
           gr: (Math.random() - 0.5) * 6,
         }
@@ -207,6 +188,8 @@ export function FunFunnel({ pool, frames, cities }: { pool: number; frames: read
                 fr={(rnd(i, 3) > 0.5 ? 1 : -1) * (70 + rnd(i, 4) * 50)}
                 hopClass={hopClass}
                 hopDelay={rnd(i, 5) * 220}
+                nervous={slashId > 0}
+                seed={i}
               />
             )
           })}

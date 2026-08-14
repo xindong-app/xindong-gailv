@@ -10,13 +10,12 @@ import {
   validatePopulationTable,
 } from '../src/data/population'
 import { CITIES } from '../src/data/cities'
-import {
-  isCityMainEstimateSupported,
-  POPULATION_QUANTIFICATION_POLICY,
-} from '../src/data/population-policy'
+import { POPULATION_QUANTIFICATION_POLICY } from '../src/data/population-policy'
+import { validateCityRoster } from '../src/data/city-validation'
 import { GOLDEN_SCENARIOS } from '../tests/model/scenarios'
 import { validateRelationshipData } from '../src/data/relationship'
 import { validateEducationTable } from '../src/data/education-validation'
+import { projectEvidenceRuntime } from './evidence-runtime-projection'
 
 const buildDate = process.env.BUILD_DATE ?? new Intl.DateTimeFormat('en-CA', {
   timeZone: 'Asia/Shanghai',
@@ -46,21 +45,7 @@ if (!evidence.valid) {
   console.log(`Evidence registry: ${evidence.entries} entries; A=${evidence.gradeCounts.A}, B=${evidence.gradeCounts.B}, C=${evidence.gradeCounts.C}, D=${evidence.gradeCounts.D}; excluded=${evidence.excludedEntries}`)
 }
 
-const runtimeProjection = {
-  dataVersion: evidenceRegistryJson.dataVersion,
-  modelVersion: evidenceRegistryJson.modelVersion,
-  retrievedAt: evidenceRegistryJson.retrievedAt,
-  entries: evidenceRegistryJson.entries.map((entry) => ({
-    id: entry.id,
-    dimensionId: entry.dimensionId,
-    grade: entry.grade,
-    modelUse: entry.modelUse,
-    sourceTitle: entry.sourceTitle,
-    sourceUrl: entry.sourceUrl,
-    publisher: entry.publisher,
-    dataYear: entry.dataYear,
-  })),
-}
+const runtimeProjection = projectEvidenceRuntime(evidenceRegistryJson)
 if (JSON.stringify(runtimeEvidenceRegistry) !== JSON.stringify(runtimeProjection)) {
   console.error('Runtime evidence projection is stale; run npm run generate:evidence-runtime')
   process.exitCode = 1
@@ -141,21 +126,17 @@ if (invalidPopulationPolicies.length > 0 || includedDimensionsWithoutPolicy.leng
   console.log(`Population quantification policy: ${Object.keys(POPULATION_QUANTIFICATION_POLICY).length} policies traceable and dimension-aligned`)
 }
 
-const invalidCityPolicies = CITIES.filter((city) => {
-  if (city.mainEstimateStatus === 'included_estimate') {
-    return city.populationStatus !== 'official_resident_anchor' || city.pop <= 0 ||
-      city.sourceEvidenceId == null || !evidenceIds.has(city.sourceEvidenceId) ||
-      city.populationSourceUrl == null || !city.populationSourceUrl.startsWith('https://')
-  }
-  return city.populationStatus !== 'unsupported' || city.pop !== 0 || city.sourceEvidenceId != null ||
-    city.populationSourceUrl != null || isCityMainEstimateSupported(city.name)
-})
-if (invalidCityPolicies.length > 0) {
-  console.error('City population policy validation failed', invalidCityPolicies.map((city) => city.name))
+const cityRoster = validateCityRoster()
+if (!cityRoster.valid) {
+  console.error('City population roster/provenance validation failed', cityRoster.issues)
   process.exitCode = 1
 } else {
-  const supportedCities = CITIES.filter((city) => isCityMainEstimateSupported(city.name)).length
-  console.log(`City population policy: ${supportedCities} supported official resident anchors; ${CITIES.length - supportedCities} explicitly unavailable`)
+  console.log([
+    `City population roster: ${cityRoster.rosterCityCount} tier-list cities`,
+    `${cityRoster.selectableCityCount} selectable cities`,
+    `${cityRoster.supportedCityCount} official resident anchors`,
+    `${cityRoster.evidenceCityCount} exact evidence references`,
+  ].join('; '))
 }
 
 const censusDenominatorEvidence = evidenceRegistryJson.entries.find(

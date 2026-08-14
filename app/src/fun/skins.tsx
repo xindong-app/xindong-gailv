@@ -1,12 +1,12 @@
 // 城市皮肤 —— 选了具体城市后, 小人阵列里会混入当地特色角色
 // 画法与 roster.tsx 一致(viewBox 34x46, 头心 17,13 r7.5)
 import type { ReactNode } from 'react'
-import { rnd, ROSTER, type Prof } from './roster'
+import { CAISHEN, rnd, ROSTER, type Prof } from './roster'
 
 const INK = '#3b3050'
 
-const skin = (name: string, emoji: string, hat?: ReactNode, body?: ReactNode, face?: ReactNode): Prof =>
-  ({ name, emoji, hat, body, face })
+const skin = (name: string, emoji: string, hat?: ReactNode, body?: ReactNode, face?: ReactNode, bye?: readonly string[]): Prof =>
+  ({ name, emoji, hat, body, face, bye })
 
 export const CITY_SKINS: Readonly<Record<string, readonly Prof[]>> = {
   北京: [
@@ -242,24 +242,31 @@ function sailor(): Prof {
 
 // 通用新角色(全国池也更有戏)
 const GENERIC_EXTRAS: readonly Prof[] = [
-  skin('外卖骑手', '🛵', (
+  { ...skin('外卖骑手', '🛵', (
     <g>
       <path d="M9 10 A 8 8 0 0 1 25 10 Z" fill="#f5a623" stroke={INK} strokeWidth="1.3" />
       <path d="M9 10 L25 10" stroke={INK} strokeWidth="1.1" />
     </g>
-  )),
-  skin('街舞少年', '🕺', (
+  )), outfit: (
+    <g stroke={INK} strokeWidth="1">
+      <path d="M9.5 26.5 L24.5 26.5 L24.5 36 L9.5 36 Z" fill="#f5a623" opacity="0.85" />
+      <path d="M17 26.5 V36" fill="none" />
+    </g>
+  ), bye: ['您的订单已超时', '下一单替我送'] },
+  { ...skin('街舞少年', '🕺', (
     <g transform="rotate(160 17 8)">
       <path d="M9.5 9 A 7.5 7.5 0 0 1 24.5 9 Z" fill="#5c4383" stroke={INK} strokeWidth="1.3" />
       <ellipse cx="24" cy="9.6" rx="4.5" ry="1.6" fill="#5c4383" stroke={INK} strokeWidth="1.1" transform="rotate(12 24 9.6)" />
     </g>
-  )),
-  skin('汉服同袍', '🏮', (
+  )), bye: ['battle 输了, 走人', '这地板我擦过了'] },
+  { ...skin('汉服同袍', '🏮', (
     <g>
       <circle cx="17" cy="4" r="2.2" fill="#3b3050" stroke={INK} strokeWidth="1" />
       <path d="M15 6.5 Q17 5 19 6.5" fill="none" stroke="#e2547a" strokeWidth="1.4" strokeLinecap="round" />
     </g>
-  )),
+  )), outfit: (
+    <path d="M12.5 26 L17 31.5 L21.5 26 M12.5 26 L10.5 44 M21.5 26 L23.5 44" stroke={INK} strokeWidth="1" fill="none" opacity="0.6" />
+  ), bye: ['先行一步, 告辞', '这厢有礼了'] },
 ]
 
 const FULL_ROSTER: readonly Prof[] = [...ROSTER, ...GENERIC_EXTRAS]
@@ -267,9 +274,11 @@ const FULL_ROSTER: readonly Prof[] = [...ROSTER, ...GENERIC_EXTRAS]
 /**
  * 按城市挑角色: 选了具体城市时, 约 45% 的小人换上当地皮肤;
  * 多城市按小人序号轮换取材; 全国/未知城市用全名册。
+ * 隐藏款财神爷约 1.5% 概率乱入人群 —— 小人池本身就是个概率游戏。
  * 全程确定性随机, 同一份输入同一批小人。
  */
 export function pickProf(index: number, cities: readonly string[]): Prof {
+  if (rnd(index, 88) < 0.015) return CAISHEN
   const skinnedCities = cities.filter((city) => CITY_SKINS[city])
   if (skinnedCities.length > 0 && rnd(index, 77) < 0.45) {
     const city = skinnedCities[Math.floor(rnd(index, 78) * skinnedCities.length)]

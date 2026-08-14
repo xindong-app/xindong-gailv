@@ -1,22 +1,9 @@
 import { writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import evidenceRegistry from '../src/data/evidence-registry.json'
+import { projectEvidenceRuntime } from './evidence-runtime-projection'
 
-const projection = {
-  dataVersion: evidenceRegistry.dataVersion,
-  modelVersion: evidenceRegistry.modelVersion,
-  retrievedAt: evidenceRegistry.retrievedAt,
-  entries: evidenceRegistry.entries.map((entry) => ({
-    id: entry.id,
-    dimensionId: entry.dimensionId,
-    grade: entry.grade,
-    modelUse: entry.modelUse,
-    sourceTitle: entry.sourceTitle,
-    sourceUrl: entry.sourceUrl,
-    publisher: entry.publisher,
-    dataYear: entry.dataYear,
-  })),
-}
+const projection = projectEvidenceRuntime(evidenceRegistry)
 
 const target = resolve(process.cwd(), 'src/data/evidence-runtime.json')
 writeFileSync(target, `${JSON.stringify(projection, null, 2)}\n`, 'utf8')

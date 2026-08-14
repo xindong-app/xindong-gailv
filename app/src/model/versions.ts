@@ -6,6 +6,6 @@
  * makes a shared result auditable without implying false precision.
  */
 export const MODEL_VERSION = '3.1.0'
-export const DATA_VERSION = '2026.08.14.1'
+export const DATA_VERSION = '2026.08.14.2'
 
 export const MODEL_RELEASED_AT = '2026-08-14'

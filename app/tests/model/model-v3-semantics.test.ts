@@ -12,11 +12,6 @@ import {
 import { CITIES } from '../../src/data/cities'
 import { DEFAULT_SELECTION, type ModelSelection } from '../../src/model/schema'
 
-const UNSUPPORTED_CITY_NAME = CITIES.find((city) => city.mainEstimateStatus === 'unquantified')?.name
-  ?? (() => { throw new Error('test fixture requires an unquantified city') })()
-const SUPPORTED_CITY_NAME = CITIES.find((city) => city.mainEstimateStatus === 'included_estimate')?.name
-  ?? (() => { throw new Error('test fixture requires a supported city') })()
-
 function selection(mutator?: (draft: ModelSelection) => void): ModelSelection {
   const draft = structuredClone(DEFAULT_SELECTION)
   mutator?.(draft)
@@ -30,38 +25,32 @@ function expectAdditive(union: number, parts: readonly number[]): void {
 }
 
 describe('v3 availability and zero semantics', () => {
-  it('returns unavailable for a selected city without an official resident anchor, never zero people', () => {
-    const result = computeModel(selection((draft) => {
-      draft.target.cities = [UNSUPPORTED_CITY_NAME]
-    }))
-
-    expect(result.population).toMatchObject({
-      status: 'unavailable',
-      interpretation: 'not_available',
-      numericStatus: 'unavailable',
-      zeroMeaning: 'unavailable',
-      resolutionExceeded: false,
-      displayShort: '无法可靠估算',
-    })
-    expect(result.coverage.unsupportedCities).toEqual([UNSUPPORTED_CITY_NAME])
-    expect(result.population.display).toContain('这不表示当地无人')
-    expect(result.population.display).not.toMatch(/约\s*0\s*人/)
-    expect(result.explanation.join(' ')).not.toContain('期望值极小')
-    expect(result.impacts).toEqual([])
-    expect(result.relaxations).toEqual([])
+  it('has an official resident anchor for every selectable city', () => {
+    for (const city of CITIES) {
+      const result = computeModel(selection((draft) => {
+        draft.target.cities = [city.name]
+      }))
+      expect(result.population.status, city.name).not.toBe('unavailable')
+      expect(result.population.estimate, city.name).toBeGreaterThan(0)
+      expect(result.coverage.unsupportedCities, city.name).toEqual([])
+    }
   })
 
-  it('does not return a partial estimate for a mixed supported/unsupported city union', () => {
-    const result = computeModel(selection((draft) => {
-      draft.target.cities = [SUPPORTED_CITY_NAME, UNSUPPORTED_CITY_NAME]
+  it('keeps a selected multi-city union additive instead of returning a partial estimate', () => {
+    const names = ['杭州', '绍兴', '宁波']
+    const union = computeModel(selection((draft) => {
+      draft.target.cities = names
     }))
+    const parts = names.map((name) => computeModel(selection((draft) => {
+      draft.target.cities = [name]
+    })).population.estimate)
 
-    expect(result.population.status).toBe('unavailable')
-    expect(result.population.zeroMeaning).toBe('unavailable')
-    expect(result.coverage.unsupportedCities).toEqual([UNSUPPORTED_CITY_NAME])
+    expect(union.population.status).not.toBe('unavailable')
+    expect(union.coverage.unsupportedCities).toEqual([])
+    expectAdditive(union.population.estimate, parts)
   })
 
-  it('distinguishes positive below one, numeric underflow to zero, and unavailable', () => {
+  it('distinguishes positive below one and numeric underflow to zero', () => {
     const belowOne = computeModel(selection((draft) => {
       draft.target.gender = 'female'
       draft.target.heightCm = { min: 193, max: 193 }
@@ -70,10 +59,6 @@ describe('v3 availability and zero semantics', () => {
       draft.target.gender = 'female'
       draft.target.heightCm = { min: 220, max: 220 }
     }))
-    const unavailable = computeModel(selection((draft) => {
-      draft.target.cities = [UNSUPPORTED_CITY_NAME]
-    }))
-
     expect(belowOne.population.estimate).toBeGreaterThan(0)
     expect(belowOne.population.estimate).toBeLessThan(1)
     expect(belowOne.population.zeroMeaning).toBe('positive_below_resolution')
@@ -83,9 +68,6 @@ describe('v3 availability and zero semantics', () => {
     expect(underflow.population.zeroMeaning).toBe('model_underflow')
     expect(underflow.population.display).toContain('不能解释为现实中恰好 0 人')
 
-    expect(unavailable.population.zeroMeaning).toBe('unavailable')
-    expect(unavailable.population.numericStatus).toBe('unavailable')
-    expect(unavailable.population.displayShort).toBe('无法可靠估算')
   })
 })
 
@@ -229,14 +211,11 @@ describe('relationship scenarios remain a separate second layer', () => {
     expect(scenario.combined.isObservedPopulationEstimate).toBe(false)
   })
 
-  it('propagates main-population unavailable without multiplying its numeric placeholder', () => {
-    const model = computeModel(selection((draft) => {
-      draft.target.gender = 'female'
-      draft.target.cities = [UNSUPPORTED_CITY_NAME]
-    }))
-    const scenario = computeRelationshipScenarioFromModel(model, {
+  it('propagates an unavailable low-level main-population input without multiplying a placeholder', () => {
+    const scenario = computeRelationshipScenario({
       seekerGender: 'male',
       targetGender: 'female',
+      targetPopulation: { status: 'unavailable', reason: '外部调用没有可核人口锚点' },
     })
 
     expect(scenario.mainLayer).toMatchObject({ status: 'unavailable', range: null })

@@ -1,6 +1,8 @@
 // 封面主场景 —— 海报即预告片: 天鹅绒舞台上, 小人排队穿过"心动筛门",
 // 多数掉落淘汰, 偶尔一个穿门发光。玩法 3 秒看懂。
 // 纯 CSS 驱动, 零 JS 帧; reduced-motion 给定格剧照。
+import { PersonSvg } from './person'
+
 const PALETTE = ['#ffd9e2', '#ffd9b8', '#cdeafa', '#e6dbf7', '#ddefd3', '#f5c1d4']
 const INK = '#241c33'
 
@@ -13,16 +15,8 @@ const WALKERS: readonly WalkerSpec[] = PALETTE.map((color, index) => ({
   staticX: 8 + index * 13,
 }))
 
-function MiniPerson({ color }: { color: string }) {
-  return (
-    <svg width="34" height="47" viewBox="0 0 34 46" aria-hidden="true">
-      <path d="M5 44 Q5 24 17 24 Q29 24 29 44 Z" fill={color} stroke={INK} strokeWidth="1.7" />
-      <circle cx="17" cy="13" r="7.5" fill={color} stroke={INK} strokeWidth="1.7" />
-      <circle cx="14" cy="12" r="1" fill={INK} />
-      <circle cx="20" cy="12" r="1" fill={INK} />
-      <path d="M14 16 Q17 18.2 20 16" stroke={INK} strokeWidth="1.1" fill="none" strokeLinecap="round" />
-    </svg>
-  )
+function MiniPerson({ color, seed }: { color: string; seed: number }) {
+  return <PersonSvg color={color} ink={INK} seed={seed} width={34} height={47} />
 }
 
 export function CoverShow() {
@@ -53,7 +47,7 @@ export function CoverShow() {
             ['--static-x' as string]: `${walker.staticX}%`,
           }}
         >
-          <MiniPerson color={walker.color} />
+          <MiniPerson color={walker.color} seed={index * 7 + 3} />
         </div>
       ))}
       <div className="cover-floor" />

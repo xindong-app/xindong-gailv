@@ -1,5 +1,5 @@
 {
-  "dataVersion": "2026.08.14.1",
+  "dataVersion": "2026.08.14.2",
   "modelVersion": "3.1.0",
   "retrievedAt": "2026-08-14",
   "methodology": {
@@ -26,7 +26,10 @@
       "classification": "hard",
       "applicablePopulation": "中国大陆常住人口（不含港澳台居民和外籍人员）",
       "geography": "中国大陆31省份",
-      "ageRange": { "min": 18, "max": 50 },
+      "ageRange": {
+        "min": 18,
+        "max": 50
+      },
       "sexBasis": "male_female_separate",
       "dataYear": "2020-11-01",
       "publisher": "国家统计局、国务院第七次全国人口普查领导小组办公室",
@@ -40,7 +43,12 @@
         "如需2025年尺度，只允许用2025年1%人口抽样调查的同年龄大组总量做raking；详细2025单岁表发布前保留2020 cohort形状。",
         "城市场景先用城市常住人口占全国常住人口缩放，再应用同一年龄结构；这是假设而非城市单岁直接统计。"
       ],
-      "estimate": { "baseline": 14043179, "optimistic": 14043179, "conservative": 14043179, "unit": "people" },
+      "estimate": {
+        "baseline": 14043179,
+        "optimistic": 14043179,
+        "conservative": 14043179,
+        "unit": "people"
+      },
       "grade": "A",
       "limitations": [
         "逐岁整数由官方A0301.xls进入population-by-age.json，并用年龄连续性、男女求和及原表5岁组汇总做校验测试。",
@@ -48,7 +56,7 @@
         "estimate字段仅用18岁人口作机器可读示例，模型应读取population-by-age.json完整单岁数组。"
       ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "direct"
     },
     {
@@ -59,7 +67,10 @@
       "classification": "hard",
       "applicablePopulation": "中国大陆31省份人口",
       "geography": "中国大陆31省份",
-      "ageRange": { "min": 0, "max": null },
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
       "sexBasis": "both_and_separate",
       "dataYear": "2025-11-01",
       "publisher": "国家统计局",
@@ -70,14 +81,19 @@
       "directValue": "总人口140,545万人；男71,722万人（51.03%），女68,823万人（48.97%）；15—59岁86,987万人；城镇人口95,208万人（67.74%）。",
       "transformation": "用作2020单岁人口表的最新宏观总量、性别和劳动年龄人口校准边界；在详细单岁表未发布前，不把15—59岁平均分配到各单岁。",
       "adjustments": [],
-      "estimate": { "baseline": 1405450000, "optimistic": 1405450000, "conservative": 1405450000, "unit": "people" },
+      "estimate": {
+        "baseline": 1405450000,
+        "optimistic": 1405450000,
+        "conservative": 1405450000,
+        "unit": "people"
+      },
       "grade": "A",
       "limitations": [
         "公报没有18—50岁单岁数据。",
         "2025年11月1日时点与2025年末公报时点不同，二者总量不可直接判为矛盾。"
       ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "calibration"
     },
     {
@@ -88,7 +104,10 @@
       "classification": "hard",
       "applicablePopulation": "中国大陆31省份人口",
       "geography": "中国大陆31省份",
-      "ageRange": { "min": 0, "max": null },
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
       "sexBasis": "both_and_separate",
       "dataYear": "2025-12-31",
       "publisher": "国家统计局",
@@ -98,12 +117,22 @@
       "denominator": "年末全国人口，不含港澳台",
       "directValue": "总人口140,489万人；城镇95,380万人（67.9%）；乡村45,109万人；就业人员72,504万人，其中城镇就业47,535万人。",
       "transformation": "本条只用于2025年全国场景的宏观总量校准；城市18—50岁年龄×性别份额不以本条为分母。城市计算固定使用与A0301/A0401分子同口径的2020七普31省份人口1,409,778,724人（140,977.8724万人）作份额分母。",
-      "adjustments": ["多城市人口池按城市常住人口求和并去除重复城市；不再额外乘全国城镇化率。"],
-      "estimate": { "baseline": 1404890000, "optimistic": 1404890000, "conservative": 1404890000, "unit": "people" },
+      "adjustments": [
+        "多城市人口池按城市常住人口求和并去除重复城市；不再额外乘全国城镇化率。"
+      ],
+      "estimate": {
+        "baseline": 1404890000,
+        "optimistic": 1404890000,
+        "conservative": 1404890000,
+        "unit": "people"
+      },
       "grade": "A",
-      "limitations": ["本条不含市级人口；各城市仍需逐市统计公报和年份字段。", "2025年末总量与2020七普单岁分子不是同一时点，禁止用140,489万人除2020单岁人口。"],
+      "limitations": [
+        "本条不含市级人口；各城市仍需逐市统计公报和年份字段。",
+        "2025年末总量与2020七普单岁分子不是同一时点，禁止用140,489万人除2020单岁人口。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "calibration"
     },
     {
@@ -114,7 +143,10 @@
       "classification": "hard",
       "applicablePopulation": "大陆31个省、自治区、直辖市人口；不含另表列示的现役军人、港澳台居民和外籍人员",
       "geography": "中国大陆31省份",
-      "ageRange": { "min": 0, "max": null },
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
       "sexBasis": "both",
       "dataYear": "2020-11-01",
       "publisher": "国家统计局、国务院第七次全国人口普查领导小组办公室",
@@ -128,7 +160,12 @@
         "多城市先按城市名去重，再对已登记的官方年末常住人口锚点求和；无可追溯锚点的城市不以0人代算。",
         "现役军人另表虽有学历汇总，但没有18—50岁逐岁×性别×学历联合格，故不混入A0301/A0401详细表分子或分母。"
       ],
-      "estimate": { "baseline": 1409778724, "optimistic": 1409778724, "conservative": 1409778724, "unit": "people" },
+      "estimate": {
+        "baseline": 1409778724,
+        "optimistic": 1409778724,
+        "conservative": 1409778724,
+        "unit": "people"
+      },
       "grade": "A",
       "limitations": [
         "本条是2020七普详细表31省份人口宇宙，只作为同次普查年龄×性别×学历人数的份额分母，不表示任一城市在2020年或2025年的人口。",
@@ -136,7 +173,7 @@
         "城市0.70—1.30宽情景倍数用于披露结构不确定性，不是本条直接人口总数的统计误差或置信区间。"
       ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "direct"
     },
     {
@@ -147,7 +184,10 @@
       "classification": "hard",
       "applicablePopulation": "中国大陆31省份人口",
       "geography": "中国大陆31省份",
-      "ageRange": { "min": 0, "max": null },
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
       "sexBasis": "male_female_separate",
       "dataYear": "2025-11-01",
       "publisher": "国家统计局",
@@ -158,11 +198,18 @@
       "directValue": "男性51.03%，女性48.97%，总人口性别比104.21。",
       "transformation": "仅用于宏观校准；18—50岁计算优先采用2020单岁表中的年龄别男性/女性人数，避免用全龄性别占比覆盖年龄差异。",
       "adjustments": [],
-      "estimate": { "baseline": 0.5103, "optimistic": 0.5103, "conservative": 0.5103, "unit": "share" },
+      "estimate": {
+        "baseline": 0.5103,
+        "optimistic": 0.5103,
+        "conservative": 0.5103,
+        "unit": "share"
+      },
       "grade": "A",
-      "limitations": ["全龄性别结构不能代替某个年龄或某个城市的性别结构。"],
+      "limitations": [
+        "全龄性别结构不能代替某个年龄或某个城市的性别结构。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "calibration"
     },
     {
@@ -173,7 +220,10 @@
       "classification": "hard",
       "applicablePopulation": "中国大陆15岁及以上普查长表样本人口",
       "geography": "中国大陆31省份",
-      "ageRange": { "min": 15, "max": null },
+      "ageRange": {
+        "min": 15,
+        "max": null
+      },
       "sexBasis": "male_female_separate",
       "dataYear": "2020-11-01",
       "publisher": "国家统计局、国务院第七次全国人口普查领导小组办公室",
@@ -188,7 +238,12 @@
         "不使用结婚登记对数直接推高或压低存量未婚率；登记是流量，普查婚姻状态是存量。",
         "若用户取消所有婚姻状态，语义是不限婚史，因子必须为1，不能回退未婚。"
       ],
-      "estimate": { "baseline": 0.2055, "optimistic": 0.2055, "conservative": 0.2055, "unit": "share" },
+      "estimate": {
+        "baseline": 0.2055,
+        "optimistic": 0.2055,
+        "conservative": 0.2055,
+        "unit": "share"
+      },
       "grade": "B",
       "limitations": [
         "长表样本没有推算至全体，但率在正确使用抽样权重/官方汇总时可作为普查估计；页面须说明样本表口径。",
@@ -197,7 +252,7 @@
         "18–19岁借用15–19岁组，50岁借用50—54岁组；启用婚史且触及边界时运行等级降为C。"
       ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "anchor"
     },
     {
@@ -208,7 +263,10 @@
       "classification": "hard",
       "applicablePopulation": "20—59岁中国成年人国民体质监测样本",
       "geography": "全国31省份",
-      "ageRange": { "min": 20, "max": 59 },
+      "ageRange": {
+        "min": 20,
+        "max": 59
+      },
       "sexBasis": "male_female_separate",
       "dataYear": "2020",
       "publisher": "国家体育总局体育科学研究所、国家国民体质监测中心",
@@ -218,15 +276,22 @@
       "denominator": "国民体质监测成年人样本，按性别和5岁年龄组",
       "directValue": "平均身高（男/女，厘米）：20—24岁172.6/160.6；25—29岁172.1/159.8；30—34岁171.4/159.1；35—39岁170.4/158.6；40—44岁169.4/158.0；45—49岁168.7/157.7；50—54岁167.9/157.0。",
       "transformation": "年龄组内平均值作正态或经验CDF的中心；阈值概率必须另外使用同口径标准差/分位数。若仅有均值而无离散度，不得声称为A级阈值概率。",
-      "adjustments": ["18—19岁没有成年人表对应值，暂用20—24岁组并扩大不确定区间。"],
-      "estimate": { "baseline": 172.6, "optimistic": 172.6, "conservative": 172.6, "unit": "cm" },
+      "adjustments": [
+        "18—19岁没有成年人表对应值，暂用20—24岁组并扩大不确定区间。"
+      ],
+      "estimate": {
+        "baseline": 172.6,
+        "optimistic": 172.6,
+        "conservative": 172.6,
+        "unit": "cm"
+      },
       "grade": "A",
       "limitations": [
         "公开公报给出均值但不在同一表给标准差；正态分布与标准差属于另一个证据条目/模型假设。",
         "监测样本与常住人口普查分母不同，地域差异未进入当前全国锚点。"
       ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "anchor"
     },
     {
@@ -237,7 +302,10 @@
       "classification": "hard",
       "applicablePopulation": "18—44岁中国居民",
       "geography": "全国31省份",
-      "ageRange": { "min": 18, "max": 44 },
+      "ageRange": {
+        "min": 18,
+        "max": 44
+      },
       "sexBasis": "male_female_separate",
       "dataYear": "2015—2019监测，2020发布",
       "publisher": "国家卫生健康委员会、国务院新闻办公室",
@@ -248,11 +316,18 @@
       "directValue": "18—44岁男性169.7厘米，女性158.0厘米。",
       "transformation": "仅作为国民体质监测年龄曲线的宏观交叉校验，不与其再次相乘。",
       "adjustments": [],
-      "estimate": { "baseline": 169.7, "optimistic": 169.7, "conservative": 169.7, "unit": "cm" },
+      "estimate": {
+        "baseline": 169.7,
+        "optimistic": 169.7,
+        "conservative": 169.7,
+        "unit": "cm"
+      },
       "grade": "A",
-      "limitations": ["不同监测体系、抽样框和年龄加权使其与体育总局均值不可直接判为冲突。"],
+      "limitations": [
+        "不同监测体系、抽样框和年龄加权使其与体育总局均值不可直接判为冲突。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "calibration"
     },
     {
@@ -263,7 +338,10 @@
       "classification": "hard",
       "applicablePopulation": "18—50岁中国成年人",
       "geography": "全国（模型假设）",
-      "ageRange": { "min": 18, "max": 50 },
+      "ageRange": {
+        "min": 18,
+        "max": 50
+      },
       "sexBasis": "male_female_separate",
       "dataYear": "model-2026",
       "publisher": "心动概率局模型组",
@@ -273,15 +351,22 @@
       "denominator": "非直接统计；GB/T 10000-2023成年人尺寸分位资料可用于后续替换/复核",
       "directValue": "当前临时假设：男性标准差6.2厘米、女性5.7厘米。",
       "transformation": "P(L≤H≤U)=Φ((U-μ)/σ)-Φ((L-μ)/σ)；仅下限或上限使用对应单尾；概率截断到[0,1]。",
-      "adjustments": ["乐观/保守范围通过σ和均值敏感性分析生成，不把固定倍数伪装成置信区间。"],
-      "estimate": { "baseline": 6.2, "optimistic": 6.6, "conservative": 5.8, "unit": "cm" },
+      "adjustments": [
+        "乐观/保守范围通过σ和均值敏感性分析生成，不把固定倍数伪装成置信区间。"
+      ],
+      "estimate": {
+        "baseline": 6.2,
+        "optimistic": 6.6,
+        "conservative": 5.8,
+        "unit": "cm"
+      },
       "grade": "C",
       "limitations": [
         "标准差尚未从可公开逐项核验的同口径官方表直接提取。",
         "正态近似对极端身高尾部尤其敏感；超过约3个标准差时可信度应降级。"
       ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "anchor"
     },
     {
@@ -292,7 +377,10 @@
       "classification": "correlated_hard",
       "applicablePopulation": "18岁及以上中国居民",
       "geography": "全国31省份",
-      "ageRange": { "min": 18, "max": null },
+      "ageRange": {
+        "min": 18,
+        "max": null
+      },
       "sexBasis": "both",
       "dataYear": "2018",
       "publisher": "国家卫生健康委员会",
@@ -302,12 +390,22 @@
       "denominator": "18岁及以上居民",
       "directValue": "超重率（24≤BMI<28）34.3%，肥胖率（BMI≥28）16.4%。",
       "transformation": "已知两个区间可直接用于粗分组；对“偏瘦/正常”等完整分布或年龄性别细分需额外证据，不能仅凭两项比例反推精确正态参数。",
-      "adjustments": ["BMI与年龄、运动、慢性病相关；如作为相关硬条件，应在健康簇联合而非与运动/健康简单连乘。"],
-      "estimate": { "baseline": 0.164, "optimistic": 0.164, "conservative": 0.164, "unit": "share" },
+      "adjustments": [
+        "BMI与年龄、运动、慢性病相关；如作为相关硬条件，应在健康簇联合而非与运动/健康简单连乘。"
+      ],
+      "estimate": {
+        "baseline": 0.164,
+        "optimistic": 0.164,
+        "conservative": 0.164,
+        "unit": "share"
+      },
       "grade": "A",
-      "limitations": ["全龄、男女合计口径不能直接代表具体年龄性别。", "BMI不是人的价值或单独健康结论。"],
+      "limitations": [
+        "全龄、男女合计口径不能直接代表具体年龄性别。",
+        "BMI不是人的价值或单独健康结论。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "anchor"
     },
     {
@@ -318,7 +416,10 @@
       "classification": "correlated_hard",
       "applicablePopulation": "中国大陆31省份3岁及以上人口；不含另表列示的现役军人",
       "geography": "中国大陆31省份",
-      "ageRange": { "min": 18, "max": 50 },
+      "ageRange": {
+        "min": 18,
+        "max": 50
+      },
       "sexBasis": "male_female_separate",
       "dataYear": "2020-11-01",
       "publisher": "国家统计局、国务院第七次全国人口普查领导小组办公室",
@@ -332,7 +433,12 @@
         "直接按年龄与性别分层，不再用一个全国常数乘任意年龄的cohort修正。",
         "学历与收入/职业组成经济社会簇；联合模型不得先乘学历边际率再乘无条件收入边际率。"
       ],
-      "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
+      "estimate": {
+        "baseline": null,
+        "optimistic": null,
+        "conservative": null,
+        "unit": "share"
+      },
       "grade": "A",
       "limitations": [
         "这是2020年11月1日普查时点存量，不是当前年度实时学历结构。",
@@ -340,7 +446,7 @@
         "A0401已明确拆分硕士和博士；但城市缺少同口径单岁×性别×学历表，城市结果仍沿用全国结构并由地域组降为C级。"
       ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "direct"
     },
     {
@@ -351,7 +457,10 @@
       "classification": "correlated_hard",
       "applicablePopulation": "中国大陆总人口",
       "geography": "中国大陆31省份",
-      "ageRange": { "min": 0, "max": null },
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
       "sexBasis": "both",
       "dataYear": "2025-11-01",
       "publisher": "国家统计局",
@@ -362,11 +471,18 @@
       "directValue": "大学（大专及以上）文化程度人口27,233万人；高中24,272万人；初中45,283万人；小学33,122万人。",
       "transformation": "仅用于校准2020表的总体变化方向；因没有年龄性别细分，不覆盖18—50岁分层率。",
       "adjustments": [],
-      "estimate": { "baseline": 272330000, "optimistic": 272330000, "conservative": 272330000, "unit": "people" },
+      "estimate": {
+        "baseline": 272330000,
+        "optimistic": 272330000,
+        "conservative": 272330000,
+        "unit": "people"
+      },
       "grade": "A",
-      "limitations": ["公报中的大学人口分母含各年龄；不能直接当作适婚年龄大学率。"],
+      "limitations": [
+        "公报中的大学人口分母含各年龄；不能直接当作适婚年龄大学率。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "calibration"
     },
     {
@@ -377,7 +493,10 @@
       "classification": "correlated_hard",
       "applicablePopulation": "全国高等教育学生",
       "geography": "全国",
-      "ageRange": { "min": null, "max": null },
+      "ageRange": {
+        "min": null,
+        "max": null
+      },
       "sexBasis": "not_reported",
       "dataYear": "2025",
       "publisher": "教育部",
@@ -388,11 +507,18 @@
       "directValue": "高等教育在学总规模4,872.57万人；普通本科招生503.71万人，高职（专科）招生551.70万人。",
       "transformation": "只做cohort趋势校验；招生是年度流量，不能除以某个单岁人口后直接替代已经毕业人群的最高学历比例。",
       "adjustments": [],
-      "estimate": { "baseline": 48725700, "optimistic": 48725700, "conservative": 48725700, "unit": "people" },
+      "estimate": {
+        "baseline": 48725700,
+        "optimistic": 48725700,
+        "conservative": 48725700,
+        "unit": "people"
+      },
       "grade": "A",
-      "limitations": ["包含成人、网络、自考等多种形式的在学规模；存在学制跨年和重复口径风险。"],
+      "limitations": [
+        "包含成人、网络、自考等多种形式的在学规模；存在学制跨年和重复口径风险。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "calibration"
     },
     {
@@ -403,7 +529,10 @@
       "classification": "correlated_hard",
       "applicablePopulation": "18—50岁成年人",
       "geography": "全国（模型假设）",
-      "ageRange": { "min": 18, "max": 50 },
+      "ageRange": {
+        "min": 18,
+        "max": 50
+      },
       "sexBasis": "both",
       "dataYear": "model-2026",
       "publisher": "心动概率局模型组",
@@ -413,12 +542,22 @@
       "denominator": "当前没有相同口径的年龄×性别×院校层级存量官方表",
       "directValue": "无可直接用于人口砍减的相同口径官方比例。",
       "transformation": "旧模型用年度录取人数÷单岁人口推估终身院校层级存量；该转换忽略扩招、毕业、海外/成人教育、院校变更和年龄cohort，升级版不得以A级展示。",
-      "adjustments": ["如保留，限定为教育簇内的C级条件参数并提供宽区间；更稳妥做法是作为软偏好。"],
-      "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
+      "adjustments": [
+        "如保留，限定为教育簇内的C级条件参数并提供宽区间；更稳妥做法是作为软偏好。"
+      ],
+      "estimate": {
+        "baseline": null,
+        "optimistic": null,
+        "conservative": null,
+        "unit": "share"
+      },
       "grade": "C",
-      "limitations": ["985/211已不是当前建设体系的正式新招生分类。", "不能与本科率和收入率重复连乘。"],
+      "limitations": [
+        "985/211已不是当前建设体系的正式新招生分类。",
+        "不能与本科率和收入率重复连乘。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "excluded"
     },
     {
@@ -429,7 +568,10 @@
       "classification": "correlated_hard",
       "applicablePopulation": "城镇法人单位就业人员",
       "geography": "全国及东中西东北地区",
-      "ageRange": { "min": null, "max": null },
+      "ageRange": {
+        "min": null,
+        "max": null
+      },
       "sexBasis": "not_reported",
       "dataYear": "2025",
       "publisher": "国家统计局",
@@ -443,7 +585,12 @@
         "未来若取得同口径微观表，须先建就业状态；只有就业者进入劳动收入分布。",
         "任何地区、学历、职业、年龄联合建模都只能在明确标注的研究情景中运行，不得削减主人口。"
       ],
-      "estimate": { "baseline": 106080, "optimistic": 129441, "conservative": 71590, "unit": "cny_per_year" },
+      "estimate": {
+        "baseline": 106080,
+        "optimistic": 129441,
+        "conservative": 71590,
+        "unit": "cny_per_year"
+      },
       "grade": "A",
       "limitations": [
         "均值无法独立识别收入尾部；百万年薪比例需要其他分布数据。",
@@ -451,7 +598,7 @@
         "该条虽为A级官方均值，仍不支持产品的个人收入阈值概率；A级来源不自动产生A级转换。"
       ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "anchor"
     },
     {
@@ -462,7 +609,10 @@
       "classification": "correlated_hard",
       "applicablePopulation": "全国住户调查常住居民",
       "geography": "全国",
-      "ageRange": { "min": null, "max": null },
+      "ageRange": {
+        "min": null,
+        "max": null
+      },
       "sexBasis": "both",
       "dataYear": "2025",
       "publisher": "国家统计局",
@@ -473,11 +623,18 @@
       "directValue": "人均可支配收入43,377元，中位数36,231元；五等份组均值10,150/22,702/35,536/55,586/103,778元。",
       "transformation": "仅作为收入分布总体形状和中位数合理性校验，不能直接替代个人税前年收入阈值分布。",
       "adjustments": [],
-      "estimate": { "baseline": 36231, "optimistic": 43377, "conservative": 36231, "unit": "cny_per_year" },
+      "estimate": {
+        "baseline": 36231,
+        "optimistic": 43377,
+        "conservative": 36231,
+        "unit": "cny_per_year"
+      },
       "grade": "A",
-      "limitations": ["个人劳动税前年收入、家庭人均可支配收入、单位平均工资是三种不同概念。"],
+      "limitations": [
+        "个人劳动税前年收入、家庭人均可支配收入、单位平均工资是三种不同概念。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "calibration"
     },
     {
@@ -488,7 +645,10 @@
       "classification": "correlated_hard",
       "applicablePopulation": "户籍仍在农村、年内从事非农产业或外出从业6个月及以上的劳动者",
       "geography": "全国及东中西东北地区",
-      "ageRange": { "min": 16, "max": null },
+      "ageRange": {
+        "min": 16,
+        "max": null
+      },
       "sexBasis": "not_reported",
       "dataYear": "2025",
       "publisher": "国家统计局",
@@ -499,11 +659,18 @@
       "directValue": "月均收入5,075元；外出农民工5,774元，本地农民工4,376元；东部5,501元、中部4,838元、西部4,653元、东北4,335元。",
       "transformation": "年化仅作锚点：月均收入×12；不与城镇单位平均工资直接加权，除非权重来自同一就业人口框。",
       "adjustments": [],
-      "estimate": { "baseline": 60900, "optimistic": 69288, "conservative": 52512, "unit": "cny_per_year" },
+      "estimate": {
+        "baseline": 60900,
+        "optimistic": 69288,
+        "conservative": 52512,
+        "unit": "cny_per_year"
+      },
       "grade": "B",
-      "limitations": ["月均收入按从业时间计算，年化隐含全年从业12个月；农民工不是全部灵活就业者。"],
+      "limitations": [
+        "月均收入按从业时间计算，年化隐含全年从业12个月；农民工不是全部灵活就业者。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "calibration"
     },
     {
@@ -514,7 +681,10 @@
       "classification": "correlated_hard",
       "applicablePopulation": "中国城镇居民家庭",
       "geography": "全国30省份",
-      "ageRange": { "min": null, "max": null },
+      "ageRange": {
+        "min": null,
+        "max": null
+      },
       "sexBasis": "household",
       "dataYear": "2019-10",
       "publisher": "中国人民银行调查统计司城镇居民家庭资产负债调查课题组",
@@ -528,7 +698,12 @@
         "资产是家庭分母，不得宣称为目标个人名下资产。",
         "年龄、城市、住房、收入高度相关，经济社会簇内联合建模，不与住房率重复连乘。"
       ],
-      "estimate": { "baseline": 163, "optimistic": 163, "conservative": 163, "unit": "wan_cny" },
+      "estimate": {
+        "baseline": 163,
+        "optimistic": 163,
+        "conservative": 163,
+        "unit": "wan_cny"
+      },
       "grade": "A",
       "limitations": [
         "原文发表于《中国金融》2020年第9期，央行官网检索目前仅稳定返回调查工作页；URL为作者署名的原文转载页，维护时应优先替换为央行持久链接。",
@@ -536,7 +711,7 @@
         "当前URL是二次发布页而非人民银行持久原文，来源链不满足生产级量化要求。"
       ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "anchor"
     },
     {
@@ -547,7 +722,10 @@
       "classification": "correlated_hard",
       "applicablePopulation": "城镇居民家庭",
       "geography": "全国（模型假设）",
-      "ageRange": { "min": null, "max": null },
+      "ageRange": {
+        "min": null,
+        "max": null
+      },
       "sexBasis": "household",
       "dataYear": "model-2026",
       "publisher": "心动概率局模型组",
@@ -557,12 +735,22 @@
       "denominator": "非直接统计；家庭总资产门槛概率",
       "directValue": "旧参数σ=0.563以及600万以上分段幂律没有被央行调查直接给出。",
       "transformation": "参数只可用于独立研究沙盒的敏感性演示；不得把情景范围包装成统计置信区间，也不得削减主人口。",
-      "adjustments": ["与收入联合时应使用经验相关范围并限制联合概率≤任一边际概率。"],
-      "estimate": { "baseline": 0.563, "optimistic": 0.7, "conservative": 0.45, "unit": "log_scale_sd" },
+      "adjustments": [
+        "与收入联合时应使用经验相关范围并限制联合概率≤任一边际概率。"
+      ],
+      "estimate": {
+        "baseline": 0.563,
+        "optimistic": 0.7,
+        "conservative": 0.45,
+        "unit": "log_scale_sd"
+      },
       "grade": "C",
-      "limitations": ["该数是对数资产尺度的标准差情景，不是人口比例。", "极富家庭抽样不足会显著影响高门槛。"],
+      "limitations": [
+        "该数是对数资产尺度的标准差情景，不是人口比例。",
+        "极富家庭抽样不足会显著影响高门槛。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "anchor"
     },
     {
@@ -573,7 +761,10 @@
       "classification": "correlated_hard",
       "applicablePopulation": "中国城镇居民家庭",
       "geography": "全国30省份",
-      "ageRange": { "min": null, "max": null },
+      "ageRange": {
+        "min": null,
+        "max": null
+      },
       "sexBasis": "household",
       "dataYear": "2019",
       "publisher": "中国人民银行调查统计司城镇居民家庭资产负债调查课题组",
@@ -587,11 +778,19 @@
         "选择资产时房产价值已包含于家庭总资产，住房与资产必须联合；不得把资产概率×独立住房概率。",
         "“接受共同购房”是软偏好，不进入住房存量概率。"
       ],
-      "estimate": { "baseline": 0.96, "optimistic": 0.96, "conservative": 0.96, "unit": "share" },
+      "estimate": {
+        "baseline": 0.96,
+        "optimistic": 0.96,
+        "conservative": 0.96,
+        "unit": "share"
+      },
       "grade": "A",
-      "limitations": ["不支持旧模型的‘城镇青年本地有房55%’；55%至多是待替换的C级假设。", "家庭住房可能属于父母或位于异地。"],
+      "limitations": [
+        "不支持旧模型的‘城镇青年本地有房55%’；55%至多是待替换的C级假设。",
+        "家庭住房可能属于父母或位于异地。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "calibration"
     },
     {
@@ -602,7 +801,10 @@
       "classification": "correlated_hard",
       "applicablePopulation": "18—50岁目标城市常住个人",
       "geography": "城市（模型假设）",
-      "ageRange": { "min": 18, "max": 50 },
+      "ageRange": {
+        "min": 18,
+        "max": 50
+      },
       "sexBasis": "both",
       "dataYear": "model-2026",
       "publisher": "心动概率局模型组",
@@ -612,12 +814,22 @@
       "denominator": "缺少全国统一、年龄×性别×城市的相同口径直接统计",
       "directValue": "旧模型常数0.55无可核验直接来源。",
       "transformation": "该常数只保留为研究情景兼容值；人口量化政策为research_only/do_not_apply，主估算不得按年龄或城市继续外推。",
-      "adjustments": ["基准0.45、乐观0.60、保守0.30仅为敏感性范围，不是调查结果。"],
-      "estimate": { "baseline": 0.45, "optimistic": 0.6, "conservative": 0.3, "unit": "share" },
+      "adjustments": [
+        "基准0.45、乐观0.60、保守0.30仅为敏感性范围，不是调查结果。"
+      ],
+      "estimate": {
+        "baseline": 0.45,
+        "optimistic": 0.6,
+        "conservative": 0.3,
+        "unit": "share"
+      },
       "grade": "C",
-      "limitations": ["全国不同城市差异巨大。", "个人产权、家庭可用住房、本地住房语义需在UI明确。"],
+      "limitations": [
+        "全国不同城市差异巨大。",
+        "个人产权、家庭可用住房、本地住房语义需在UI明确。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "anchor"
     },
     {
@@ -628,7 +840,10 @@
       "classification": "correlated_hard",
       "applicablePopulation": "全国居民家庭",
       "geography": "全国",
-      "ageRange": { "min": null, "max": null },
+      "ageRange": {
+        "min": null,
+        "max": null
+      },
       "sexBasis": "household",
       "dataYear": "2025",
       "publisher": "国家统计局",
@@ -638,12 +853,22 @@
       "denominator": "全国居民家庭，每百户拥有量（辆/百户），不是拥有汽车家庭占比",
       "directValue": "2025年全国居民平均每百户拥有家用汽车52.9辆；2020年为37.1辆。",
       "transformation": "52.9辆/百户不能直接等同于52.9%的家庭有车，因为一户可多车；可作为家庭有车率上限约束和趋势校准。个人本人名下有车率需要另外建模。",
-      "adjustments": ["汽车与收入、资产、城市交通和住房共同进入经济社会簇。"],
-      "estimate": { "baseline": 52.9, "optimistic": 52.9, "conservative": 52.9, "unit": "vehicles_per_100_households" },
+      "adjustments": [
+        "汽车与收入、资产、城市交通和住房共同进入经济社会簇。"
+      ],
+      "estimate": {
+        "baseline": 52.9,
+        "optimistic": 52.9,
+        "conservative": 52.9,
+        "unit": "vehicles_per_100_households"
+      },
       "grade": "A",
-      "limitations": ["辆/百户不等于拥有汽车的家庭比例，更不是个人本人名下有车率。", "不能支持旧模型CAR_RATE=42%的个人拥有率。"],
+      "limitations": [
+        "辆/百户不等于拥有汽车的家庭比例，更不是个人本人名下有车率。",
+        "不能支持旧模型CAR_RATE=42%的个人拥有率。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "calibration"
     },
     {
@@ -654,7 +879,10 @@
       "classification": "correlated_hard",
       "applicablePopulation": "18—50岁成年人",
       "geography": "全国/城市（模型假设）",
-      "ageRange": { "min": 18, "max": 50 },
+      "ageRange": {
+        "min": 18,
+        "max": 50
+      },
       "sexBasis": "both",
       "dataYear": "model-2026",
       "publisher": "心动概率局模型组",
@@ -664,12 +892,21 @@
       "denominator": "缺少年龄×性别×城市个人有车的统一官方比例",
       "directValue": "无直接统计。国家统计局明确家用汽车（户调）与私人汽车（车管登记）是不同指标。",
       "transformation": "旧个人常数只保留为研究情景兼容值；家庭辆/百户无法转换为个人有车及价位概率，主人口不得扣减。",
-      "adjustments": ["基准0.35、乐观0.48、保守0.24为模型敏感性范围。"],
-      "estimate": { "baseline": 0.35, "optimistic": 0.48, "conservative": 0.24, "unit": "share" },
+      "adjustments": [
+        "基准0.35、乐观0.48、保守0.24为模型敏感性范围。"
+      ],
+      "estimate": {
+        "baseline": 0.35,
+        "optimistic": 0.48,
+        "conservative": 0.24,
+        "unit": "share"
+      },
       "grade": "C",
-      "limitations": ["一户多车、家庭共用、未登记实际使用者都会造成换算偏差。"],
+      "limitations": [
+        "一户多车、家庭共用、未登记实际使用者都会造成换算偏差。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "anchor"
     },
     {
@@ -680,7 +917,10 @@
       "classification": "correlated_hard",
       "applicablePopulation": "15岁及以上中国居民",
       "geography": "全国",
-      "ageRange": { "min": 15, "max": null },
+      "ageRange": {
+        "min": 15,
+        "max": null
+      },
       "sexBasis": "male_female_separate",
       "dataYear": "2024",
       "publisher": "中国疾病预防控制中心",
@@ -690,12 +930,22 @@
       "denominator": "15岁及以上调查人群",
       "directValue": "现在吸烟率23.2%；男性43.9%，女性1.8%。",
       "transformation": "不吸烟率=1-现在吸烟率；男56.1%，女98.2%。如用户语义是‘从不吸烟’或‘不吸卷烟’，需要匹配相应指标，不能沿用现在吸烟的补集。",
-      "adjustments": ["吸烟与年龄、饮酒、职业相关；生活方式簇不无脑连乘。"],
-      "estimate": { "baseline": 0.561, "optimistic": 0.561, "conservative": 0.561, "unit": "share" },
+      "adjustments": [
+        "吸烟与年龄、饮酒、职业相关；生活方式簇不无脑连乘。"
+      ],
+      "estimate": {
+        "baseline": 0.561,
+        "optimistic": 0.561,
+        "conservative": 0.561,
+        "unit": "share"
+      },
       "grade": "B",
-      "limitations": ["estimate仅示例男性不吸烟率。", "全龄率不含年龄细分；电子烟定义需核对报告。"],
+      "limitations": [
+        "estimate仅示例男性不吸烟率。",
+        "全龄率不含年龄细分；电子烟定义需核对报告。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "direct"
     },
     {
@@ -706,7 +956,10 @@
       "classification": "correlated_hard",
       "applicablePopulation": "中国15岁及以上人群；产品仅使用18—50岁范围内对应年龄组",
       "geography": "中国大陆31省份",
-      "ageRange": { "min": 15, "max": null },
+      "ageRange": {
+        "min": 15,
+        "max": null
+      },
       "sexBasis": "male_female_separate",
       "dataYear": "2024",
       "publisher": "中国疾病预防控制中心慢性非传染性疾病预防控制中心等",
@@ -716,12 +969,24 @@
       "denominator": "2024年调查的46,376名15岁及以上参与者，经复杂抽样加权代表全国；过去30天/12个月饮酒定义为对应回溯期内饮用过酒精饮料",
       "directValue": "过去30天饮酒20.3%（95%CI 18.4%—22.2%），男34.3%、女5.9%；过去12个月饮酒27.6%（25.3%—29.8%），男44.5%、女10.2%。年龄组过去30天/12个月：15—24岁14.3%/22.0%，25—44岁23.2%/32.5%，45—64岁21.2%/27.3%。当前饮酒者中重度间歇饮酒42.9%。",
       "transformation": "公开表分别给出性别边际与年龄组边际，但没有年龄×性别联合率。运行时先取对应性别未饮酒率，再用年龄组饮酒率÷全龄饮酒率作raking比例调整并截断到[0,1]；该年龄×性别组合是C级近似。‘过去30天未饮酒’不等于终身不饮酒。",
-      "adjustments": ["18—24岁用15—24岁公开组作为近似；45—50岁用45—64岁公开组作为近似，因此应用到产品年龄边界时降一级。"],
-      "estimate": { "baseline": 0.203, "optimistic": 0.222, "conservative": 0.184, "unit": "share" },
+      "adjustments": [
+        "18—24岁用15—24岁公开组作为近似；45—50岁用45—64岁公开组作为近似，因此应用到产品年龄边界时降一级。"
+      ],
+      "estimate": {
+        "baseline": 0.203,
+        "optimistic": 0.222,
+        "conservative": 0.184,
+        "unit": "share"
+      },
       "grade": "C",
-      "limitations": ["公开年龄组不与产品18—50边界完全一致，不能作为逐单岁直接率。", "公开结果没有年龄×性别联合单元格；运行时raking近似不能显示为B级直接率。", "自报饮酒存在回忆与社会期许偏差；过去30天、过去12个月、重度间歇饮酒是不同指标。", "旧模型男性58.4%、女性18.7%及规律饮酒参数已被更近期同口径来源替换，不得继续混用。"],
+      "limitations": [
+        "公开年龄组不与产品18—50边界完全一致，不能作为逐单岁直接率。",
+        "公开结果没有年龄×性别联合单元格；运行时raking近似不能显示为B级直接率。",
+        "自报饮酒存在回忆与社会期许偏差；过去30天、过去12个月、重度间歇饮酒是不同指标。",
+        "旧模型男性58.4%、女性18.7%及规律饮酒参数已被更近期同口径来源替换，不得继续混用。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "anchor"
     },
     {
@@ -732,7 +997,10 @@
       "classification": "correlated_hard",
       "applicablePopulation": "全国居民/国民体质监测口径",
       "geography": "全国",
-      "ageRange": { "min": null, "max": null },
+      "ageRange": {
+        "min": null,
+        "max": null
+      },
       "sexBasis": "both",
       "dataYear": "2020",
       "publisher": "国家体育总局、国家卫生健康委员会新闻发布平台",
@@ -742,12 +1010,22 @@
       "denominator": "全民健身活动状况调查人口",
       "directValue": "2020年经常参加体育锻炼人数比例37.2%，较2014年提高3.3个百分点。",
       "transformation": "只有用户选择的训练频率与官方定义一致时才能直接使用37.2%；‘偶尔运动’或‘身材有训练痕迹’不是同一指标。",
-      "adjustments": ["与BMI、睡眠、慢性病相关，进入健康行为簇联合；不能与这些边际率全乘。"],
-      "estimate": { "baseline": 0.372, "optimistic": 0.372, "conservative": 0.372, "unit": "share" },
+      "adjustments": [
+        "与BMI、睡眠、慢性病相关，进入健康行为簇联合；不能与这些边际率全乘。"
+      ],
+      "estimate": {
+        "baseline": 0.372,
+        "optimistic": 0.372,
+        "conservative": 0.372,
+        "unit": "share"
+      },
       "grade": "A",
-      "limitations": ["该发布会未在摘要中列年龄、性别和地区细分。", "2025年官方报道为7岁及以上38.52%，口径与成年人筛选仍需核对后再替换。"],
+      "limitations": [
+        "该发布会未在摘要中列年龄、性别和地区细分。",
+        "2025年官方报道为7岁及以上38.52%，口径与成年人筛选仍需核对后再替换。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "anchor"
     },
     {
@@ -758,7 +1036,10 @@
       "classification": "correlated_hard",
       "applicablePopulation": "18岁及以上中国成年人",
       "geography": "全国",
-      "ageRange": { "min": 18, "max": null },
+      "ageRange": {
+        "min": 18,
+        "max": null
+      },
       "sexBasis": "both",
       "dataYear": "2012—2015",
       "publisher": "国家心血管病中心等",
@@ -768,12 +1049,22 @@
       "denominator": "全国代表性18岁及以上成人调查样本",
       "directValue": "成人高血压患病率23.2%，另有41.3%为高血压前期（论文定义）。",
       "transformation": "全龄率只能作年龄函数的总体校准。‘无慢性病’不是1-高血压率；还需糖尿病、其他病种及共病联合。",
-      "adjustments": ["与年龄、BMI、运动、睡眠强相关，健康簇条件化。"],
-      "estimate": { "baseline": 0.232, "optimistic": 0.232, "conservative": 0.232, "unit": "share" },
+      "adjustments": [
+        "与年龄、BMI、运动、睡眠强相关，健康簇条件化。"
+      ],
+      "estimate": {
+        "baseline": 0.232,
+        "optimistic": 0.232,
+        "conservative": 0.232,
+        "unit": "share"
+      },
       "grade": "A",
-      "limitations": ["旧模型单岁无慢性病曲线并非论文直接给出。", "诊断阈值变化会改变流行率。"],
+      "limitations": [
+        "旧模型单岁无慢性病曲线并非论文直接给出。",
+        "诊断阈值变化会改变流行率。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "calibration"
     },
     {
@@ -784,7 +1075,10 @@
       "classification": "correlated_hard",
       "applicablePopulation": "18—50岁成年人",
       "geography": "全国（模型假设）",
-      "ageRange": { "min": 18, "max": 50 },
+      "ageRange": {
+        "min": 18,
+        "max": 50
+      },
       "sexBasis": "both",
       "dataYear": "model-2026",
       "publisher": "心动概率局模型组",
@@ -794,12 +1088,22 @@
       "denominator": "定义依赖纳入的病种和自报/检测方式",
       "directValue": "旧曲线20岁0.95至50岁0.61不是任何单一官方表直接值。",
       "transformation": "只有UI明确‘未检出高血压或糖尿病’时，才可用两病联合率；更宽泛‘无慢性病’应改为软偏好或不给人口概率。",
-      "adjustments": ["模型输出需标C级并展示定义。"],
-      "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
+      "adjustments": [
+        "模型输出需标C级并展示定义。"
+      ],
+      "estimate": {
+        "baseline": null,
+        "optimistic": null,
+        "conservative": null,
+        "unit": "share"
+      },
       "grade": "C",
-      "limitations": ["病种集合不清会造成严重语义误导。", "健康属于敏感信息，默认不分享。"],
+      "limitations": [
+        "病种集合不清会造成严重语义误导。",
+        "健康属于敏感信息，默认不分享。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "excluded"
     },
     {
@@ -810,7 +1114,10 @@
       "classification": "correlated_hard",
       "applicablePopulation": "中国一般人群",
       "geography": "中国",
-      "ageRange": { "min": null, "max": null },
+      "ageRange": {
+        "min": null,
+        "max": null
+      },
       "sexBasis": "both",
       "dataYear": "文献检索截至2023-11-23",
       "publisher": "同行评议系统综述与Meta分析",
@@ -820,12 +1127,22 @@
       "denominator": "32项研究，共376,824名参与者",
       "directValue": "睡眠质量差合并流行率19.0%（95%CI 15.8%—22.8%；研究范围6.6%—43.6%）。",
       "transformation": "若‘睡眠良好’定义为非睡眠质量差，基准补集81.0%，乐观84.2%，保守77.2%。",
-      "adjustments": ["睡眠与年龄、健康、工作制度相关；在健康行为簇联合。"],
-      "estimate": { "baseline": 0.81, "optimistic": 0.842, "conservative": 0.772, "unit": "share" },
+      "adjustments": [
+        "睡眠与年龄、健康、工作制度相关；在健康行为簇联合。"
+      ],
+      "estimate": {
+        "baseline": 0.81,
+        "optimistic": 0.842,
+        "conservative": 0.772,
+        "unit": "share"
+      },
       "grade": "B",
-      "limitations": ["异质性高；不同量表和阈值并不完全等价。", "不能把失眠诊断、失眠症状和睡眠质量差混成同一指标。"],
+      "limitations": [
+        "异质性高；不同量表和阈值并不完全等价。",
+        "不能把失眠诊断、失眠症状和睡眠质量差混成同一指标。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "anchor"
     },
     {
@@ -836,7 +1153,10 @@
       "classification": "correlated_hard",
       "applicablePopulation": "18—50岁成年人",
       "geography": "全国",
-      "ageRange": { "min": 18, "max": 50 },
+      "ageRange": {
+        "min": 18,
+        "max": 50
+      },
       "sexBasis": "both",
       "dataYear": "model-2026",
       "publisher": "心动概率局模型组",
@@ -847,11 +1167,19 @@
       "directValue": "邯郸农村眼病研究经2000年人口标化的成人近视率26.7%；不能代表全国年轻城市成年人。",
       "transformation": "旧模型按年龄设不近视0.28—0.55以及本科人群0.12，证据不能支撑全国同口径硬筛选；迁出可信人口估算。",
       "adjustments": [],
-      "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
+      "estimate": {
+        "baseline": null,
+        "optimistic": null,
+        "conservative": null,
+        "unit": "share"
+      },
       "grade": "C",
-      "limitations": ["明显cohort、城乡、教育和诊断方法差异。", "应优先作为软偏好，或要求用户定义是否包括矫正后视力。"],
+      "limitations": [
+        "明显cohort、城乡、教育和诊断方法差异。",
+        "应优先作为软偏好，或要求用户定义是否包括矫正后视力。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "excluded"
     },
     {
@@ -862,7 +1190,10 @@
       "classification": "correlated_hard",
       "applicablePopulation": "中国六城市社区成年人",
       "geography": "中国六城市",
-      "ageRange": { "min": 18, "max": null },
+      "ageRange": {
+        "min": 18,
+        "max": null
+      },
       "sexBasis": "male_female_separate",
       "dataYear": "研究发表于2010",
       "publisher": "同行评议社区研究",
@@ -872,12 +1203,23 @@
       "denominator": "六城市社区样本",
       "directValue": "男性总体21.3%；18—29岁2.8%、30—39岁13.3%、40—49岁21.4%、50—59岁31.9%。女性总体约6.0%（旧参数，论文全文需复核年龄细分）。",
       "transformation": "若UI精确定义为‘无雄激素性脱发’，按性别年龄组取补集；‘发量王者’不是医学诊断同义词，不应以此比例硬砍人口。",
-      "adjustments": ["与年龄高度相关，不能再和发际线/少白头的无来源边际率连乘。"],
-      "estimate": { "baseline": 0.867, "optimistic": 0.867, "conservative": 0.867, "unit": "share" },
+      "adjustments": [
+        "与年龄高度相关，不能再和发际线/少白头的无来源边际率连乘。"
+      ],
+      "estimate": {
+        "baseline": 0.867,
+        "optimistic": 0.867,
+        "conservative": 0.867,
+        "unit": "share"
+      },
       "grade": "B",
-      "limitations": ["六城市并非全国概率样本。", "estimate示例为30—39岁男性无AGA比例。", "外貌/身体条件文案不得羞辱。"],
+      "limitations": [
+        "六城市并非全国概率样本。",
+        "estimate示例为30—39岁男性无AGA比例。",
+        "外貌/身体条件文案不得羞辱。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "anchor"
     },
     {
@@ -888,7 +1230,10 @@
       "classification": "soft",
       "applicablePopulation": "成年人",
       "geography": "不适用",
-      "ageRange": { "min": 18, "max": 50 },
+      "ageRange": {
+        "min": 18,
+        "max": 50
+      },
       "sexBasis": "both",
       "dataYear": "model-2026",
       "publisher": "心动概率局娱乐设定",
@@ -899,11 +1244,18 @@
       "directValue": "旧模型男性0.85、女性0.96为无来源估计。",
       "transformation": "不进入可信人口估算；可作为用户自定义的软偏好强度。",
       "adjustments": [],
-      "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
+      "estimate": {
+        "baseline": null,
+        "optimistic": null,
+        "conservative": null,
+        "unit": "share"
+      },
       "grade": "D",
-      "limitations": ["主观、文化依赖，且容易与AGA重复。"],
+      "limitations": [
+        "主观、文化依赖，且容易与AGA重复。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "excluded"
     },
     {
@@ -914,7 +1266,10 @@
       "classification": "soft",
       "applicablePopulation": "成年人",
       "geography": "不适用",
-      "ageRange": { "min": 18, "max": 50 },
+      "ageRange": {
+        "min": 18,
+        "max": 50
+      },
       "sexBasis": "both",
       "dataYear": "model-2026",
       "publisher": "心动概率局娱乐设定",
@@ -925,11 +1280,18 @@
       "directValue": "旧模型常数0.75没有可核验来源。",
       "transformation": "不进入可信人口估算；仅作为软偏好。",
       "adjustments": [],
-      "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
+      "estimate": {
+        "baseline": null,
+        "optimistic": null,
+        "conservative": null,
+        "unit": "share"
+      },
       "grade": "D",
-      "limitations": ["年龄和染发行为会使定义不可观测。"],
+      "limitations": [
+        "年龄和染发行为会使定义不可观测。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "excluded"
     },
     {
@@ -940,7 +1302,10 @@
       "classification": "soft",
       "applicablePopulation": "中国学龄儿童（非目标成年人）",
       "geography": "中国",
-      "ageRange": { "min": null, "max": 18 },
+      "ageRange": {
+        "min": null,
+        "max": 18
+      },
       "sexBasis": "both",
       "dataYear": "研究1991—2018，2020发表",
       "publisher": "同行评议系统综述与Meta分析",
@@ -951,11 +1316,19 @@
       "directValue": "文献综述报道全国合并错颌畸形率约47.92%，地区研究范围约30.07%—75.43%。",
       "transformation": "不能以1-错颌率等同成年人‘牙齿整齐’比例；牙列审美、是否矫正和临床错颌是不同定义。旧常数0.32缺乏成人相同口径证据。",
       "adjustments": [],
-      "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
+      "estimate": {
+        "baseline": null,
+        "optimistic": null,
+        "conservative": null,
+        "unit": "share"
+      },
       "grade": "C",
-      "limitations": ["目标年龄不符。", "迁出可信人口估算，保留为软偏好。"],
+      "limitations": [
+        "目标年龄不符。",
+        "迁出可信人口估算，保留为软偏好。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "excluded"
     },
     {
@@ -966,7 +1339,10 @@
       "classification": "soft",
       "applicablePopulation": "中国大陆成年男性",
       "geography": "中国大陆",
-      "ageRange": { "min": 18, "max": null },
+      "ageRange": {
+        "min": 18,
+        "max": null
+      },
       "sexBasis": "male_only",
       "dataYear": "检索截至2015，2017发表",
       "publisher": "同行评议Meta分析",
@@ -977,11 +1353,19 @@
       "directValue": "ED发生率：<30岁20.86%，30—39岁25.30%，40—49岁40.48%，50—59岁60.12%。",
       "transformation": "即便存在文献，也不进入可信人口估算：自报/量表/临床定义异质，且不是关系结果预测。仅可在用户主动展开的敏感软偏好中使用。",
       "adjustments": [],
-      "estimate": { "baseline": 0.747, "optimistic": 0.747, "conservative": 0.747, "unit": "share" },
+      "estimate": {
+        "baseline": 0.747,
+        "optimistic": 0.747,
+        "conservative": 0.747,
+        "unit": "share"
+      },
       "grade": "B",
-      "limitations": ["敏感健康信息；默认不持久化、不分享。", "estimate示例为30—39岁无ED补集，不适用于女性。"],
+      "limitations": [
+        "敏感健康信息；默认不持久化、不分享。",
+        "estimate示例为30—39岁无ED补集，不适用于女性。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "excluded"
     },
     {
@@ -992,7 +1376,10 @@
       "classification": "soft",
       "applicablePopulation": "成年人主动选择",
       "geography": "不适用",
-      "ageRange": { "min": 18, "max": null },
+      "ageRange": {
+        "min": 18,
+        "max": null
+      },
       "sexBasis": "context_dependent",
       "dataYear": "model-2026",
       "publisher": "心动概率局产品定义",
@@ -1003,11 +1390,19 @@
       "directValue": "旧模型0.75不是对产品文案相同口径的直接数据。",
       "transformation": "不进入人口估算；只进入敏感软偏好匹配评分，且不得以疾病或表现羞辱。",
       "adjustments": [],
-      "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
+      "estimate": {
+        "baseline": null,
+        "optimistic": null,
+        "conservative": null,
+        "unit": "share"
+      },
       "grade": "D",
-      "limitations": ["产品文案不是医学诊断。", "默认折叠且不分享。"],
+      "limitations": [
+        "产品文案不是医学诊断。",
+        "默认折叠且不分享。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "excluded"
     },
     {
@@ -1018,7 +1413,10 @@
       "classification": "soft",
       "applicablePopulation": "成年人",
       "geography": "全国",
-      "ageRange": { "min": 18, "max": 50 },
+      "ageRange": {
+        "min": 18,
+        "max": 50
+      },
       "sexBasis": "both",
       "dataYear": "model-2026",
       "publisher": "心动概率局模型组",
@@ -1029,11 +1427,18 @@
       "directValue": "旧模型‘未婚中65%无对象’没有可核验全国同口径来源。",
       "transformation": "不能再乘0.65；若产品保留，作为用户语义偏好或明确C级范围，不与未婚状态重复砍减。",
       "adjustments": [],
-      "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
+      "estimate": {
+        "baseline": null,
+        "optimistic": null,
+        "conservative": null,
+        "unit": "share"
+      },
       "grade": "D",
-      "limitations": ["当前关系状态变化快，调查定义不统一。"],
+      "limitations": [
+        "当前关系状态变化快，调查定义不统一。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "excluded"
     },
     {
@@ -1044,7 +1449,10 @@
       "classification": "soft",
       "applicablePopulation": "成年人主动选择",
       "geography": "不适用",
-      "ageRange": { "min": 18, "max": null },
+      "ageRange": {
+        "min": 18,
+        "max": null
+      },
       "sexBasis": "self_defined",
       "dataYear": "model-2026",
       "publisher": "心动概率局隐私与尊重原则",
@@ -1055,11 +1463,18 @@
       "directValue": "旧模型‘异性取向95%’不作为可信人口估算参数。",
       "transformation": "用于双方边界/偏好兼容逻辑，不进入单向人口稀有度，不默认保存或分享。",
       "adjustments": [],
-      "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
+      "estimate": {
+        "baseline": null,
+        "optimistic": null,
+        "conservative": null,
+        "unit": "share"
+      },
       "grade": "D",
-      "limitations": ["高度敏感；禁止羞辱和强迫二元分类。"],
+      "limitations": [
+        "高度敏感；禁止羞辱和强迫二元分类。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "excluded"
     },
     {
@@ -1070,7 +1485,10 @@
       "classification": "soft",
       "applicablePopulation": "成年人",
       "geography": "不适用",
-      "ageRange": { "min": 18, "max": 50 },
+      "ageRange": {
+        "min": 18,
+        "max": 50
+      },
       "sexBasis": "both",
       "dataYear": "model-2026",
       "publisher": "心动概率局产品定义",
@@ -1081,11 +1499,18 @@
       "directValue": "旧常数0.60没有相同定义来源。",
       "transformation": "不进入人口估算；进入生活方式匹配评分。",
       "adjustments": [],
-      "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
+      "estimate": {
+        "baseline": null,
+        "optimistic": null,
+        "conservative": null,
+        "unit": "share"
+      },
       "grade": "D",
-      "limitations": ["技能、频率和意愿是不同问题。"],
+      "limitations": [
+        "技能、频率和意愿是不同问题。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "excluded"
     },
     {
@@ -1096,7 +1521,10 @@
       "classification": "soft",
       "applicablePopulation": "成年人的家庭背景",
       "geography": "全国",
-      "ageRange": { "min": 18, "max": 50 },
+      "ageRange": {
+        "min": 18,
+        "max": 50
+      },
       "sexBasis": "household",
       "dataYear": "model-2026",
       "publisher": "心动概率局模型组",
@@ -1107,11 +1535,18 @@
       "directValue": "旧常数0.45为无相同口径推算。",
       "transformation": "迁出人口估算，作为家庭规划软偏好；不把社会保险覆盖率转为个人父母同时有职工养老金率。",
       "adjustments": [],
-      "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
+      "estimate": {
+        "baseline": null,
+        "optimistic": null,
+        "conservative": null,
+        "unit": "share"
+      },
       "grade": "D",
-      "limitations": ["涉及家庭敏感经济信息，默认不分享。"],
+      "limitations": [
+        "涉及家庭敏感经济信息，默认不分享。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "excluded"
     },
     {
@@ -1122,7 +1557,10 @@
       "classification": "soft",
       "applicablePopulation": "18—50岁成年人",
       "geography": "全国",
-      "ageRange": { "min": 18, "max": 50 },
+      "ageRange": {
+        "min": 18,
+        "max": 50
+      },
       "sexBasis": "both",
       "dataYear": "model-2026",
       "publisher": "心动概率局模型组",
@@ -1133,11 +1571,18 @@
       "directValue": "旧常数0.50无可核验全国相同口径来源。",
       "transformation": "不进入人口估算；作为家庭结构/养老规划软偏好。",
       "adjustments": [],
-      "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
+      "estimate": {
+        "baseline": null,
+        "optimistic": null,
+        "conservative": null,
+        "unit": "share"
+      },
       "grade": "D",
-      "limitations": ["18岁与50岁经历完全不同的生育政策cohort。"],
+      "limitations": [
+        "18岁与50岁经历完全不同的生育政策cohort。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "excluded"
     },
     {
@@ -1148,7 +1593,10 @@
       "classification": "soft",
       "applicablePopulation": "就业成年人",
       "geography": "全国",
-      "ageRange": { "min": 18, "max": 50 },
+      "ageRange": {
+        "min": 18,
+        "max": 50
+      },
       "sexBasis": "both",
       "dataYear": "model-2026",
       "publisher": "心动概率局模型组",
@@ -1159,11 +1607,18 @@
       "directValue": "旧常数0.15没有相同定义的直接官方分母。",
       "transformation": "升级版作为职业稳定/组织类型软偏好，或等待单位登记类型×年龄性别数据后重建；不与学历收入职业重复连乘。",
       "adjustments": [],
-      "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
+      "estimate": {
+        "baseline": null,
+        "optimistic": null,
+        "conservative": null,
+        "unit": "share"
+      },
       "grade": "C",
-      "limitations": ["‘体制内’不是标准统计分类，国企是否计入也常有歧义。"],
+      "limitations": [
+        "‘体制内’不是标准统计分类，国企是否计入也常有歧义。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "excluded"
     },
     {
@@ -1174,7 +1629,10 @@
       "classification": "soft",
       "applicablePopulation": "成年人",
       "geography": "不适用",
-      "ageRange": { "min": 18, "max": 50 },
+      "ageRange": {
+        "min": 18,
+        "max": 50
+      },
       "sexBasis": "both",
       "dataYear": "model-2026",
       "publisher": "心动概率局产品定义",
@@ -1185,11 +1643,18 @@
       "directValue": "旧年龄曲线无直接来源。",
       "transformation": "迁出人口估算；以接受程度进入软匹配。",
       "adjustments": [],
-      "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
+      "estimate": {
+        "baseline": null,
+        "optimistic": null,
+        "conservative": null,
+        "unit": "share"
+      },
       "grade": "D",
-      "limitations": ["可见/不可见、面积和文化场景使定义不统一。"],
+      "limitations": [
+        "可见/不可见、面积和文化场景使定义不统一。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "excluded"
     },
     {
@@ -1200,7 +1665,10 @@
       "classification": "entertainment",
       "applicablePopulation": "自愿参与者",
       "geography": "不适用",
-      "ageRange": { "min": 18, "max": null },
+      "ageRange": {
+        "min": 18,
+        "max": null
+      },
       "sexBasis": "both",
       "dataYear": "model-2026",
       "publisher": "心动概率局娱乐设定",
@@ -1211,11 +1679,18 @@
       "directValue": "旧模型把每个轴设为1/2并相乘，是娱乐假设。",
       "transformation": "仅计算娱乐指数；不改变满足硬条件人数。",
       "adjustments": [],
-      "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
+      "estimate": {
+        "baseline": null,
+        "optimistic": null,
+        "conservative": null,
+        "unit": "share"
+      },
       "grade": "D",
-      "limitations": ["自我报告、测量稳定性和样本选择偏差。"],
+      "limitations": [
+        "自我报告、测量稳定性和样本选择偏差。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "excluded"
     },
     {
@@ -1226,7 +1701,10 @@
       "classification": "entertainment",
       "applicablePopulation": "自愿参与者",
       "geography": "不适用",
-      "ageRange": { "min": 18, "max": null },
+      "ageRange": {
+        "min": 18,
+        "max": null
+      },
       "sexBasis": "both",
       "dataYear": "model-2026",
       "publisher": "心动概率局娱乐设定",
@@ -1237,531 +1715,2080 @@
       "directValue": "旧模型每个星座1/12。",
       "transformation": "仅计算娱乐指数；选中n个星座时娱乐覆盖n/12，不改变可信人口估算。",
       "adjustments": [],
-      "estimate": { "baseline": 0.083333, "optimistic": 0.083333, "conservative": 0.083333, "unit": "share" },
+      "estimate": {
+        "baseline": 0.083333,
+        "optimistic": 0.083333,
+        "conservative": 0.083333,
+        "unit": "share"
+      },
       "grade": "D",
-      "limitations": ["出生季节不均匀；星座无择偶成功预测含义。"],
+      "limitations": [
+        "出生季节不均匀；星座无择偶成功预测含义。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "excluded"
     },
     {
-      "id": "evidence.base.region.nanjing-2025",
+      "id": "evidence.base.region.shanghai-2025",
       "dimensionId": "base.region",
-      "dimensionName": "南京市常住人口",
-      "definition": "2025年末南京市行政区域内常住人口。",
+      "dimensionName": "上海市常住人口",
+      "definition": "2025年末上海市行政区域常住人口。",
       "classification": "hard",
-      "applicablePopulation": "南京市常住人口",
-      "geography": "南京市行政区域",
-      "ageRange": { "min": 0, "max": null },
+      "applicablePopulation": "上海市常住人口",
+      "geography": "上海市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
       "sexBasis": "both",
       "dataYear": "2025-year-end",
-      "publisher": "南京市统计局",
-      "sourceTitle": "南京市2025年国民经济和社会发展统计公报",
-      "sourceUrl": "https://tjj.nanjing.gov.cn/bmfw/njsj/202604/t20260403_5818444.html",
+      "publisher": "上海市统计局、国家统计局上海调查总队",
+      "sourceTitle": "2025年上海市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.sh.gov.cn/tjgb/20260330/e0772941e8e041eaaad2df850b44ef98.html",
       "retrievedAt": "2026-08-14",
-      "denominator": "南京市行政区域年末常住人口",
-      "directValue": "2025年末常住人口963.85万人，其中城镇人口843.37万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×963.85万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
-      "adjustments": ["城市年龄性别结构没有逐岁直表，采用0.70—1.30宽情景倍数；该范围不是统计置信区间。"],
-      "estimate": { "baseline": 963.85, "optimistic": 963.85, "conservative": 963.85, "unit": "wan" },
+      "denominator": "上海市行政区域常住人口",
+      "directValue": "2025年末常住人口2,485.41万人；其中户籍常住人口1,510.91万人、外来常住人口974.50万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×2485.41万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 2485.41,
+        "optimistic": 2485.41,
+        "conservative": 2485.41,
+        "unit": "wan"
+      },
       "grade": "A",
-      "limitations": ["官方公报网页正文以DOCX附件发布；登记值已从官方附件复核。", "全国年龄性别份额不能反映南京高校人口和迁移结构。"],
+      "limitations": [
+        "城市公报未直接提供18—50岁逐岁结构；应用全国单岁结构属于后续模型假设。",
+        "常住、户籍与外来常住人口是不同口径，不得重复相加。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
-      "modelUse": "anchor"
-    },
-    {
-      "id": "evidence.base.region.xian-2025",
-      "dimensionId": "base.region",
-      "dimensionName": "西安市常住人口",
-      "definition": "2025年末西安市行政区域内常住人口。",
-      "classification": "hard",
-      "applicablePopulation": "西安市常住人口",
-      "geography": "西安市行政区域",
-      "ageRange": { "min": 0, "max": null },
-      "sexBasis": "both",
-      "dataYear": "2025-year-end",
-      "publisher": "西安市统计局、国家统计局西安调查队",
-      "sourceTitle": "西安市2025年国民经济和社会发展统计公报",
-      "sourceUrl": "https://tjj.xa.gov.cn/web_files/tjj/file/2026/05/15/202605151000219859531.pdf",
-      "retrievedAt": "2026-08-14",
-      "denominator": "西安市行政区域年末常住人口",
-      "directValue": "2025年末常住人口1323.63万人，其中城镇常住人口1072.27万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1323.63万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
-      "adjustments": ["城市年龄性别结构采用0.70—1.30宽情景倍数；不是统计置信区间。"],
-      "estimate": { "baseline": 1323.63, "optimistic": 1323.63, "conservative": 1323.63, "unit": "wan" },
-      "grade": "A",
-      "limitations": ["公报未给18—50岁逐岁×性别结构。", "行政区常住人口不等于中心城区或都市圈人口。"],
-      "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
-      "modelUse": "anchor"
-    },
-    {
-      "id": "evidence.base.region.chongqing-2025",
-      "dimensionId": "base.region",
-      "dimensionName": "重庆市常住人口",
-      "definition": "2025年末重庆市行政区域内常住人口。",
-      "classification": "hard",
-      "applicablePopulation": "重庆市常住人口",
-      "geography": "重庆市行政区域",
-      "ageRange": { "min": 0, "max": null },
-      "sexBasis": "both",
-      "dataYear": "2025-year-end",
-      "publisher": "重庆市统计局、国家统计局重庆调查总队",
-      "sourceTitle": "2025年重庆市国民经济和社会发展统计公报",
-      "sourceUrl": "https://www.cq.gov.cn/zwgk/zfxxgkml/sjfb_120853/tjgb/202603/t20260326_15568523.html",
-      "retrievedAt": "2026-08-14",
-      "denominator": "重庆市行政区域年末常住人口",
-      "directValue": "2025年末常住人口3187.26万人，其中城镇常住人口2327.34万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×3187.26万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
-      "adjustments": ["城市年龄性别结构采用0.70—1.30宽情景倍数；不是统计置信区间。"],
-      "estimate": { "baseline": 3187.26, "optimistic": 3187.26, "conservative": 3187.26, "unit": "wan" },
-      "grade": "A",
-      "limitations": ["重庆行政范围广、城乡差异显著，全国年龄结构外推误差可能高于一般中心城市。"],
-      "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
-      "modelUse": "anchor"
-    },
-    {
-      "id": "evidence.base.region.tianjin-2025",
-      "dimensionId": "base.region",
-      "dimensionName": "天津市常住人口",
-      "definition": "2025年末天津市行政区域内常住人口。",
-      "classification": "hard",
-      "applicablePopulation": "天津市常住人口",
-      "geography": "天津市行政区域",
-      "ageRange": { "min": 0, "max": null },
-      "sexBasis": "both",
-      "dataYear": "2025-year-end",
-      "publisher": "天津市统计局、国家统计局天津调查总队",
-      "sourceTitle": "2025年天津市国民经济和社会发展统计公报",
-      "sourceUrl": "https://www.tj.gov.cn/sq/tjgb/202603/t20260327_7271193.html",
-      "retrievedAt": "2026-08-14",
-      "denominator": "天津市行政区域年末常住人口",
-      "directValue": "2025年末常住人口1363万人，其中城镇常住人口1175万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1363万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
-      "adjustments": ["城市年龄性别结构采用0.70—1.30宽情景倍数；不是统计置信区间。"],
-      "estimate": { "baseline": 1363, "optimistic": 1363, "conservative": 1363, "unit": "wan" },
-      "grade": "A",
-      "limitations": ["公报未给18—50岁逐岁×性别结构。"],
-      "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
-      "modelUse": "anchor"
-    },
-    {
-      "id": "evidence.base.region.zhengzhou-2025",
-      "dimensionId": "base.region",
-      "dimensionName": "郑州市常住人口",
-      "definition": "2025年末郑州市行政区域内常住人口。",
-      "classification": "hard",
-      "applicablePopulation": "郑州市常住人口",
-      "geography": "郑州市行政区域",
-      "ageRange": { "min": 0, "max": null },
-      "sexBasis": "both",
-      "dataYear": "2025-year-end",
-      "publisher": "郑州市统计局",
-      "sourceTitle": "2025年郑州常住人口总量1313.8万人 人口高质量发展持续推进",
-      "sourceUrl": "https://tjj.zhengzhou.gov.cn/fxtj/10069073.jhtml",
-      "retrievedAt": "2026-08-14",
-      "denominator": "郑州市行政区域年末常住人口",
-      "directValue": "2025年末常住人口1313.8万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1313.8万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
-      "adjustments": ["城市年龄性别结构采用0.70—1.30宽情景倍数；不是统计置信区间。"],
-      "estimate": { "baseline": 1313.8, "optimistic": 1313.8, "conservative": 1313.8, "unit": "wan" },
-      "grade": "A",
-      "limitations": ["专题发布给出16—59岁总量，但未给18—50岁逐岁×性别结构。"],
-      "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
-      "modelUse": "anchor"
-    },
-    {
-      "id": "evidence.base.region.dongguan-2025",
-      "dimensionId": "base.region",
-      "dimensionName": "东莞市常住人口",
-      "definition": "2025年末东莞市行政区域内常住人口。",
-      "classification": "hard",
-      "applicablePopulation": "东莞市常住人口",
-      "geography": "东莞市行政区域",
-      "ageRange": { "min": 0, "max": null },
-      "sexBasis": "both",
-      "dataYear": "2025-year-end",
-      "publisher": "东莞市统计局、国家统计局东莞调查队",
-      "sourceTitle": "2025年东莞市国民经济和社会发展统计公报",
-      "sourceUrl": "https://tjj.dg.gov.cn/tjzl/tjgb/content/post_4537415.html",
-      "retrievedAt": "2026-08-14",
-      "denominator": "东莞市行政区域年末常住人口",
-      "directValue": "2025年末常住人口1080.04万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1080.04万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
-      "adjustments": ["城市年龄性别结构采用0.70—1.30宽情景倍数；不是统计置信区间。"],
-      "estimate": { "baseline": 1080.04, "optimistic": 1080.04, "conservative": 1080.04, "unit": "wan" },
-      "grade": "A",
-      "limitations": ["东莞迁移人口多，全国年龄性别结构可能产生系统性偏差。"],
-      "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
-      "modelUse": "anchor"
-    },
-    {
-      "id": "evidence.base.region.foshan-2024",
-      "dimensionId": "base.region",
-      "dimensionName": "佛山市常住人口",
-      "definition": "2024年末佛山市行政区域内常住人口。",
-      "classification": "hard",
-      "applicablePopulation": "佛山市常住人口",
-      "geography": "佛山市行政区域",
-      "ageRange": { "min": 0, "max": null },
-      "sexBasis": "both",
-      "dataYear": "2024-year-end",
-      "publisher": "佛山市统计局、国家统计局佛山调查队",
-      "sourceTitle": "2024年佛山市国民经济和社会发展统计公报",
-      "sourceUrl": "https://www.foshan.gov.cn/attachment/0/537/537176/6564843.pdf",
-      "retrievedAt": "2026-08-14",
-      "denominator": "佛山市行政区域年末常住人口",
-      "directValue": "2024年末常住人口969.89万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×969.89万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
-      "adjustments": ["总量比2025锚点旧一年；城市结构采用0.70—1.30宽情景倍数。"],
-      "estimate": { "baseline": 969.89, "optimistic": 969.89, "conservative": 969.89, "unit": "wan" },
-      "grade": "A",
-      "limitations": ["2024与全国2025尺度有一年时点差。", "公报未给18—50岁逐岁×性别结构。"],
-      "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
-      "modelUse": "anchor"
-    },
-    {
-      "id": "evidence.base.region.jinan-2025",
-      "dimensionId": "base.region",
-      "dimensionName": "济南市常住人口",
-      "definition": "2025年末济南市行政区域内常住人口。",
-      "classification": "hard",
-      "applicablePopulation": "济南市常住人口",
-      "geography": "济南市行政区域",
-      "ageRange": { "min": 0, "max": null },
-      "sexBasis": "both",
-      "dataYear": "2025-year-end",
-      "publisher": "济南市统计局、国家统计局济南调查队",
-      "sourceTitle": "2025年济南市国民经济和社会发展统计公报",
-      "sourceUrl": "https://jntj.jinan.gov.cn/col/col18254/art/2026/art_7dc3135bb2209f961b3c65baa8ab3d2d.html",
-      "retrievedAt": "2026-08-14",
-      "denominator": "济南市行政区域年末常住人口",
-      "directValue": "2025年末常住人口961.6万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×961.6万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
-      "adjustments": ["城市年龄性别结构采用0.70—1.30宽情景倍数；不是统计置信区间。"],
-      "estimate": { "baseline": 961.6, "optimistic": 961.6, "conservative": 961.6, "unit": "wan" },
-      "grade": "A",
-      "limitations": ["公报未给18—50岁逐岁×性别结构。"],
-      "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
-      "modelUse": "anchor"
-    },
-    {
-      "id": "evidence.base.region.shenyang-2024",
-      "dimensionId": "base.region",
-      "dimensionName": "沈阳市常住人口",
-      "definition": "2024年末沈阳市行政区域内常住人口。",
-      "classification": "hard",
-      "applicablePopulation": "沈阳市常住人口",
-      "geography": "沈阳市行政区域",
-      "ageRange": { "min": 0, "max": null },
-      "sexBasis": "both",
-      "dataYear": "2024-year-end",
-      "publisher": "沈阳市统计局、国家统计局沈阳调查队",
-      "sourceTitle": "2024年沈阳市国民经济和社会发展统计公报",
-      "sourceUrl": "https://tjj.shenyang.gov.cn/sjfb/tjgb/202504/P020250423354552607711.pdf",
-      "retrievedAt": "2026-08-14",
-      "denominator": "沈阳市行政区域年末常住人口",
-      "directValue": "2024年末常住人口924.3万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×924.3万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
-      "adjustments": ["总量比2025锚点旧一年；城市结构采用0.70—1.30宽情景倍数。"],
-      "estimate": { "baseline": 924.3, "optimistic": 924.3, "conservative": 924.3, "unit": "wan" },
-      "grade": "A",
-      "limitations": ["2024与全国2025尺度有一年时点差。"],
-      "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
-      "modelUse": "anchor"
-    },
-    {
-      "id": "evidence.base.region.fuzhou-2025",
-      "dimensionId": "base.region",
-      "dimensionName": "福州市常住人口",
-      "definition": "2025年末福州市行政区域内常住人口。",
-      "classification": "hard",
-      "applicablePopulation": "福州市常住人口",
-      "geography": "福州市行政区域",
-      "ageRange": { "min": 0, "max": null },
-      "sexBasis": "both",
-      "dataYear": "2025-year-end",
-      "publisher": "福州市统计局、国家统计局福州调查队",
-      "sourceTitle": "2025年福州市国民经济和社会发展统计公报",
-      "sourceUrl": "https://tjj.fuzhou.gov.cn/zwgk/tjzl/ndbg/202604/t20260414_5308173.htm",
-      "retrievedAt": "2026-08-14",
-      "denominator": "福州市行政区域年末常住人口",
-      "directValue": "2025年末常住人口852.1万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×852.1万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
-      "adjustments": ["城市年龄性别结构采用0.70—1.30宽情景倍数；不是统计置信区间。"],
-      "estimate": { "baseline": 852.1, "optimistic": 852.1, "conservative": 852.1, "unit": "wan" },
-      "grade": "A",
-      "limitations": ["公报未给18—50岁逐岁×性别结构。"],
-      "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
-      "modelUse": "anchor"
-    },
-    {
-      "id": "evidence.base.region.changzhou-2025",
-      "dimensionId": "base.region",
-      "dimensionName": "常州市常住人口",
-      "definition": "2025年末常州市行政区域内常住人口。",
-      "classification": "hard",
-      "applicablePopulation": "常州市常住人口",
-      "geography": "常州市行政区域",
-      "ageRange": { "min": 0, "max": null },
-      "sexBasis": "both",
-      "dataYear": "2025-year-end",
-      "publisher": "常州市统计局、国家统计局常州调查队",
-      "sourceTitle": "2025年常州市国民经济和社会发展统计公报",
-      "sourceUrl": "https://tjj.changzhou.gov.cn/content/suitable/show?catid=24519&id=29035",
-      "retrievedAt": "2026-08-14",
-      "denominator": "常州市行政区域年末常住人口",
-      "directValue": "2025年末常住人口541.54万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×541.54万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
-      "adjustments": ["城市年龄性别结构采用0.70—1.30宽情景倍数；不是统计置信区间。"],
-      "estimate": { "baseline": 541.54, "optimistic": 541.54, "conservative": 541.54, "unit": "wan" },
-      "grade": "A",
-      "limitations": ["公报未给18—50岁逐岁×性别结构。"],
-      "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
-      "modelUse": "anchor"
-    },
-    {
-      "id": "evidence.base.region.nantong-2024",
-      "dimensionId": "base.region",
-      "dimensionName": "南通市常住人口",
-      "definition": "2024年末南通市行政区域内常住人口。",
-      "classification": "hard",
-      "applicablePopulation": "南通市常住人口",
-      "geography": "南通市行政区域",
-      "ageRange": { "min": 0, "max": null },
-      "sexBasis": "both",
-      "dataYear": "2024-year-end",
-      "publisher": "南通市统计局、国家统计局南通调查队",
-      "sourceTitle": "2024年南通市国民经济和社会发展统计公报",
-      "sourceUrl": "https://tjj.nantong.gov.cn/ntstj/2025tjnj/zk/html/gb.pdf",
-      "retrievedAt": "2026-08-14",
-      "denominator": "南通市行政区域年末常住人口",
-      "directValue": "2024年末常住人口775.0万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×775.0万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
-      "adjustments": ["总量比2025锚点旧一年；城市结构采用0.70—1.30宽情景倍数。"],
-      "estimate": { "baseline": 775, "optimistic": 775, "conservative": 775, "unit": "wan" },
-      "grade": "A",
-      "limitations": ["2024与全国2025尺度有一年时点差。"],
-      "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
-      "modelUse": "anchor"
-    },
-    {
-      "id": "evidence.base.region.yantai-2025",
-      "dimensionId": "base.region",
-      "dimensionName": "烟台市常住人口",
-      "definition": "2025年末烟台市行政区域内常住人口。",
-      "classification": "hard",
-      "applicablePopulation": "烟台市常住人口",
-      "geography": "烟台市行政区域",
-      "ageRange": { "min": 0, "max": null },
-      "sexBasis": "both",
-      "dataYear": "2025-year-end",
-      "publisher": "烟台市统计局、国家统计局烟台调查队",
-      "sourceTitle": "2025年烟台市国民经济和社会发展统计公报",
-      "sourceUrl": "https://tjj.yantai.gov.cn/col/col117/art/2026/art_61a619eacfd44e5bbf80e45bf2cdd6d0.html",
-      "retrievedAt": "2026-08-14",
-      "denominator": "烟台市行政区域年末常住人口",
-      "directValue": "2025年末常住人口700.05万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×700.05万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
-      "adjustments": ["城市年龄性别结构采用0.70—1.30宽情景倍数；不是统计置信区间。"],
-      "estimate": { "baseline": 700.05, "optimistic": 700.05, "conservative": 700.05, "unit": "wan" },
-      "grade": "A",
-      "limitations": ["公报未给18—50岁逐岁×性别结构。"],
-      "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
-      "modelUse": "anchor"
-    },
-    {
-      "id": "evidence.base.region.shijiazhuang-2025",
-      "dimensionId": "base.region",
-      "dimensionName": "石家庄市常住人口",
-      "definition": "2025年末石家庄市行政区域内常住人口。",
-      "classification": "hard",
-      "applicablePopulation": "石家庄市常住人口",
-      "geography": "石家庄市行政区域",
-      "ageRange": { "min": 0, "max": null },
-      "sexBasis": "both",
-      "dataYear": "2025-year-end",
-      "publisher": "石家庄市统计局、国家统计局石家庄调查队",
-      "sourceTitle": "石家庄市2025年国民经济和社会发展统计公报",
-      "sourceUrl": "https://tjj.sjz.gov.cn/columns/940d701f-5e56-4f5d-9ece-7968f6354993/202605/26/f062dca8-ce95-46f8-b1c9-33f507db5a29.html",
-      "retrievedAt": "2026-08-14",
-      "denominator": "石家庄市行政区域年末常住人口",
-      "directValue": "2025年末常住人口1124.69万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1124.69万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
-      "adjustments": ["城市年龄性别结构采用0.70—1.30宽情景倍数；不是统计置信区间。"],
-      "estimate": { "baseline": 1124.69, "optimistic": 1124.69, "conservative": 1124.69, "unit": "wan" },
-      "grade": "A",
-      "limitations": ["公报未给18—50岁逐岁×性别结构。", "行政口径须随未来区划或统计范围变化复核。"],
-      "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "anchor"
     },
     {
       "id": "evidence.base.region.beijing-2025",
       "dimensionId": "base.region",
       "dimensionName": "北京市常住人口",
-      "definition": "2025年末北京市行政区域内常住人口。",
+      "definition": "2025年末北京市行政区域常住人口。",
       "classification": "hard",
       "applicablePopulation": "北京市常住人口",
       "geography": "北京市行政区域",
-      "ageRange": { "min": 0, "max": null },
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
       "sexBasis": "both",
       "dataYear": "2025-year-end",
       "publisher": "北京市统计局、国家统计局北京调查总队",
       "sourceTitle": "北京市2025年国民经济和社会发展统计公报",
       "sourceUrl": "https://tjj.beijing.gov.cn/tjsj_31433/tjgb_31445/ndgb_31446/202603/t20260326_4566469.html",
-      "retrievedAt": "2026-08-13",
+      "retrievedAt": "2026-08-14",
       "denominator": "北京市行政区域常住人口",
       "directValue": "2025年末常住人口2,180.0万人；其中城镇人口1,924.9万人，城镇化率88.3%。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×2,180.0万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×2180万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
       "adjustments": [],
-      "estimate": { "baseline": 2180, "optimistic": 2180, "conservative": 2180, "unit": "wan" },
+      "estimate": {
+        "baseline": 2180,
+        "optimistic": 2180,
+        "conservative": 2180,
+        "unit": "wan"
+      },
       "grade": "A",
-      "limitations": ["城市公报未直接提供18—50岁逐岁结构；应用全国单岁结构属于后续模型假设。", "与其他城市并集时必须先按行政区域去重。"],
+      "limitations": [
+        "城市公报未直接提供18—50岁逐岁结构；应用全国单岁结构属于后续模型假设。",
+        "与其他城市并集时必须先按行政区域去重。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
-      "modelUse": "anchor"
-    },
-    {
-      "id": "evidence.base.region.shanghai-2025",
-      "dimensionId": "base.region",
-      "dimensionName": "上海市常住人口",
-      "definition": "2025年末上海市行政区域内常住人口。",
-      "classification": "hard",
-      "applicablePopulation": "上海市常住人口",
-      "geography": "上海市行政区域",
-      "ageRange": { "min": 0, "max": null },
-      "sexBasis": "both",
-      "dataYear": "2025-year-end",
-      "publisher": "上海市统计局、国家统计局上海调查总队",
-      "sourceTitle": "2025年上海市国民经济和社会发展统计公报",
-      "sourceUrl": "https://tjj.sh.gov.cn/tjgb/20260330/e0772941e8e041eaaad2df850b44ef98.html",
-      "retrievedAt": "2026-08-13",
-      "denominator": "上海市行政区域常住人口",
-      "directValue": "2025年末常住人口2,485.41万人；其中户籍常住人口1,510.91万人、外来常住人口974.50万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×2,485.41万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不得只用户籍人口。",
-      "adjustments": [],
-      "estimate": { "baseline": 2485.41, "optimistic": 2485.41, "conservative": 2485.41, "unit": "wan" },
-      "grade": "A",
-      "limitations": ["城市公报未直接提供18—50岁逐岁结构；应用全国单岁结构属于后续模型假设。", "常住、户籍与外来常住人口是不同口径，不得重复相加。"],
-      "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "anchor"
     },
     {
       "id": "evidence.base.region.shenzhen-2025",
       "dimensionId": "base.region",
       "dimensionName": "深圳市常住人口",
-      "definition": "2025年末深圳市行政区域内常住人口。",
+      "definition": "2025年末深圳市行政区域常住人口。",
       "classification": "hard",
       "applicablePopulation": "深圳市常住人口",
       "geography": "深圳市行政区域",
-      "ageRange": { "min": 0, "max": null },
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
       "sexBasis": "both",
       "dataYear": "2025-year-end",
       "publisher": "深圳市统计局、国家统计局深圳调查队",
       "sourceTitle": "深圳市2025年国民经济和社会发展统计公报",
       "sourceUrl": "https://tjj.sz.gov.cn/zwgk/zfxxgkml/tjsj/tjgb/content/post_12803919.html",
-      "retrievedAt": "2026-08-13",
+      "retrievedAt": "2026-08-14",
       "denominator": "深圳市行政区域常住人口",
       "directValue": "2025年末常住人口1,824.85万人；其中城镇常住人口1,820.96万人，城镇化率99.79%。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1,824.85万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘城镇化率。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1824.85万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
       "adjustments": [],
-      "estimate": { "baseline": 1824.85, "optimistic": 1824.85, "conservative": 1824.85, "unit": "wan" },
+      "estimate": {
+        "baseline": 1824.85,
+        "optimistic": 1824.85,
+        "conservative": 1824.85,
+        "unit": "wan"
+      },
       "grade": "A",
-      "limitations": ["城市公报未直接提供18—50岁逐岁结构；深圳年龄结构与全国结构可能显著不同。", "行政区常住人口不等于都市圈人口。"],
+      "limitations": [
+        "城市公报未直接提供18—50岁逐岁结构；深圳年龄结构与全国结构可能显著不同。",
+        "行政区常住人口不等于都市圈人口。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "anchor"
     },
     {
       "id": "evidence.base.region.guangzhou-2025",
       "dimensionId": "base.region",
       "dimensionName": "广州市常住人口",
-      "definition": "2025年末广州市行政区域内常住人口。",
+      "definition": "2025年末广州市行政区域常住人口。",
       "classification": "hard",
       "applicablePopulation": "广州市常住人口",
       "geography": "广州市行政区域",
-      "ageRange": { "min": 0, "max": null },
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
       "sexBasis": "both",
       "dataYear": "2025-year-end",
       "publisher": "广州市统计局",
       "sourceTitle": "2025年广州市人口规模及分布情况",
       "sourceUrl": "https://tjj.gz.gov.cn/zzfwzq/tjgb/content/post_10804088.html",
-      "retrievedAt": "2026-08-13",
+      "retrievedAt": "2026-08-14",
       "denominator": "广州市行政区域常住人口",
       "directValue": "2025年末常住人口1,910.10万人，城镇化率87.56%；户籍人口1,091.14万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1,910.10万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不得以户籍人口替代常住人口。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1910.1万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
       "adjustments": [],
-      "estimate": { "baseline": 1910.1, "optimistic": 1910.1, "conservative": 1910.1, "unit": "wan" },
+      "estimate": {
+        "baseline": 1910.1,
+        "optimistic": 1910.1,
+        "conservative": 1910.1,
+        "unit": "wan"
+      },
       "grade": "A",
-      "limitations": ["城市公报未直接提供18—50岁逐岁结构；应用全国单岁结构属于后续模型假设。", "行政区常住人口不等于广佛都市圈人口。"],
+      "limitations": [
+        "城市公报未直接提供18—50岁逐岁结构；应用全国单岁结构属于后续模型假设。",
+        "行政区常住人口不等于广佛都市圈人口。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "anchor"
     },
     {
-      "id": "evidence.base.region.suzhou-2025",
+      "id": "evidence.base.region.chengdu-2025",
       "dimensionId": "base.region",
-      "dimensionName": "苏州市常住人口",
-      "definition": "2025年末苏州市行政区域内常住人口。",
+      "dimensionName": "成都市常住人口",
+      "definition": "2025年末成都市行政区域常住人口。",
       "classification": "hard",
-      "applicablePopulation": "苏州市常住人口",
-      "geography": "苏州市行政区域",
-      "ageRange": { "min": 0, "max": null },
+      "applicablePopulation": "成都市常住人口",
+      "geography": "成都市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
       "sexBasis": "both",
       "dataYear": "2025-year-end",
-      "publisher": "苏州市统计局",
-      "sourceTitle": "2025年苏州市国民经济和社会发展统计公报",
-      "sourceUrl": "https://tjj.suzhou.gov.cn/sztjj/tjgb/202604/3dc4b574cabd4e86b36ec5d3280e927c.shtml",
-      "retrievedAt": "2026-08-13",
-      "denominator": "苏州市行政区域常住人口",
-      "directValue": "2025年末常住人口1,304.77万人，常住人口城镇化率82.9%。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1,304.77万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘城镇化率。",
+      "publisher": "成都市统计局、国家统计局成都调查队",
+      "sourceTitle": "2025年成都市国民经济和社会发展统计公报",
+      "sourceUrl": "https://cdstats.chengdu.gov.cn/cdstjj/c154795/2026-04/14/content_58dc076a80974f999828b691bfca027f.shtml",
+      "retrievedAt": "2026-08-14",
+      "denominator": "成都市行政区域常住人口",
+      "directValue": "2025年末成都市常住人口2153.5万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×2153.5万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
       "adjustments": [],
-      "estimate": { "baseline": 1304.77, "optimistic": 1304.77, "conservative": 1304.77, "unit": "wan" },
+      "estimate": {
+        "baseline": 2153.5,
+        "optimistic": 2153.5,
+        "conservative": 2153.5,
+        "unit": "wan"
+      },
       "grade": "A",
-      "limitations": ["城市公报未直接提供18—50岁逐岁结构；应用全国单岁结构属于后续模型假设。", "苏州市行政区域包含县级市，不等同中心城区。"],
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "公报年度数为初步统计值。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.hangzhou-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "杭州市常住人口",
+      "definition": "2025年末杭州市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "杭州市常住人口",
+      "geography": "杭州市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "杭州市统计局、国家统计局杭州调查队",
+      "sourceTitle": "2025年杭州市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.hangzhou.gov.cn/col/col1229279682/art/2026/art_99cf56b3747b44b492375d4b4d4943d3.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "杭州市行政区域常住人口",
+      "directValue": "据2025年1%人口抽样调查数据推算，年末全市常住人口1270.0万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1270万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 1270,
+        "optimistic": 1270,
+        "conservative": 1270,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "1%人口抽样调查推算值，不是逐户普查值。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.chongqing-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "重庆市常住人口",
+      "definition": "2025年末重庆市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "重庆市常住人口",
+      "geography": "重庆市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "重庆市统计局、国家统计局重庆调查总队",
+      "sourceTitle": "2025年重庆市国民经济和社会发展统计公报",
+      "sourceUrl": "https://www.cq.gov.cn/zwgk/zfxxgkml/sjfb_120853/tjgb/202603/t20260326_15568523.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "重庆市行政区域常住人口",
+      "directValue": "2025年末常住人口3187.26万人，其中城镇常住人口2327.34万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×3187.26万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 3187.26,
+        "optimistic": 3187.26,
+        "conservative": 3187.26,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "重庆行政范围广、城乡差异显著，全国年龄结构外推误差可能高于一般中心城市。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "anchor"
     },
     {
       "id": "evidence.base.region.wuhan-2025",
       "dimensionId": "base.region",
       "dimensionName": "武汉市常住人口",
-      "definition": "2025年末武汉市行政区域内常住人口。",
+      "definition": "2025年末武汉市行政区域常住人口。",
       "classification": "hard",
       "applicablePopulation": "武汉市常住人口",
       "geography": "武汉市行政区域",
-      "ageRange": { "min": 0, "max": null },
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
       "sexBasis": "both",
       "dataYear": "2025-year-end",
       "publisher": "武汉市统计局、国家统计局武汉调查队",
       "sourceTitle": "2025年武汉市国民经济和社会发展统计公报",
       "sourceUrl": "https://tjj.wuhan.gov.cn/tjfw/tjgb/202604/t20260408_2750693.shtml",
-      "retrievedAt": "2026-08-13",
+      "retrievedAt": "2026-08-14",
       "denominator": "武汉市行政区域常住人口",
       "directValue": "2025年末常住人口1,386.19万人，城镇化率85.22%。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1,386.19万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘城镇化率。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1386.19万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
       "adjustments": [],
-      "estimate": { "baseline": 1386.19, "optimistic": 1386.19, "conservative": 1386.19, "unit": "wan" },
+      "estimate": {
+        "baseline": 1386.19,
+        "optimistic": 1386.19,
+        "conservative": 1386.19,
+        "unit": "wan"
+      },
       "grade": "A",
-      "limitations": ["城市公报未直接提供18—50岁逐岁结构；应用全国单岁结构属于后续模型假设。", "网页正文数字排版有空格，登记值按公报的1,386.19万人规范化。"],
+      "limitations": [
+        "城市公报未直接提供18—50岁逐岁结构；应用全国单岁结构属于后续模型假设。",
+        "网页正文数字排版有空格，登记值按公报的1,386.19万人规范化。"
+      ],
       "modelVersion": "3.1.0",
-      "dataVersion": "2026.08.14.1",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.suzhou-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "苏州市常住人口",
+      "definition": "2025年末苏州市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "苏州市常住人口",
+      "geography": "苏州市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "苏州市统计局",
+      "sourceTitle": "2025年苏州市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.suzhou.gov.cn/sztjj/tjgb/202604/3dc4b574cabd4e86b36ec5d3280e927c.shtml",
+      "retrievedAt": "2026-08-14",
+      "denominator": "苏州市行政区域常住人口",
+      "directValue": "2025年末常住人口1,304.77万人，常住人口城镇化率82.9%。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1304.77万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 1304.77,
+        "optimistic": 1304.77,
+        "conservative": 1304.77,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "城市公报未直接提供18—50岁逐岁结构；应用全国单岁结构属于后续模型假设。",
+        "苏州市行政区域包含县级市，不等同中心城区。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.xian-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "西安市常住人口",
+      "definition": "2025年末西安市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "西安市常住人口",
+      "geography": "西安市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "西安市统计局、国家统计局西安调查队",
+      "sourceTitle": "西安市2025年国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.xa.gov.cn/web_files/tjj/file/2026/05/15/202605151000219859531.pdf",
+      "retrievedAt": "2026-08-14",
+      "denominator": "西安市行政区域常住人口",
+      "directValue": "2025年末常住人口1323.63万人，其中城镇常住人口1072.27万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1323.63万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 1323.63,
+        "optimistic": 1323.63,
+        "conservative": 1323.63,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "公报未给18—50岁逐岁×性别结构。",
+        "行政区常住人口不等于中心城区或都市圈人口。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.nanjing-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "南京市常住人口",
+      "definition": "2025年末南京市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "南京市常住人口",
+      "geography": "南京市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "南京市统计局",
+      "sourceTitle": "南京市2025年国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.nanjing.gov.cn/bmfw/njsj/202604/t20260403_5818444.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "南京市行政区域常住人口",
+      "directValue": "2025年末常住人口963.85万人，其中城镇人口843.37万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×963.85万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 963.85,
+        "optimistic": 963.85,
+        "conservative": 963.85,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方公报网页正文以DOCX附件发布；登记值已从官方附件复核。",
+        "全国年龄性别份额不能反映南京高校人口和迁移结构。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.changsha-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "长沙市常住人口",
+      "definition": "2025年末长沙市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "长沙市常住人口",
+      "geography": "长沙市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "长沙市统计局",
+      "sourceTitle": "长沙市2025年国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.hunan.gov.cn/hntj/tjfx/tjgb/szgb/zss_1/202605/t20260512_33975356.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "长沙市行政区域常住人口",
+      "directValue": "2025年末长沙市常住总人口1072.14万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1072.14万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 1072.14,
+        "optimistic": 1072.14,
+        "conservative": 1072.14,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "湖南省统计局转载长沙市统计局公报；公报注明部分数据为初步统计。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.zhengzhou-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "郑州市常住人口",
+      "definition": "2025年末郑州市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "郑州市常住人口",
+      "geography": "郑州市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "郑州市统计局",
+      "sourceTitle": "2025年郑州常住人口总量1313.8万人 人口高质量发展持续推进",
+      "sourceUrl": "https://tjj.zhengzhou.gov.cn/fxtj/10069073.jhtml",
+      "retrievedAt": "2026-08-14",
+      "denominator": "郑州市行政区域常住人口",
+      "directValue": "2025年末常住人口1313.8万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1313.8万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 1313.8,
+        "optimistic": 1313.8,
+        "conservative": 1313.8,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "专题发布给出16—59岁总量，但未给18—50岁逐岁×性别结构。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.tianjin-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "天津市常住人口",
+      "definition": "2025年末天津市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "天津市常住人口",
+      "geography": "天津市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "天津市统计局、国家统计局天津调查总队",
+      "sourceTitle": "2025年天津市国民经济和社会发展统计公报",
+      "sourceUrl": "https://www.tj.gov.cn/sq/tjgb/202603/t20260327_7271193.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "天津市行政区域常住人口",
+      "directValue": "2025年末常住人口1363万人，其中城镇常住人口1175万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1363万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 1363,
+        "optimistic": 1363,
+        "conservative": 1363,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "公报未给18—50岁逐岁×性别结构。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.hefei-2024",
+      "dimensionId": "base.region",
+      "dimensionName": "合肥市常住人口",
+      "definition": "2024年末合肥市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "合肥市常住人口",
+      "geography": "合肥市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2024-year-end",
+      "publisher": "合肥市统计局",
+      "sourceTitle": "2024年合肥市人口变动情况抽样调查主要数据公报",
+      "sourceUrl": "https://tjj.hefei.gov.cn/tjyw/tjgb/15296487.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "合肥市行政区域常住人口",
+      "directValue": "2024年末合肥市常住人口1000.2万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1000.2万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 1000.2,
+        "optimistic": 1000.2,
+        "conservative": 1000.2,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "多阶段分层概率抽样推算；2025值未采用，因为未取得稳定的一手HTTPS正文。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.qingdao-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "青岛市常住人口",
+      "definition": "2025年末青岛市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "青岛市常住人口",
+      "geography": "青岛市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "青岛市人民政府（数据来源：青岛市统计局、国家统计局青岛调查队）",
+      "sourceTitle": "人口简况（2025年数据）",
+      "sourceUrl": "https://www.qingdao.gov.cn/yfqd/qdgk/rkjk/202009/t20200903_66.shtml",
+      "retrievedAt": "2026-08-14",
+      "denominator": "青岛市行政区域常住人口",
+      "directValue": "2025年青岛市常住人口1051.55万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1051.55万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 1051.55,
+        "optimistic": 1051.55,
+        "conservative": 1051.55,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "全市口径包含七区及胶州、平度、莱西三个县级市；政府人口页为持续更新页面。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.dongguan-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "东莞市常住人口",
+      "definition": "2025年末东莞市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "东莞市常住人口",
+      "geography": "东莞市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "东莞市统计局、国家统计局东莞调查队",
+      "sourceTitle": "2025年东莞市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.dg.gov.cn/tjzl/tjgb/content/post_4537415.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "东莞市行政区域常住人口",
+      "directValue": "2025年末常住人口1080.04万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1080.04万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 1080.04,
+        "optimistic": 1080.04,
+        "conservative": 1080.04,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "东莞迁移人口多，全国年龄性别结构可能产生系统性偏差。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.ningbo-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "宁波市常住人口",
+      "definition": "2025年末宁波市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "宁波市常住人口",
+      "geography": "宁波市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "宁波市统计局",
+      "sourceTitle": "2025年宁波市人口主要数据公报",
+      "sourceUrl": "https://tjj.ningbo.gov.cn/col/col1229042825/art/2026/art_06881e7e7c8d4e24896d020c7cad28c3.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "宁波市行政区域常住人口",
+      "directValue": "据2025年全国1%人口抽样调查推算，年末全市常住人口983.3万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×983.3万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 983.3,
+        "optimistic": 983.3,
+        "conservative": 983.3,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "调查标准时点为2025年11月1日零时，年末数为抽样推算。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.foshan-2024",
+      "dimensionId": "base.region",
+      "dimensionName": "佛山市常住人口",
+      "definition": "2024年末佛山市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "佛山市常住人口",
+      "geography": "佛山市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2024-year-end",
+      "publisher": "佛山市统计局、国家统计局佛山调查队",
+      "sourceTitle": "2024年佛山市国民经济和社会发展统计公报",
+      "sourceUrl": "https://www.foshan.gov.cn/attachment/0/537/537176/6564843.pdf",
+      "retrievedAt": "2026-08-14",
+      "denominator": "佛山市行政区域常住人口",
+      "directValue": "2024年末常住人口969.89万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×969.89万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 969.89,
+        "optimistic": 969.89,
+        "conservative": 969.89,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "2024与全国2025尺度有一年时点差。",
+        "公报未给18—50岁逐岁×性别结构。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.jinan-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "济南市常住人口",
+      "definition": "2025年末济南市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "济南市常住人口",
+      "geography": "济南市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "济南市统计局、国家统计局济南调查队",
+      "sourceTitle": "2025年济南市国民经济和社会发展统计公报",
+      "sourceUrl": "https://jntj.jinan.gov.cn/col/col18254/art/2026/art_7dc3135bb2209f961b3c65baa8ab3d2d.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "济南市行政区域常住人口",
+      "directValue": "2025年末常住人口961.6万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×961.6万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 961.6,
+        "optimistic": 961.6,
+        "conservative": 961.6,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "公报未给18—50岁逐岁×性别结构。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.wuxi-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "无锡市常住人口",
+      "definition": "2025年末无锡市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "无锡市常住人口",
+      "geography": "无锡市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "无锡市统计局、国家统计局无锡调查队",
+      "sourceTitle": "2025年无锡市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tj.wuxi.gov.cn/doc/2026/05/09/4772420.shtml",
+      "retrievedAt": "2026-08-14",
+      "denominator": "无锡市行政区域常住人口",
+      "directValue": "2025年末无锡市常住人口753.74万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×753.74万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 753.74,
+        "optimistic": 753.74,
+        "conservative": 753.74,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "公报注明为初步统计数。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.shenyang-2024",
+      "dimensionId": "base.region",
+      "dimensionName": "沈阳市常住人口",
+      "definition": "2024年末沈阳市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "沈阳市常住人口",
+      "geography": "沈阳市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2024-year-end",
+      "publisher": "沈阳市统计局、国家统计局沈阳调查队",
+      "sourceTitle": "2024年沈阳市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.shenyang.gov.cn/sjfb/tjgb/202504/P020250423354552607711.pdf",
+      "retrievedAt": "2026-08-14",
+      "denominator": "沈阳市行政区域常住人口",
+      "directValue": "2024年末常住人口924.3万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×924.3万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 924.3,
+        "optimistic": 924.3,
+        "conservative": 924.3,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "2024与全国2025尺度有一年时点差。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.kunming-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "昆明市常住人口",
+      "definition": "2025年末昆明市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "昆明市常住人口",
+      "geography": "昆明市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "昆明市统计局、国家统计局昆明调查队",
+      "sourceTitle": "2025年昆明市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.km.gov.cn/c/2026-05-21/5083313.shtml",
+      "retrievedAt": "2026-08-14",
+      "denominator": "昆明市行政区域常住人口",
+      "directValue": "2025年末昆明市常住人口874.4万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×874.4万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 874.4,
+        "optimistic": 874.4,
+        "conservative": 874.4,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "公报年度数为初步统计值。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.fuzhou-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "福州市常住人口",
+      "definition": "2025年末福州市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "福州市常住人口",
+      "geography": "福州市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "福州市统计局、国家统计局福州调查队",
+      "sourceTitle": "2025年福州市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.fuzhou.gov.cn/zwgk/tjzl/ndbg/202604/t20260414_5308173.htm",
+      "retrievedAt": "2026-08-14",
+      "denominator": "福州市行政区域常住人口",
+      "directValue": "2025年末常住人口852.1万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×852.1万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 852.1,
+        "optimistic": 852.1,
+        "conservative": 852.1,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "公报未给18—50岁逐岁×性别结构。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.xiamen-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "厦门市常住人口",
+      "definition": "2025年末厦门市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "厦门市常住人口",
+      "geography": "厦门市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "厦门市统计局、国家统计局厦门调查队",
+      "sourceTitle": "2025年厦门市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.xm.gov.cn/tjzl/ndgb/202603/t20260325_2991064.htm",
+      "retrievedAt": "2026-08-14",
+      "denominator": "厦门市行政区域常住人口",
+      "directValue": "2025年末厦门市常住人口536.50万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×536.5万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 536.5,
+        "optimistic": 536.5,
+        "conservative": 536.5,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "行政区常住人口不等于厦漳泉都市圈人口。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.wenzhou-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "温州市常住人口",
+      "definition": "2025年末温州市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "温州市常住人口",
+      "geography": "温州市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "温州市统计局、国家统计局温州调查队",
+      "sourceTitle": "2025年温州市国民经济和社会发展统计公报",
+      "sourceUrl": "https://zjzd.stats.gov.cn/gjtjjwzdcd/dcsj/tjgb/art/2026/art_c10d7fff23af4793b579d9208f3debf9.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "温州市行政区域常住人口",
+      "directValue": "据2025年全国1%人口抽样调查数据推算，年末全市常住人口990.2万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×990.2万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 990.2,
+        "optimistic": 990.2,
+        "conservative": 990.2,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "1%人口抽样调查推算值。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.shijiazhuang-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "石家庄市常住人口",
+      "definition": "2025年末石家庄市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "石家庄市常住人口",
+      "geography": "石家庄市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "石家庄市统计局、国家统计局石家庄调查队",
+      "sourceTitle": "石家庄市2025年国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.sjz.gov.cn/columns/940d701f-5e56-4f5d-9ece-7968f6354993/202605/26/f062dca8-ce95-46f8-b1c9-33f507db5a29.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "石家庄市行政区域常住人口",
+      "directValue": "2025年末常住人口1124.69万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1124.69万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 1124.69,
+        "optimistic": 1124.69,
+        "conservative": 1124.69,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "公报未给18—50岁逐岁×性别结构。",
+        "行政口径须随未来区划或统计范围变化复核。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.dalian-2024",
+      "dimensionId": "base.region",
+      "dimensionName": "大连市常住人口",
+      "definition": "2024年末大连市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "大连市常住人口",
+      "geography": "大连市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2024-year-end",
+      "publisher": "辽宁省人民政府",
+      "sourceTitle": "大连",
+      "sourceUrl": "https://www.ln.gov.cn/web/sqgk/csmp/2025101310551499142/index.shtml",
+      "retrievedAt": "2026-08-14",
+      "denominator": "大连市行政区域常住人口",
+      "directValue": "2024年末大连市常住人口754.4万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×754.4万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 754.4,
+        "optimistic": 754.4,
+        "conservative": 754.4,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "2025市公报只披露户籍人口，故回退到省政府可核验的2024常住人口。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.harbin-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "哈尔滨市常住人口",
+      "definition": "2025年末哈尔滨市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "哈尔滨市常住人口",
+      "geography": "哈尔滨市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "哈尔滨市统计局、国家统计局哈尔滨调查队",
+      "sourceTitle": "2025年哈尔滨市国民经济和社会发展统计公报",
+      "sourceUrl": "https://www.harbin.gov.cn/haerbin/c104569/202606/1129059/files/2025年哈尔滨市国民经济和社会发展统计公报-20260603093614665.pdf",
+      "retrievedAt": "2026-08-14",
+      "denominator": "哈尔滨市行政区域常住人口",
+      "directValue": "2025年末哈尔滨市常住人口988.7万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×988.7万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 988.7,
+        "optimistic": 988.7,
+        "conservative": 988.7,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "官方PDF给出城乡总量，但未给18—50岁逐岁结构。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.jinhua-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "金华市常住人口",
+      "definition": "2025年末金华市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "金华市常住人口",
+      "geography": "金华市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "金华市统计局",
+      "sourceTitle": "2025年我市新增人口数居全省第二",
+      "sourceUrl": "https://tjj.jinhua.gov.cn/col/col1229317895/art/2026/art_4eccb6563ecf478a8f9ba76c1b44aa31.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "金华市行政区域常住人口",
+      "directValue": "2025年末金华市常住人口726.9万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×726.9万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 726.9,
+        "optimistic": 726.9,
+        "conservative": 726.9,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "统计分析短文而非正式统计公报；数值来自2025年1%人口抽样调查。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.quanzhou-2024",
+      "dimensionId": "base.region",
+      "dimensionName": "泉州市常住人口",
+      "definition": "2024年末泉州市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "泉州市常住人口",
+      "geography": "泉州市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2024-year-end",
+      "publisher": "泉州市统计局",
+      "sourceTitle": "解读：2024年末泉州市常住人口主要数据发布",
+      "sourceUrl": "https://tjj.quanzhou.gov.cn/tjzl/sjjd/202502/t20250224_3142656.htm",
+      "retrievedAt": "2026-08-14",
+      "denominator": "泉州市行政区域常住人口",
+      "directValue": "2024年末泉州市常住人口891.4万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×891.4万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 891.4,
+        "optimistic": 891.4,
+        "conservative": 891.4,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "2025公报仅给户籍人口，故回退2024；泉州统计口径不含金门县。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.nanning-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "南宁市常住人口",
+      "definition": "2025年末南宁市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "南宁市常住人口",
+      "geography": "南宁市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "南宁市统计局、国家统计局南宁调查队",
+      "sourceTitle": "2025年南宁市国民经济和社会发展统计公报",
+      "sourceUrl": "https://www.nanning.gov.cn/sjfw/tjgb/t6627373.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "南宁市行政区域常住人口",
+      "directValue": "2025年末南宁市常住人口901.66万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×901.66万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 901.66,
+        "optimistic": 901.66,
+        "conservative": 901.66,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "行政区常住人口不等于南宁都市圈人口。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.changchun-2024",
+      "dimensionId": "base.region",
+      "dimensionName": "长春市常住人口",
+      "definition": "2024年末长春市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "长春市常住人口",
+      "geography": "长春市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2024-year-end",
+      "publisher": "吉林省统计局",
+      "sourceTitle": "长春市2024年国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.jl.gov.cn/tjsj/tjgb/ndgb/202508/t20250806_3488044.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "长春市行政区域常住人口",
+      "directValue": "2024年末长春市常住人口908.51万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×908.51万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 908.51,
+        "optimistic": 908.51,
+        "conservative": 908.51,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "2025市统计局页面仅能以HTTP稳定访问，为保持可核HTTPS链路回退2024省统计局页面。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.changzhou-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "常州市常住人口",
+      "definition": "2025年末常州市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "常州市常住人口",
+      "geography": "常州市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "常州市统计局、国家统计局常州调查队",
+      "sourceTitle": "2025年常州市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.changzhou.gov.cn/content/suitable/show?catid=24519&id=29035",
+      "retrievedAt": "2026-08-14",
+      "denominator": "常州市行政区域常住人口",
+      "directValue": "2025年末常住人口541.54万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×541.54万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 541.54,
+        "optimistic": 541.54,
+        "conservative": 541.54,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "公报未给18—50岁逐岁×性别结构。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.nanchang-2024",
+      "dimensionId": "base.region",
+      "dimensionName": "南昌市常住人口",
+      "definition": "2024年末南昌市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "南昌市常住人口",
+      "geography": "南昌市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2024-year-end",
+      "publisher": "南昌市统计局",
+      "sourceTitle": "2024年南昌市常住人口增加10.22万人",
+      "sourceUrl": "https://tjj.nc.gov.cn/ncstjj/sjfb/202502/4e66745eb31e4ca4bd6bbddc560c9567.shtml",
+      "retrievedAt": "2026-08-14",
+      "denominator": "南昌市行政区域常住人口",
+      "directValue": "2024年末南昌市常住人口667.04万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×667.04万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 667.04,
+        "optimistic": 667.04,
+        "conservative": 667.04,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "2025统计公报页面未呈现可核常住人口总量，故回退2024。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.nantong-2024",
+      "dimensionId": "base.region",
+      "dimensionName": "南通市常住人口",
+      "definition": "2024年末南通市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "南通市常住人口",
+      "geography": "南通市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2024-year-end",
+      "publisher": "南通市统计局、国家统计局南通调查队",
+      "sourceTitle": "2024年南通市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.nantong.gov.cn/ntstj/2025tjnj/zk/html/gb.pdf",
+      "retrievedAt": "2026-08-14",
+      "denominator": "南通市行政区域常住人口",
+      "directValue": "2024年末常住人口775.0万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×775万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 775,
+        "optimistic": 775,
+        "conservative": 775,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "2024与全国2025尺度有一年时点差。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.guiyang-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "贵阳市常住人口",
+      "definition": "2025年末贵阳市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "贵阳市常住人口",
+      "geography": "贵阳市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "贵阳市统计局、国家统计局贵阳调查队",
+      "sourceTitle": "2025年贵阳市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.guiyang.gov.cn/2020_zwgk/2020_zdlygk/2020_sjfb/tjgb/202605/t20260509_90153688.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "贵阳市行政区域常住人口",
+      "directValue": "2025年末贵阳市常住人口666.89万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×666.89万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 666.89,
+        "optimistic": 666.89,
+        "conservative": 666.89,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "公报年度数为初步统计值。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.jiaxing-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "嘉兴市常住人口",
+      "definition": "2025年末嘉兴市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "嘉兴市常住人口",
+      "geography": "嘉兴市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "嘉兴市统计局、国家统计局嘉兴调查队",
+      "sourceTitle": "2025年嘉兴市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.jiaxing.gov.cn/col/col1512321/art/2026/art_38e28ce32b7c4e6bba2b1888752f97cc.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "嘉兴市行政区域常住人口",
+      "directValue": "据2025年1%人口变动抽样调查推算，年末全市常住人口561.3万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×561.3万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 561.3,
+        "optimistic": 561.3,
+        "conservative": 561.3,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "年度初步统计数据；1%人口抽样调查推算。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.xuzhou-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "徐州市常住人口",
+      "definition": "2025年末徐州市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "徐州市常住人口",
+      "geography": "徐州市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "徐州市统计局、国家统计局徐州调查队",
+      "sourceTitle": "2025年徐州市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tj.xz.gov.cn/govxxgk/01405176-5/2026-06-17/f2a59a95-a040-450c-9115-2e2cdb43040e.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "徐州市行政区域常住人口",
+      "directValue": "2025年末徐州市常住人口896.71万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×896.71万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 896.71,
+        "optimistic": 896.71,
+        "conservative": 896.71,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "公报注明数据为初步统计数。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.huizhou-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "惠州市常住人口",
+      "definition": "2025年末惠州市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "惠州市常住人口",
+      "geography": "惠州市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "惠州市统计局、国家统计局惠州调查队",
+      "sourceTitle": "2025年惠州国民经济和社会发展统计公报",
+      "sourceUrl": "https://www.huizhou.gov.cn/bmpd/hzstjj/tjsj/content/post_5767540.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "惠州市行政区域常住人口",
+      "directValue": "2025年末惠州市常住人口619.30万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×619.3万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 619.3,
+        "optimistic": 619.3,
+        "conservative": 619.3,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "公报年度数为初步统计值。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.taiyuan-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "太原市常住人口",
+      "definition": "2025年末太原市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "太原市常住人口",
+      "geography": "太原市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "太原市统计局",
+      "sourceTitle": "2025年太原市人口主要数据公报",
+      "sourceUrl": "https://stats.taiyuan.gov.cn/tjgb/20260528/30296681.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "太原市行政区域常住人口",
+      "directValue": "2025年末太原市常住人口552.606万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×552.606万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 552.606,
+        "optimistic": 552.606,
+        "conservative": 552.606,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "人口主要数据来自2025年全国1%人口抽样调查。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.yantai-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "烟台市常住人口",
+      "definition": "2025年末烟台市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "烟台市常住人口",
+      "geography": "烟台市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "烟台市统计局、国家统计局烟台调查队",
+      "sourceTitle": "2025年烟台市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.yantai.gov.cn/col/col117/art/2026/art_61a619eacfd44e5bbf80e45bf2cdd6d0.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "烟台市行政区域常住人口",
+      "directValue": "2025年末常住人口700.05万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×700.05万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 700.05,
+        "optimistic": 700.05,
+        "conservative": 700.05,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "公报未给18—50岁逐岁×性别结构。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.linyi-2024",
+      "dimensionId": "base.region",
+      "dimensionName": "临沂市常住人口",
+      "definition": "2024年末临沂市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "临沂市常住人口",
+      "geography": "临沂市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2024-year-end",
+      "publisher": "临沂市人民政府办公室",
+      "sourceTitle": "临沂市基本医保定点医药机构资源配置规划（2026—2028年）",
+      "sourceUrl": "https://www.linyi.gov.cn/info/10605/412349.htm",
+      "retrievedAt": "2026-08-14",
+      "denominator": "临沂市行政区域常住人口",
+      "directValue": "正式规划文件登记2024年末全市常住人口1084.84万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1084.84万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 1084.84,
+        "optimistic": 1084.84,
+        "conservative": 1084.84,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "2025统计公报未披露常住人口；本条采用市政府正式规划对市卫健委数据的转引，不是独立人口公报。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.baoding-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "保定市常住人口",
+      "definition": "2025年末保定市行政区域（不含定州市、雄安新区）常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "保定市常住人口",
+      "geography": "保定市行政区域（不含定州市、雄安新区）",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "保定市统计局、国家统计局保定调查队",
+      "sourceTitle": "保定市2025年国民经济和社会发展统计公报",
+      "sourceUrl": "https://www.baoding.gov.cn/baoding/government/data?itemResourceId=412a4b8b-f62e-49e1-a937-b5a8453cd5a0&resourceType=3",
+      "retrievedAt": "2026-08-14",
+      "denominator": "保定市行政区域（不含定州市、雄安新区）常住人口",
+      "directValue": "2025年末全市（不含定州）常住人口900.07万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×900.07万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 900.07,
+        "optimistic": 900.07,
+        "conservative": 900.07,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "明确采用不含定州市、不含雄安新区的保定市统计口径；部分数据为快报数。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.taizhou-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "台州市常住人口",
+      "definition": "2025年末台州市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "台州市常住人口",
+      "geography": "台州市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "台州市统计局",
+      "sourceTitle": "2025年台州市人口主要数据公报",
+      "sourceUrl": "https://tjj.zjtz.gov.cn/col/col1229890988/art/2026/art_47ec51b2a9ca4f6bb65abe92bdbf60a6.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "台州市行政区域常住人口",
+      "directValue": "据2025年1%人口抽样调查推算，年末全市常住人口676.0万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×676万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 676,
+        "optimistic": 676,
+        "conservative": 676,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "1%人口抽样调查推算，精度到0.1万人。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.shaoxing-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "绍兴市常住人口",
+      "definition": "2025年末绍兴市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "绍兴市常住人口",
+      "geography": "绍兴市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "绍兴市统计局",
+      "sourceTitle": "2025年绍兴市主要人口数据公报",
+      "sourceUrl": "https://tjj.sx.gov.cn/col/col1229362069/art/2026/art_77a3b6c66a1342ca8d6cdcf1f4278971.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "绍兴市行政区域常住人口",
+      "directValue": "据2025年1%人口抽样调查推算，年末绍兴市常住人口544.3万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×544.3万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 544.3,
+        "optimistic": 544.3,
+        "conservative": 544.3,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "1%人口抽样调查推算值。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.zhuhai-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "珠海市常住人口",
+      "definition": "2025年末珠海市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "珠海市常住人口",
+      "geography": "珠海市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "珠海市统计局",
+      "sourceTitle": "2025珠海市人口规模及分布情况",
+      "sourceUrl": "https://tjj.zhuhai.gov.cn/tjsj/tjzl/tjjpcgb/content/post_3927164.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "珠海市行政区域常住人口",
+      "directValue": "据2025年全国1%人口抽样调查，年末全市常住人口254.31万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×254.31万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 254.31,
+        "optimistic": 254.31,
+        "conservative": 254.31,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "全市口径明确包含横琴粤澳深度合作区。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.luoyang-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "洛阳市常住人口",
+      "definition": "2025年末洛阳市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "洛阳市常住人口",
+      "geography": "洛阳市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "洛阳市统计局",
+      "sourceTitle": "2025年洛阳市国民经济和社会发展统计公报",
+      "sourceUrl": "https://lytjj.ly.gov.cn/2026/04-30/1059043.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "洛阳市行政区域常住人口",
+      "directValue": "2025年末洛阳市常住人口708.3万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×708.3万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 708.3,
+        "optimistic": 708.3,
+        "conservative": 708.3,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "2025年数据为初步统计结果；官网排版会把部分数字拆分，登记值已按正文语义复核。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.weifang-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "潍坊市常住人口",
+      "definition": "2025年末潍坊市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "潍坊市常住人口",
+      "geography": "潍坊市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "潍坊市统计局、国家统计局潍坊调查队",
+      "sourceTitle": "2025年潍坊市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.weifang.gov.cn/55356/1306569853.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "潍坊市行政区域常住人口",
+      "directValue": "2025年末潍坊市常住人口927.12万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×927.12万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 927.12,
+        "optimistic": 927.12,
+        "conservative": 927.12,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "公报注明为初步统计数，正式数据以潍坊统计年鉴2026为准。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.lanzhou-2024",
+      "dimensionId": "base.region",
+      "dimensionName": "兰州市常住人口",
+      "definition": "2024年末兰州市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "兰州市常住人口",
+      "geography": "兰州市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2024-year-end",
+      "publisher": "甘肃省统计局",
+      "sourceTitle": "甘肃统计提要2025·表2-2各地县人口和城镇化率（2024年）",
+      "sourceUrl": "https://tjj.gansu.gov.cn/tjj/c117468/202505/174143566/files/4db368f09fac4efb95b5d73aa316e1bf.pdf",
+      "retrievedAt": "2026-08-14",
+      "denominator": "兰州市行政区域常住人口",
+      "directValue": "2024年末兰州市常住人口443.65万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×443.65万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 443.65,
+        "optimistic": 443.65,
+        "conservative": 443.65,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "来源为省统计局统计提要表，不是兰州市单独人口公报。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.urumqi-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "乌鲁木齐市常住人口",
+      "definition": "2025年末乌鲁木齐市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "乌鲁木齐市常住人口",
+      "geography": "乌鲁木齐市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "乌鲁木齐市统计局、国家统计局乌鲁木齐调查队",
+      "sourceTitle": "乌鲁木齐市2025年国民经济和社会发展统计公报",
+      "sourceUrl": "https://www.wlmq.gov.cn/wlmqs/c119359/202604/6070ed21632343cca95db20395862469.shtml",
+      "retrievedAt": "2026-08-14",
+      "denominator": "乌鲁木齐市行政区域常住人口",
+      "directValue": "2025年末乌鲁木齐市常住人口415.39万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×415.39万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 415.39,
+        "optimistic": 415.39,
+        "conservative": 415.39,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "公报年度数为初步统计值。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.haikou-2024",
+      "dimensionId": "base.region",
+      "dimensionName": "海口市常住人口",
+      "definition": "2024年末海口市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "海口市常住人口",
+      "geography": "海口市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2024-year-end",
+      "publisher": "海口市统计局",
+      "sourceTitle": "2024年末海口市常住人口主要数据",
+      "sourceUrl": "https://tjj.haikou.gov.cn/hkstjj/tjpc/202504/a783fd9d41b4496893446b1e2085437e.shtml",
+      "retrievedAt": "2026-08-14",
+      "denominator": "海口市行政区域常住人口",
+      "directValue": "2024年末海口市常住人口303.14万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×303.14万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 303.14,
+        "optimistic": 303.14,
+        "conservative": 303.14,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "2025公报未给可核全市常住人口总量，故回退2024。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.yinchuan-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "银川市常住人口",
+      "definition": "2025年末银川市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "银川市常住人口",
+      "geography": "银川市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "银川市统计局、国家统计局银川调查队",
+      "sourceTitle": "银川市2025年国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.yinchuan.gov.cn/zzb/tjgb_72222/202604/t20260427_5226142.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "银川市行政区域常住人口",
+      "directValue": "2025年末银川市常住人口294.26万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×294.26万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 294.26,
+        "optimistic": 294.26,
+        "conservative": 294.26,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "公报年度数为初步统计值。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.xining-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "西宁市常住人口",
+      "definition": "2025年末西宁市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "西宁市常住人口",
+      "geography": "西宁市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "西宁市人民政府",
+      "sourceTitle": "人口（2025统计公报数据）",
+      "sourceUrl": "https://www.xining.gov.cn/zjxn/xngk/rw/rk_146/202406/t20240621_204689.html",
+      "retrievedAt": "2026-08-14",
+      "denominator": "西宁市行政区域常住人口",
+      "directValue": "2025年末西宁市常住人口247.56万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×247.56万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 247.56,
+        "optimistic": 247.56,
+        "conservative": 247.56,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "政府人口页为持续更新页面，数值注明来源为2025统计公报。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.hohhot-2024",
+      "dimensionId": "base.region",
+      "dimensionName": "呼和浩特市常住人口",
+      "definition": "2024年末呼和浩特市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "呼和浩特市常住人口",
+      "geography": "呼和浩特市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2024-year-end",
+      "publisher": "呼和浩特市发展和改革委员会（转引内蒙古自治区统计局）",
+      "sourceTitle": "2024年内蒙古自治区常住人口主要数据公布 出生人口有所回升",
+      "sourceUrl": "https://fgw.huhhot.gov.cn/zwdt/ssxw/202504/t20250414_1877594.html?zbb=true",
+      "retrievedAt": "2026-08-14",
+      "denominator": "呼和浩特市行政区域常住人口",
+      "directValue": "2024年末呼和浩特市常住人口363.94万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×363.94万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 363.94,
+        "optimistic": 363.94,
+        "conservative": 363.94,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "2025统计局原文仅能以HTTP稳定访问，为保持可核HTTPS链路回退2024官方政府页。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
+      "modelUse": "anchor"
+    },
+    {
+      "id": "evidence.base.region.lhasa-2025",
+      "dimensionId": "base.region",
+      "dimensionName": "拉萨市常住人口",
+      "definition": "2025年末拉萨市行政区域常住人口。",
+      "classification": "hard",
+      "applicablePopulation": "拉萨市常住人口",
+      "geography": "拉萨市行政区域",
+      "ageRange": {
+        "min": 0,
+        "max": null
+      },
+      "sexBasis": "both",
+      "dataYear": "2025-year-end",
+      "publisher": "拉萨市统计局",
+      "sourceTitle": "2025年拉萨市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.lasa.gov.cn/tjj/tjgb/202605/f7890507561b4eecb1d299c01cc74cab.shtml",
+      "retrievedAt": "2026-08-14",
+      "denominator": "拉萨市行政区域常住人口",
+      "directValue": "2025年末拉萨市常住人口88.30万人。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×88.3万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "adjustments": [],
+      "estimate": {
+        "baseline": 88.3,
+        "optimistic": 88.3,
+        "conservative": 88.3,
+        "unit": "wan"
+      },
+      "grade": "A",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "公报年度数为初步统计值。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.2",
       "modelUse": "anchor"
     }
   ]

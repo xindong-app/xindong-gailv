@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { playTada } from './sound'
 import { rnd } from './roster'
+import { PersonSvg } from './person'
 
 const TITLE = [...'心动概率局']
 const RUNNERS = 14
@@ -14,20 +15,13 @@ function Runner({ index }: { index: number }) {
   const delay = 120 + index * 70
   const bottom = 18 + rnd(index, 11) * 26
   return (
-    <svg
+    <div
       aria-hidden="true"
       className={`intro-runner ${fromLeft ? 'from-left' : 'from-right'}`}
       style={{ animationDelay: `${delay}ms`, bottom: `${bottom}%`, ['--run-x' as string]: `${8 + rnd(index, 12) * 30}vw` }}
-      width="30"
-      height="42"
-      viewBox="0 0 34 46"
     >
-      <path d="M5 44 Q5 24 17 24 Q29 24 29 44 Z" fill={color} stroke={INK} strokeWidth="1.7" />
-      <circle cx="17" cy="13" r="7.5" fill={color} stroke={INK} strokeWidth="1.7" />
-      <circle cx="14" cy="12" r="1" fill={INK} />
-      <circle cx="20" cy="12" r="1" fill={INK} />
-      <path d="M14 16 Q17 18.2 20 16" stroke={INK} strokeWidth="1.1" fill="none" strokeLinecap="round" />
-    </svg>
+      <PersonSvg color={color} ink={INK} seed={index * 13 + 5} width={30} height={42} blink={false} />
+    </div>
   )
 }
 

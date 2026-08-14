@@ -8,10 +8,11 @@ export interface RuntimeEvidenceEntry {
   dimensionId: string
   grade: RuntimeEvidenceGrade
   modelUse: RuntimeEvidenceModelUse
-  sourceTitle: string
-  sourceUrl: string
-  publisher: string
-  dataYear: string
+  /** Present for the featured records rendered on the home page. */
+  sourceTitle?: string
+  sourceUrl?: string
+  publisher?: string
+  dataYear?: string
 }
 
 export interface RuntimeEvidenceRegistry {
@@ -22,8 +23,9 @@ export interface RuntimeEvidenceRegistry {
 }
 
 /**
- * Browser-safe display projection. The complete definitions, denominators,
- * transformations, estimates and limitations remain in evidence-registry.json
- * and are validated by evidence-validation.ts during every release check.
+ * Browser-safe display projection. All records retain countable policy fields;
+ * only the featured records retain verbose display metadata. The complete
+ * definitions, denominators, transformations, estimates and limitations remain
+ * in evidence-registry.json and are validated during every release check.
  */
 export const EVIDENCE_REGISTRY = runtimeEvidenceRegistry as RuntimeEvidenceRegistry

@@ -1,0 +1,1015 @@
+{
+  "schemaVersion": 1,
+  "dataVersion": "2026.08.14.2",
+  "retrievedAt": "2026-08-14",
+  "rosterId": "yicai-city-tier-2025-05-28",
+  "unit": "wan",
+  "populationBasis": "year_end_resident_population",
+  "structurePolicy": {
+    "method": "national_2020_age_sex_share",
+    "evidenceGrade": "C",
+    "conservativeMultiplier": 0.7,
+    "optimisticMultiplier": 1.3,
+    "isConfidenceInterval": false
+  },
+  "entries": [
+    {
+      "name": "上海",
+      "province": "上海",
+      "wage": 229337,
+      "hot": true,
+      "popWan": 2485.41,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.shanghai-2025",
+      "publisher": "上海市统计局、国家统计局上海调查总队",
+      "sourceTitle": "2025年上海市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.sh.gov.cn/tjgb/20260330/e0772941e8e041eaaad2df850b44ef98.html",
+      "geography": "上海市行政区域",
+      "directValue": "2025年末常住人口2,485.41万人；其中户籍常住人口1,510.91万人、外来常住人口974.50万人。",
+      "limitations": [
+        "城市公报未直接提供18—50岁逐岁结构；应用全国单岁结构属于后续模型假设。",
+        "常住、户籍与外来常住人口是不同口径，不得重复相加。"
+      ]
+    },
+    {
+      "name": "北京",
+      "province": "北京",
+      "wage": 218312,
+      "hot": true,
+      "popWan": 2180,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.beijing-2025",
+      "publisher": "北京市统计局、国家统计局北京调查总队",
+      "sourceTitle": "北京市2025年国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.beijing.gov.cn/tjsj_31433/tjgb_31445/ndgb_31446/202603/t20260326_4566469.html",
+      "geography": "北京市行政区域",
+      "directValue": "2025年末常住人口2,180.0万人；其中城镇人口1,924.9万人，城镇化率88.3%。",
+      "limitations": [
+        "城市公报未直接提供18—50岁逐岁结构；应用全国单岁结构属于后续模型假设。",
+        "与其他城市并集时必须先按行政区域去重。"
+      ]
+    },
+    {
+      "name": "深圳",
+      "province": "广东",
+      "wage": 174640,
+      "hot": true,
+      "popWan": 1824.85,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.shenzhen-2025",
+      "publisher": "深圳市统计局、国家统计局深圳调查队",
+      "sourceTitle": "深圳市2025年国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.sz.gov.cn/zwgk/zfxxgkml/tjsj/tjgb/content/post_12803919.html",
+      "geography": "深圳市行政区域",
+      "directValue": "2025年末常住人口1,824.85万人；其中城镇常住人口1,820.96万人，城镇化率99.79%。",
+      "limitations": [
+        "城市公报未直接提供18—50岁逐岁结构；深圳年龄结构与全国结构可能显著不同。",
+        "行政区常住人口不等于都市圈人口。"
+      ]
+    },
+    {
+      "name": "广州",
+      "province": "广东",
+      "wage": 158318,
+      "hot": true,
+      "popWan": 1910.1,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.guangzhou-2025",
+      "publisher": "广州市统计局",
+      "sourceTitle": "2025年广州市人口规模及分布情况",
+      "sourceUrl": "https://tjj.gz.gov.cn/zzfwzq/tjgb/content/post_10804088.html",
+      "geography": "广州市行政区域",
+      "directValue": "2025年末常住人口1,910.10万人，城镇化率87.56%；户籍人口1,091.14万人。",
+      "limitations": [
+        "城市公报未直接提供18—50岁逐岁结构；应用全国单岁结构属于后续模型假设。",
+        "行政区常住人口不等于广佛都市圈人口。"
+      ]
+    },
+    {
+      "name": "成都",
+      "province": "四川",
+      "wage": 127093,
+      "hot": true,
+      "popWan": 2153.5,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.chengdu-2025",
+      "publisher": "成都市统计局、国家统计局成都调查队",
+      "sourceTitle": "2025年成都市国民经济和社会发展统计公报",
+      "sourceUrl": "https://cdstats.chengdu.gov.cn/cdstjj/c154795/2026-04/14/content_58dc076a80974f999828b691bfca027f.shtml",
+      "geography": "成都市行政区域",
+      "directValue": "2025年末成都市常住人口2153.5万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "公报年度数为初步统计值。"
+      ]
+    },
+    {
+      "name": "杭州",
+      "province": "浙江",
+      "wage": 161660,
+      "hot": true,
+      "popWan": 1270,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.hangzhou-2025",
+      "publisher": "杭州市统计局、国家统计局杭州调查队",
+      "sourceTitle": "2025年杭州市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.hangzhou.gov.cn/col/col1229279682/art/2026/art_99cf56b3747b44b492375d4b4d4943d3.html",
+      "geography": "杭州市行政区域",
+      "directValue": "据2025年1%人口抽样调查数据推算，年末全市常住人口1270.0万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "1%人口抽样调查推算值，不是逐户普查值。"
+      ]
+    },
+    {
+      "name": "重庆",
+      "province": "重庆",
+      "wage": 117446,
+      "hot": true,
+      "popWan": 3187.26,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.chongqing-2025",
+      "publisher": "重庆市统计局、国家统计局重庆调查总队",
+      "sourceTitle": "2025年重庆市国民经济和社会发展统计公报",
+      "sourceUrl": "https://www.cq.gov.cn/zwgk/zfxxgkml/sjfb_120853/tjgb/202603/t20260326_15568523.html",
+      "geography": "重庆市行政区域",
+      "directValue": "2025年末常住人口3187.26万人，其中城镇常住人口2327.34万人。",
+      "limitations": [
+        "重庆行政范围广、城乡差异显著，全国年龄结构外推误差可能高于一般中心城市。"
+      ]
+    },
+    {
+      "name": "武汉",
+      "province": "湖北",
+      "wage": 109227,
+      "hot": true,
+      "popWan": 1386.19,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.wuhan-2025",
+      "publisher": "武汉市统计局、国家统计局武汉调查队",
+      "sourceTitle": "2025年武汉市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.wuhan.gov.cn/tjfw/tjgb/202604/t20260408_2750693.shtml",
+      "geography": "武汉市行政区域",
+      "directValue": "2025年末常住人口1,386.19万人，城镇化率85.22%。",
+      "limitations": [
+        "城市公报未直接提供18—50岁逐岁结构；应用全国单岁结构属于后续模型假设。",
+        "网页正文数字排版有空格，登记值按公报的1,386.19万人规范化。"
+      ]
+    },
+    {
+      "name": "苏州",
+      "province": "江苏",
+      "wage": 138732,
+      "hot": true,
+      "popWan": 1304.77,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.suzhou-2025",
+      "publisher": "苏州市统计局",
+      "sourceTitle": "2025年苏州市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.suzhou.gov.cn/sztjj/tjgb/202604/3dc4b574cabd4e86b36ec5d3280e927c.shtml",
+      "geography": "苏州市行政区域",
+      "directValue": "2025年末常住人口1,304.77万人，常住人口城镇化率82.9%。",
+      "limitations": [
+        "城市公报未直接提供18—50岁逐岁结构；应用全国单岁结构属于后续模型假设。",
+        "苏州市行政区域包含县级市，不等同中心城区。"
+      ]
+    },
+    {
+      "name": "西安",
+      "province": "陕西",
+      "wage": 128675,
+      "hot": true,
+      "popWan": 1323.63,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.xian-2025",
+      "publisher": "西安市统计局、国家统计局西安调查队",
+      "sourceTitle": "西安市2025年国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.xa.gov.cn/web_files/tjj/file/2026/05/15/202605151000219859531.pdf",
+      "geography": "西安市行政区域",
+      "directValue": "2025年末常住人口1323.63万人，其中城镇常住人口1072.27万人。",
+      "limitations": [
+        "公报未给18—50岁逐岁×性别结构。",
+        "行政区常住人口不等于中心城区或都市圈人口。"
+      ]
+    },
+    {
+      "name": "南京",
+      "province": "江苏",
+      "wage": 159659,
+      "hot": true,
+      "popWan": 963.85,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.nanjing-2025",
+      "publisher": "南京市统计局",
+      "sourceTitle": "南京市2025年国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.nanjing.gov.cn/bmfw/njsj/202604/t20260403_5818444.html",
+      "geography": "南京市行政区域",
+      "directValue": "2025年末常住人口963.85万人，其中城镇人口843.37万人。",
+      "limitations": [
+        "官方公报网页正文以DOCX附件发布；登记值已从官方附件复核。",
+        "全国年龄性别份额不能反映南京高校人口和迁移结构。"
+      ]
+    },
+    {
+      "name": "长沙",
+      "province": "湖南",
+      "wage": 97015,
+      "hot": true,
+      "popWan": 1072.14,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.changsha-2025",
+      "publisher": "长沙市统计局",
+      "sourceTitle": "长沙市2025年国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.hunan.gov.cn/hntj/tjfx/tjgb/szgb/zss_1/202605/t20260512_33975356.html",
+      "geography": "长沙市行政区域",
+      "directValue": "2025年末长沙市常住总人口1072.14万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "湖南省统计局转载长沙市统计局公报；公报注明部分数据为初步统计。"
+      ]
+    },
+    {
+      "name": "郑州",
+      "province": "河南",
+      "wage": 84156,
+      "hot": false,
+      "popWan": 1313.8,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.zhengzhou-2025",
+      "publisher": "郑州市统计局",
+      "sourceTitle": "2025年郑州常住人口总量1313.8万人 人口高质量发展持续推进",
+      "sourceUrl": "https://tjj.zhengzhou.gov.cn/fxtj/10069073.jhtml",
+      "geography": "郑州市行政区域",
+      "directValue": "2025年末常住人口1313.8万人。",
+      "limitations": [
+        "专题发布给出16—59岁总量，但未给18—50岁逐岁×性别结构。"
+      ]
+    },
+    {
+      "name": "天津",
+      "province": "天津",
+      "wage": 138007,
+      "hot": false,
+      "popWan": 1363,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.tianjin-2025",
+      "publisher": "天津市统计局、国家统计局天津调查总队",
+      "sourceTitle": "2025年天津市国民经济和社会发展统计公报",
+      "sourceUrl": "https://www.tj.gov.cn/sq/tjgb/202603/t20260327_7271193.html",
+      "geography": "天津市行政区域",
+      "directValue": "2025年末常住人口1363万人，其中城镇常住人口1175万人。",
+      "limitations": [
+        "公报未给18—50岁逐岁×性别结构。"
+      ]
+    },
+    {
+      "name": "合肥",
+      "province": "安徽",
+      "wage": 103688,
+      "hot": false,
+      "popWan": 1000.2,
+      "populationYear": 2024,
+      "sourceEvidenceId": "evidence.base.region.hefei-2024",
+      "publisher": "合肥市统计局",
+      "sourceTitle": "2024年合肥市人口变动情况抽样调查主要数据公报",
+      "sourceUrl": "https://tjj.hefei.gov.cn/tjyw/tjgb/15296487.html",
+      "geography": "合肥市行政区域",
+      "directValue": "2024年末合肥市常住人口1000.2万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "多阶段分层概率抽样推算；2025值未采用，因为未取得稳定的一手HTTPS正文。"
+      ]
+    },
+    {
+      "name": "青岛",
+      "province": "山东",
+      "wage": 107131,
+      "hot": false,
+      "popWan": 1051.55,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.qingdao-2025",
+      "publisher": "青岛市人民政府（数据来源：青岛市统计局、国家统计局青岛调查队）",
+      "sourceTitle": "人口简况（2025年数据）",
+      "sourceUrl": "https://www.qingdao.gov.cn/yfqd/qdgk/rkjk/202009/t20200903_66.shtml",
+      "geography": "青岛市行政区域",
+      "directValue": "2025年青岛市常住人口1051.55万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "全市口径包含七区及胶州、平度、莱西三个县级市；政府人口页为持续更新页面。"
+      ]
+    },
+    {
+      "name": "东莞",
+      "province": "广东",
+      "wage": 131418,
+      "hot": false,
+      "popWan": 1080.04,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.dongguan-2025",
+      "publisher": "东莞市统计局、国家统计局东莞调查队",
+      "sourceTitle": "2025年东莞市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.dg.gov.cn/tjzl/tjgb/content/post_4537415.html",
+      "geography": "东莞市行政区域",
+      "directValue": "2025年末常住人口1080.04万人。",
+      "limitations": [
+        "东莞迁移人口多，全国年龄性别结构可能产生系统性偏差。"
+      ]
+    },
+    {
+      "name": "宁波",
+      "province": "浙江",
+      "wage": 138033,
+      "hot": false,
+      "popWan": 983.3,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.ningbo-2025",
+      "publisher": "宁波市统计局",
+      "sourceTitle": "2025年宁波市人口主要数据公报",
+      "sourceUrl": "https://tjj.ningbo.gov.cn/col/col1229042825/art/2026/art_06881e7e7c8d4e24896d020c7cad28c3.html",
+      "geography": "宁波市行政区域",
+      "directValue": "据2025年全国1%人口抽样调查推算，年末全市常住人口983.3万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "调查标准时点为2025年11月1日零时，年末数为抽样推算。"
+      ]
+    },
+    {
+      "name": "佛山",
+      "province": "广东",
+      "wage": 115084,
+      "hot": false,
+      "popWan": 969.89,
+      "populationYear": 2024,
+      "sourceEvidenceId": "evidence.base.region.foshan-2024",
+      "publisher": "佛山市统计局、国家统计局佛山调查队",
+      "sourceTitle": "2024年佛山市国民经济和社会发展统计公报",
+      "sourceUrl": "https://www.foshan.gov.cn/attachment/0/537/537176/6564843.pdf",
+      "geography": "佛山市行政区域",
+      "directValue": "2024年末常住人口969.89万人。",
+      "limitations": [
+        "2024与全国2025尺度有一年时点差。",
+        "公报未给18—50岁逐岁×性别结构。"
+      ]
+    },
+    {
+      "name": "济南",
+      "province": "山东",
+      "wage": 133232,
+      "hot": false,
+      "popWan": 961.6,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.jinan-2025",
+      "publisher": "济南市统计局、国家统计局济南调查队",
+      "sourceTitle": "2025年济南市国民经济和社会发展统计公报",
+      "sourceUrl": "https://jntj.jinan.gov.cn/col/col18254/art/2026/art_7dc3135bb2209f961b3c65baa8ab3d2d.html",
+      "geography": "济南市行政区域",
+      "directValue": "2025年末常住人口961.6万人。",
+      "limitations": [
+        "公报未给18—50岁逐岁×性别结构。"
+      ]
+    },
+    {
+      "name": "无锡",
+      "province": "江苏",
+      "wage": 139697,
+      "hot": false,
+      "popWan": 753.74,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.wuxi-2025",
+      "publisher": "无锡市统计局、国家统计局无锡调查队",
+      "sourceTitle": "2025年无锡市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tj.wuxi.gov.cn/doc/2026/05/09/4772420.shtml",
+      "geography": "无锡市行政区域",
+      "directValue": "2025年末无锡市常住人口753.74万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "公报注明为初步统计数。"
+      ]
+    },
+    {
+      "name": "沈阳",
+      "province": "辽宁",
+      "wage": 114821,
+      "hot": false,
+      "popWan": 924.3,
+      "populationYear": 2024,
+      "sourceEvidenceId": "evidence.base.region.shenyang-2024",
+      "publisher": "沈阳市统计局、国家统计局沈阳调查队",
+      "sourceTitle": "2024年沈阳市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.shenyang.gov.cn/sjfb/tjgb/202504/P020250423354552607711.pdf",
+      "geography": "沈阳市行政区域",
+      "directValue": "2024年末常住人口924.3万人。",
+      "limitations": [
+        "2024与全国2025尺度有一年时点差。"
+      ]
+    },
+    {
+      "name": "昆明",
+      "province": "云南",
+      "wage": 106769,
+      "hot": false,
+      "popWan": 874.4,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.kunming-2025",
+      "publisher": "昆明市统计局、国家统计局昆明调查队",
+      "sourceTitle": "2025年昆明市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.km.gov.cn/c/2026-05-21/5083313.shtml",
+      "geography": "昆明市行政区域",
+      "directValue": "2025年末昆明市常住人口874.4万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "公报年度数为初步统计值。"
+      ]
+    },
+    {
+      "name": "福州",
+      "province": "福建",
+      "wage": 108520,
+      "hot": false,
+      "popWan": 852.1,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.fuzhou-2025",
+      "publisher": "福州市统计局、国家统计局福州调查队",
+      "sourceTitle": "2025年福州市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.fuzhou.gov.cn/zwgk/tjzl/ndbg/202604/t20260414_5308173.htm",
+      "geography": "福州市行政区域",
+      "directValue": "2025年末常住人口852.1万人。",
+      "limitations": [
+        "公报未给18—50岁逐岁×性别结构。"
+      ]
+    },
+    {
+      "name": "厦门",
+      "province": "福建",
+      "wage": 108520,
+      "hot": false,
+      "popWan": 536.5,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.xiamen-2025",
+      "publisher": "厦门市统计局、国家统计局厦门调查队",
+      "sourceTitle": "2025年厦门市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.xm.gov.cn/tjzl/ndgb/202603/t20260325_2991064.htm",
+      "geography": "厦门市行政区域",
+      "directValue": "2025年末厦门市常住人口536.50万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "行政区常住人口不等于厦漳泉都市圈人口。"
+      ]
+    },
+    {
+      "name": "温州",
+      "province": "浙江",
+      "wage": 122163,
+      "hot": false,
+      "popWan": 990.2,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.wenzhou-2025",
+      "publisher": "温州市统计局、国家统计局温州调查队",
+      "sourceTitle": "2025年温州市国民经济和社会发展统计公报",
+      "sourceUrl": "https://zjzd.stats.gov.cn/gjtjjwzdcd/dcsj/tjgb/art/2026/art_c10d7fff23af4793b579d9208f3debf9.html",
+      "geography": "温州市行政区域",
+      "directValue": "据2025年全国1%人口抽样调查数据推算，年末全市常住人口990.2万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "1%人口抽样调查推算值。"
+      ]
+    },
+    {
+      "name": "石家庄",
+      "province": "河北",
+      "wage": 94818,
+      "hot": false,
+      "popWan": 1124.69,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.shijiazhuang-2025",
+      "publisher": "石家庄市统计局、国家统计局石家庄调查队",
+      "sourceTitle": "石家庄市2025年国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.sjz.gov.cn/columns/940d701f-5e56-4f5d-9ece-7968f6354993/202605/26/f062dca8-ce95-46f8-b1c9-33f507db5a29.html",
+      "geography": "石家庄市行政区域",
+      "directValue": "2025年末常住人口1124.69万人。",
+      "limitations": [
+        "公报未给18—50岁逐岁×性别结构。",
+        "行政口径须随未来区划或统计范围变化复核。"
+      ]
+    },
+    {
+      "name": "大连",
+      "province": "辽宁",
+      "wage": 119793,
+      "hot": false,
+      "popWan": 754.4,
+      "populationYear": 2024,
+      "sourceEvidenceId": "evidence.base.region.dalian-2024",
+      "publisher": "辽宁省人民政府",
+      "sourceTitle": "大连",
+      "sourceUrl": "https://www.ln.gov.cn/web/sqgk/csmp/2025101310551499142/index.shtml",
+      "geography": "大连市行政区域",
+      "directValue": "2024年末大连市常住人口754.4万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "2025市公报只披露户籍人口，故回退到省政府可核验的2024常住人口。"
+      ]
+    },
+    {
+      "name": "哈尔滨",
+      "province": "黑龙江",
+      "wage": 95750,
+      "hot": false,
+      "popWan": 988.7,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.harbin-2025",
+      "publisher": "哈尔滨市统计局、国家统计局哈尔滨调查队",
+      "sourceTitle": "2025年哈尔滨市国民经济和社会发展统计公报",
+      "sourceUrl": "https://www.harbin.gov.cn/haerbin/c104569/202606/1129059/files/2025年哈尔滨市国民经济和社会发展统计公报-20260603093614665.pdf",
+      "geography": "哈尔滨市行政区域",
+      "directValue": "2025年末哈尔滨市常住人口988.7万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "官方PDF给出城乡总量，但未给18—50岁逐岁结构。"
+      ]
+    },
+    {
+      "name": "金华",
+      "province": "浙江",
+      "wage": 133045,
+      "hot": false,
+      "popWan": 726.9,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.jinhua-2025",
+      "publisher": "金华市统计局",
+      "sourceTitle": "2025年我市新增人口数居全省第二",
+      "sourceUrl": "https://tjj.jinhua.gov.cn/col/col1229317895/art/2026/art_4eccb6563ecf478a8f9ba76c1b44aa31.html",
+      "geography": "金华市行政区域",
+      "directValue": "2025年末金华市常住人口726.9万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "统计分析短文而非正式统计公报；数值来自2025年1%人口抽样调查。"
+      ]
+    },
+    {
+      "name": "泉州",
+      "province": "福建",
+      "wage": 108520,
+      "hot": false,
+      "popWan": 891.4,
+      "populationYear": 2024,
+      "sourceEvidenceId": "evidence.base.region.quanzhou-2024",
+      "publisher": "泉州市统计局",
+      "sourceTitle": "解读：2024年末泉州市常住人口主要数据发布",
+      "sourceUrl": "https://tjj.quanzhou.gov.cn/tjzl/sjjd/202502/t20250224_3142656.htm",
+      "geography": "泉州市行政区域",
+      "directValue": "2024年末泉州市常住人口891.4万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "2025公报仅给户籍人口，故回退2024；泉州统计口径不含金门县。"
+      ]
+    },
+    {
+      "name": "南宁",
+      "province": "广西",
+      "wage": 96184,
+      "hot": false,
+      "popWan": 901.66,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.nanning-2025",
+      "publisher": "南宁市统计局、国家统计局南宁调查队",
+      "sourceTitle": "2025年南宁市国民经济和社会发展统计公报",
+      "sourceUrl": "https://www.nanning.gov.cn/sjfw/tjgb/t6627373.html",
+      "geography": "南宁市行政区域",
+      "directValue": "2025年末南宁市常住人口901.66万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "行政区常住人口不等于南宁都市圈人口。"
+      ]
+    },
+    {
+      "name": "长春",
+      "province": "吉林",
+      "wage": 94937,
+      "hot": false,
+      "popWan": 908.51,
+      "populationYear": 2024,
+      "sourceEvidenceId": "evidence.base.region.changchun-2024",
+      "publisher": "吉林省统计局",
+      "sourceTitle": "长春市2024年国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.jl.gov.cn/tjsj/tjgb/ndgb/202508/t20250806_3488044.html",
+      "geography": "长春市行政区域",
+      "directValue": "2024年末长春市常住人口908.51万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "2025市统计局页面仅能以HTTP稳定访问，为保持可核HTTPS链路回退2024省统计局页面。"
+      ]
+    },
+    {
+      "name": "常州",
+      "province": "江苏",
+      "wage": 134829,
+      "hot": false,
+      "popWan": 541.54,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.changzhou-2025",
+      "publisher": "常州市统计局、国家统计局常州调查队",
+      "sourceTitle": "2025年常州市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.changzhou.gov.cn/content/suitable/show?catid=24519&id=29035",
+      "geography": "常州市行政区域",
+      "directValue": "2025年末常住人口541.54万人。",
+      "limitations": [
+        "公报未给18—50岁逐岁×性别结构。"
+      ]
+    },
+    {
+      "name": "南昌",
+      "province": "江西",
+      "wage": 92794,
+      "hot": false,
+      "popWan": 667.04,
+      "populationYear": 2024,
+      "sourceEvidenceId": "evidence.base.region.nanchang-2024",
+      "publisher": "南昌市统计局",
+      "sourceTitle": "2024年南昌市常住人口增加10.22万人",
+      "sourceUrl": "https://tjj.nc.gov.cn/ncstjj/sjfb/202502/4e66745eb31e4ca4bd6bbddc560c9567.shtml",
+      "geography": "南昌市行政区域",
+      "directValue": "2024年末南昌市常住人口667.04万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "2025统计公报页面未呈现可核常住人口总量，故回退2024。"
+      ]
+    },
+    {
+      "name": "南通",
+      "province": "江苏",
+      "wage": 125102,
+      "hot": false,
+      "popWan": 775,
+      "populationYear": 2024,
+      "sourceEvidenceId": "evidence.base.region.nantong-2024",
+      "publisher": "南通市统计局、国家统计局南通调查队",
+      "sourceTitle": "2024年南通市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.nantong.gov.cn/ntstj/2025tjnj/zk/html/gb.pdf",
+      "geography": "南通市行政区域",
+      "directValue": "2024年末常住人口775.0万人。",
+      "limitations": [
+        "2024与全国2025尺度有一年时点差。"
+      ]
+    },
+    {
+      "name": "贵阳",
+      "province": "贵州",
+      "wage": 102010,
+      "hot": false,
+      "popWan": 666.89,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.guiyang-2025",
+      "publisher": "贵阳市统计局、国家统计局贵阳调查队",
+      "sourceTitle": "2025年贵阳市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.guiyang.gov.cn/2020_zwgk/2020_zdlygk/2020_sjfb/tjgb/202605/t20260509_90153688.html",
+      "geography": "贵阳市行政区域",
+      "directValue": "2025年末贵阳市常住人口666.89万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "公报年度数为初步统计值。"
+      ]
+    },
+    {
+      "name": "嘉兴",
+      "province": "浙江",
+      "wage": 133045,
+      "hot": false,
+      "popWan": 561.3,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.jiaxing-2025",
+      "publisher": "嘉兴市统计局、国家统计局嘉兴调查队",
+      "sourceTitle": "2025年嘉兴市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.jiaxing.gov.cn/col/col1512321/art/2026/art_38e28ce32b7c4e6bba2b1888752f97cc.html",
+      "geography": "嘉兴市行政区域",
+      "directValue": "据2025年1%人口变动抽样调查推算，年末全市常住人口561.3万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "年度初步统计数据；1%人口抽样调查推算。"
+      ]
+    },
+    {
+      "name": "徐州",
+      "province": "江苏",
+      "wage": 125102,
+      "hot": false,
+      "popWan": 896.71,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.xuzhou-2025",
+      "publisher": "徐州市统计局、国家统计局徐州调查队",
+      "sourceTitle": "2025年徐州市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tj.xz.gov.cn/govxxgk/01405176-5/2026-06-17/f2a59a95-a040-450c-9115-2e2cdb43040e.html",
+      "geography": "徐州市行政区域",
+      "directValue": "2025年末徐州市常住人口896.71万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "公报注明数据为初步统计数。"
+      ]
+    },
+    {
+      "name": "惠州",
+      "province": "广东",
+      "wage": 131418,
+      "hot": false,
+      "popWan": 619.3,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.huizhou-2025",
+      "publisher": "惠州市统计局、国家统计局惠州调查队",
+      "sourceTitle": "2025年惠州国民经济和社会发展统计公报",
+      "sourceUrl": "https://www.huizhou.gov.cn/bmpd/hzstjj/tjsj/content/post_5767540.html",
+      "geography": "惠州市行政区域",
+      "directValue": "2025年末惠州市常住人口619.30万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "公报年度数为初步统计值。"
+      ]
+    },
+    {
+      "name": "太原",
+      "province": "山西",
+      "wage": 95025,
+      "hot": false,
+      "popWan": 552.606,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.taiyuan-2025",
+      "publisher": "太原市统计局",
+      "sourceTitle": "2025年太原市人口主要数据公报",
+      "sourceUrl": "https://stats.taiyuan.gov.cn/tjgb/20260528/30296681.html",
+      "geography": "太原市行政区域",
+      "directValue": "2025年末太原市常住人口552.606万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "人口主要数据来自2025年全国1%人口抽样调查。"
+      ]
+    },
+    {
+      "name": "烟台",
+      "province": "山东",
+      "wage": 107131,
+      "hot": false,
+      "popWan": 700.05,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.yantai-2025",
+      "publisher": "烟台市统计局、国家统计局烟台调查队",
+      "sourceTitle": "2025年烟台市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.yantai.gov.cn/col/col117/art/2026/art_61a619eacfd44e5bbf80e45bf2cdd6d0.html",
+      "geography": "烟台市行政区域",
+      "directValue": "2025年末常住人口700.05万人。",
+      "limitations": [
+        "公报未给18—50岁逐岁×性别结构。"
+      ]
+    },
+    {
+      "name": "临沂",
+      "province": "山东",
+      "wage": 107131,
+      "hot": false,
+      "popWan": 1084.84,
+      "populationYear": 2024,
+      "sourceEvidenceId": "evidence.base.region.linyi-2024",
+      "publisher": "临沂市人民政府办公室",
+      "sourceTitle": "临沂市基本医保定点医药机构资源配置规划（2026—2028年）",
+      "sourceUrl": "https://www.linyi.gov.cn/info/10605/412349.htm",
+      "geography": "临沂市行政区域",
+      "directValue": "正式规划文件登记2024年末全市常住人口1084.84万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "2025统计公报未披露常住人口；本条采用市政府正式规划对市卫健委数据的转引，不是独立人口公报。"
+      ]
+    },
+    {
+      "name": "保定",
+      "province": "河北",
+      "wage": 94818,
+      "hot": false,
+      "popWan": 900.07,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.baoding-2025",
+      "publisher": "保定市统计局、国家统计局保定调查队",
+      "sourceTitle": "保定市2025年国民经济和社会发展统计公报",
+      "sourceUrl": "https://www.baoding.gov.cn/baoding/government/data?itemResourceId=412a4b8b-f62e-49e1-a937-b5a8453cd5a0&resourceType=3",
+      "geography": "保定市行政区域（不含定州市、雄安新区）",
+      "directValue": "2025年末全市（不含定州）常住人口900.07万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "明确采用不含定州市、不含雄安新区的保定市统计口径；部分数据为快报数。"
+      ]
+    },
+    {
+      "name": "台州",
+      "province": "浙江",
+      "wage": 133045,
+      "hot": false,
+      "popWan": 676,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.taizhou-2025",
+      "publisher": "台州市统计局",
+      "sourceTitle": "2025年台州市人口主要数据公报",
+      "sourceUrl": "https://tjj.zjtz.gov.cn/col/col1229890988/art/2026/art_47ec51b2a9ca4f6bb65abe92bdbf60a6.html",
+      "geography": "台州市行政区域",
+      "directValue": "据2025年1%人口抽样调查推算，年末全市常住人口676.0万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "1%人口抽样调查推算，精度到0.1万人。"
+      ]
+    },
+    {
+      "name": "绍兴",
+      "province": "浙江",
+      "wage": 133045,
+      "hot": false,
+      "popWan": 544.3,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.shaoxing-2025",
+      "publisher": "绍兴市统计局",
+      "sourceTitle": "2025年绍兴市主要人口数据公报",
+      "sourceUrl": "https://tjj.sx.gov.cn/col/col1229362069/art/2026/art_77a3b6c66a1342ca8d6cdcf1f4278971.html",
+      "geography": "绍兴市行政区域",
+      "directValue": "据2025年1%人口抽样调查推算，年末绍兴市常住人口544.3万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "1%人口抽样调查推算值。"
+      ]
+    },
+    {
+      "name": "珠海",
+      "province": "广东",
+      "wage": 133869,
+      "hot": false,
+      "popWan": 254.31,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.zhuhai-2025",
+      "publisher": "珠海市统计局",
+      "sourceTitle": "2025珠海市人口规模及分布情况",
+      "sourceUrl": "https://tjj.zhuhai.gov.cn/tjsj/tjzl/tjjpcgb/content/post_3927164.html",
+      "geography": "珠海市行政区域",
+      "directValue": "据2025年全国1%人口抽样调查，年末全市常住人口254.31万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "全市口径明确包含横琴粤澳深度合作区。"
+      ]
+    },
+    {
+      "name": "洛阳",
+      "province": "河南",
+      "wage": 84156,
+      "hot": false,
+      "popWan": 708.3,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.luoyang-2025",
+      "publisher": "洛阳市统计局",
+      "sourceTitle": "2025年洛阳市国民经济和社会发展统计公报",
+      "sourceUrl": "https://lytjj.ly.gov.cn/2026/04-30/1059043.html",
+      "geography": "洛阳市行政区域",
+      "directValue": "2025年末洛阳市常住人口708.3万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "2025年数据为初步统计结果；官网排版会把部分数字拆分，登记值已按正文语义复核。"
+      ]
+    },
+    {
+      "name": "潍坊",
+      "province": "山东",
+      "wage": 107131,
+      "hot": false,
+      "popWan": 927.12,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.weifang-2025",
+      "publisher": "潍坊市统计局、国家统计局潍坊调查队",
+      "sourceTitle": "2025年潍坊市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.weifang.gov.cn/55356/1306569853.html",
+      "geography": "潍坊市行政区域",
+      "directValue": "2025年末潍坊市常住人口927.12万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "公报注明为初步统计数，正式数据以潍坊统计年鉴2026为准。"
+      ]
+    },
+    {
+      "name": "兰州",
+      "province": "甘肃",
+      "wage": 99124,
+      "hot": false,
+      "popWan": 443.65,
+      "populationYear": 2024,
+      "sourceEvidenceId": "evidence.base.region.lanzhou-2024",
+      "publisher": "甘肃省统计局",
+      "sourceTitle": "甘肃统计提要2025·表2-2各地县人口和城镇化率（2024年）",
+      "sourceUrl": "https://tjj.gansu.gov.cn/tjj/c117468/202505/174143566/files/4db368f09fac4efb95b5d73aa316e1bf.pdf",
+      "geography": "兰州市行政区域",
+      "directValue": "2024年末兰州市常住人口443.65万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "来源为省统计局统计提要表，不是兰州市单独人口公报。"
+      ]
+    },
+    {
+      "name": "乌鲁木齐",
+      "province": "新疆",
+      "wage": 112305,
+      "hot": false,
+      "popWan": 415.39,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.urumqi-2025",
+      "publisher": "乌鲁木齐市统计局、国家统计局乌鲁木齐调查队",
+      "sourceTitle": "乌鲁木齐市2025年国民经济和社会发展统计公报",
+      "sourceUrl": "https://www.wlmq.gov.cn/wlmqs/c119359/202604/6070ed21632343cca95db20395862469.shtml",
+      "geography": "乌鲁木齐市行政区域",
+      "directValue": "2025年末乌鲁木齐市常住人口415.39万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "公报年度数为初步统计值。"
+      ]
+    },
+    {
+      "name": "海口",
+      "province": "海南",
+      "wage": 114572,
+      "hot": false,
+      "popWan": 303.14,
+      "populationYear": 2024,
+      "sourceEvidenceId": "evidence.base.region.haikou-2024",
+      "publisher": "海口市统计局",
+      "sourceTitle": "2024年末海口市常住人口主要数据",
+      "sourceUrl": "https://tjj.haikou.gov.cn/hkstjj/tjpc/202504/a783fd9d41b4496893446b1e2085437e.shtml",
+      "geography": "海口市行政区域",
+      "directValue": "2024年末海口市常住人口303.14万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "2025公报未给可核全市常住人口总量，故回退2024。"
+      ]
+    },
+    {
+      "name": "银川",
+      "province": "宁夏",
+      "wage": 117681,
+      "hot": false,
+      "popWan": 294.26,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.yinchuan-2025",
+      "publisher": "银川市统计局、国家统计局银川调查队",
+      "sourceTitle": "银川市2025年国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.yinchuan.gov.cn/zzb/tjgb_72222/202604/t20260427_5226142.html",
+      "geography": "银川市行政区域",
+      "directValue": "2025年末银川市常住人口294.26万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "公报年度数为初步统计值。"
+      ]
+    },
+    {
+      "name": "西宁",
+      "province": "青海",
+      "wage": 121457,
+      "hot": false,
+      "popWan": 247.56,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.xining-2025",
+      "publisher": "西宁市人民政府",
+      "sourceTitle": "人口（2025统计公报数据）",
+      "sourceUrl": "https://www.xining.gov.cn/zjxn/xngk/rw/rk_146/202406/t20240621_204689.html",
+      "geography": "西宁市行政区域",
+      "directValue": "2025年末西宁市常住人口247.56万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "政府人口页为持续更新页面，数值注明来源为2025统计公报。"
+      ]
+    },
+    {
+      "name": "呼和浩特",
+      "province": "内蒙古",
+      "wage": 108856,
+      "hot": false,
+      "popWan": 363.94,
+      "populationYear": 2024,
+      "sourceEvidenceId": "evidence.base.region.hohhot-2024",
+      "publisher": "呼和浩特市发展和改革委员会（转引内蒙古自治区统计局）",
+      "sourceTitle": "2024年内蒙古自治区常住人口主要数据公布 出生人口有所回升",
+      "sourceUrl": "https://fgw.huhhot.gov.cn/zwdt/ssxw/202504/t20250414_1877594.html?zbb=true",
+      "geography": "呼和浩特市行政区域",
+      "directValue": "2024年末呼和浩特市常住人口363.94万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "2025统计局原文仅能以HTTP稳定访问，为保持可核HTTPS链路回退2024官方政府页。"
+      ]
+    },
+    {
+      "name": "拉萨",
+      "province": "西藏",
+      "wage": 165004,
+      "hot": false,
+      "popWan": 88.3,
+      "populationYear": 2025,
+      "sourceEvidenceId": "evidence.base.region.lhasa-2025",
+      "publisher": "拉萨市统计局",
+      "sourceTitle": "2025年拉萨市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.lasa.gov.cn/tjj/tjgb/202605/f7890507561b4eecb1d299c01cc74cab.shtml",
+      "geography": "拉萨市行政区域",
+      "directValue": "2025年末拉萨市常住人口88.30万人。",
+      "limitations": [
+        "官方来源未提供18—50岁逐岁×性别结构；运行时采用2020七普全国详细表份额外推，并保留0.70—1.30宽情景。",
+        "公报年度数为初步统计值。"
+      ]
+    }
+  ]
+}
