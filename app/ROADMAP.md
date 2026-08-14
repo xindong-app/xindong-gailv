@@ -78,16 +78,15 @@
 
 ---
 
-## 六、🧱 技术债（2026-08-14 实测记录，待 Codex 审核轮处理）
+## 六、🧱 构建预算（2026-08-14 批次 2 前置）
 
-**JS 总预算 146.1 / 150 KiB（v3 证据投影裁剪后余量 3.9 KiB）。** 实测结论（sourcemap 归因 + manualChunks 对照实验）：
+**当前 JS 149.3 / 160 KiB，CSS 18.0 / 25 KiB。** 预算扫描统计 `dist` 内全部同类产物的 gzip 总量，按二进制 KiB（1 KiB = 1024 bytes）执行硬门禁。
 
-- 预算扫描口径是 dist **全部** JS 的 gzip 总量；纯静态分包不减肥，实测反而 +4.6 KiB（已还原配置，未提交）
-- 包体实测构成（v3 前）：react 59.6 / 应用自身 72.9 / zod 18.1 / uqr 3.8 KiB gzip
-- **最大赘肉 = zod 的 JSON-Schema 生成器**（json-schema-processors + to-json-schema 等约 229 KiB 源码中相当一部分）：运行时零调用，被 `import { z } from 'zod'` 命名空间导入整体物化拖进包里
-- 涉及文件：`src/model/schema.ts`、`src/engine/modelEngine.ts`、`src/data/evidence.ts`（Codex 领地，未动）
-- 建议方案：三处改为具名 core 导入（避开 `z` 命名空间物化），链式 API 全保留、语义零变化；预期 −5~7 KiB。109 个测试可兜底验证
-- 备选：预算口径改"首屏入口 ≤150 + 总量 ≤180"，之后分享栈（canvas+uqr ≈ 8 KiB）做 React.lazy 才有意义
+- 生产输入校验链已经迁移到 `zod/v4/mini`，并由运行时错误契约测试兜底；继续裁剪 Zod 需要重写或削弱校验，风险高于收益，不作为批次 2 前置方案
+- JS 上限由 150 KiB 有意调整为 160 KiB，为批次 2 卡面系统提供约 10.7 KiB 的可用余量；这是仍会失败构建的硬上限，不是取消包体治理
+- CSS 上限保持 25 KiB，不随本次调整放宽
+- `scan:dist` 的阈值、报错文案和边界回归测试共用同一常量；恰好 160 KiB 可通过，超过 1 byte 即失败
+- 纯静态分包不减少总 gzip；如后续逼近 160 KiB，应优先按真实模块归因减重，并重新执行完整构建与产物扫描
 
 ## 七、📊 数据债（v3 降级维度的恢复路线，权威台账以 docs/DATA_UPDATE.md 优先队列 + docs/DATA_SOURCES.md 为准）
 
@@ -117,6 +116,6 @@
 - 不改 `src/engine` / `src/data` / `src/model` 的数学与校验（Codex 领地）
 - 不改测试锚定的功能文案与组件名（181 个 vitest + 28 个 E2E 必须保持绿）
 - 所有动效 prefers-reduced-motion 降级；手机 375px 优先验收
-- JS gzip ≤ 150 KiB、CSS ≤ 25 KiB 预算不破
+- JS gzip ≤ 160 KiB、CSS ≤ 25 KiB 硬预算不破
 - 外部素材只进本地 `public/assets/`，许可优先 CC0 / 免费可商用 / AI 自生成
 - 每期完成：typecheck + test + lint + validate:model + build + scan:dist + 截图验收 + git commit，不主动部署

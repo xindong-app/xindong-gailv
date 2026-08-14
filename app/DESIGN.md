@@ -72,5 +72,5 @@
 - 不改测试锚定的功能文案与组件名
 - 所有动效必须 prefers-reduced-motion 降级
 - 手机端（375px）优先验收
-- JS gzip ≤ 150 KiB、CSS ≤ 25 KiB 预算不破
+- JS gzip ≤ 160 KiB、CSS ≤ 25 KiB 硬预算不破
 - 外部素材只进 workspace，许可合规优先 CC0/免费可商用

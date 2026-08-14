@@ -1,6 +1,11 @@
 import { gzipSync } from 'node:zlib'
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { extname, join, relative, resolve } from 'node:path'
+import {
+  CSS_GZIP_BUDGET_KIB,
+  JS_GZIP_BUDGET_KIB,
+  exceedsGzipBudget,
+} from './artifact-budgets.ts'
 
 const distDirectory = resolve(process.cwd(), 'dist')
 const readableExtensions = new Set(['.css', '.html', '.js', '.json', '.map', '.svg', '.txt', '.xml'])
@@ -48,8 +53,12 @@ const jsGzip = budgets.filter((item) => item.type === '.js').reduce((sum, item) 
 const cssGzip = budgets.filter((item) => item.type === '.css').reduce((sum, item) => sum + item.gzipBytes, 0)
 
 console.log(`Artifact scan: ${files.length} files; JS gzip ${(jsGzip / 1024).toFixed(1)} KiB; CSS gzip ${(cssGzip / 1024).toFixed(1)} KiB.`)
-if (jsGzip > 150 * 1024) findings.push(`JS gzip budget exceeded: ${(jsGzip / 1024).toFixed(1)} KiB > 150 KiB`)
-if (cssGzip > 25 * 1024) findings.push(`CSS gzip budget exceeded: ${(cssGzip / 1024).toFixed(1)} KiB > 25 KiB`)
+if (exceedsGzipBudget(jsGzip, JS_GZIP_BUDGET_KIB)) {
+  findings.push(`JS gzip budget exceeded: ${(jsGzip / 1024).toFixed(1)} KiB > ${JS_GZIP_BUDGET_KIB} KiB`)
+}
+if (exceedsGzipBudget(cssGzip, CSS_GZIP_BUDGET_KIB)) {
+  findings.push(`CSS gzip budget exceeded: ${(cssGzip / 1024).toFixed(1)} KiB > ${CSS_GZIP_BUDGET_KIB} KiB`)
+}
 
 if (findings.length > 0) {
   console.error(findings.map((finding) => `- ${finding}`).join('\n'))
