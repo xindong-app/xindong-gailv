@@ -7,6 +7,7 @@ import { playTada } from '../../fun/sound'
 import type { GenderId, ModelSelection, SoftPreferenceId } from '../../model/schema'
 import { DIMENSION_BY_ID } from '../../model/dimensions'
 import { toggleArrayValue } from '../../model/selectionUtils'
+import { declarableHardConditions } from '../../features/hardDeclaration'
 import { Chip, EvidenceStatusBadge } from '../../components/ui'
 
 export function ResultsStep({ result, selection, comparison, hardRequirementIds, seekerGender, onChange, onRelax, onShare, onCaptureComparison, onSeekerGender, onToggleHardRequirement }: {
@@ -25,14 +26,24 @@ export function ResultsStep({ result, selection, comparison, hardRequirementIds,
 }) {
   // 揭榜仪式感: 进入本步时钢印重新砸落 + 聚光灯扫过 + tada 音效
   const [revealKey] = useState(() => Date.now())
-  useEffect(() => { playTada() }, [])
+  useEffect(() => {
+    playTada()
+    // 主数字必须完全露出在底部舞台之上: 滚到视口中偏上
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
+    const numberEl = document.querySelector('.results-step .result-number')
+    if (numberEl) {
+      window.requestAnimationFrame(() => {
+        numberEl.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' })
+      })
+    }
+  }, [])
   const targetSoftIds = new Set<SoftPreferenceId>(selection.softPreferenceIds)
   if (selection.correlated.schoolTier) targetSoftIds.add('education.school')
   if (selection.correlated.healthCriteria.includes('no_myopia')) targetSoftIds.add('health.myopia')
   if (selection.correlated.healthCriteria.includes('no_major_chronic')) targetSoftIds.add('health.chronic')
   const reciprocalOptions = [...targetSoftIds].map((id) => DIMENSION_BY_ID.get(id)).filter(Boolean)
-  // 可声明为硬边界的候选: 已选软偏好(声明后数值不变, 主数字诚实转为上限)
-  const declarableSoftIds = selection.softPreferenceIds
+  // 可声明为硬边界的候选: 已选且未量化的软偏好(含结构化字段里的慢性病/近视)
+  const declarableSoftIds = declarableHardConditions(selection)
   return (
     <section className="step-panel results-step" aria-labelledby="results-title">
       <div className="reveal-spotlight" aria-hidden="true" />
@@ -69,12 +80,19 @@ export function ResultsStep({ result, selection, comparison, hardRequirementIds,
           <p>先保存当前方案 A，再调整条件；这里比较的是同一模型下的估算变化。</p>
         </div>
         {comparison ? (
+          comparison.population.numericStatus === 'unavailable' || result.population.numericStatus === 'unavailable' ? (
+            <p className="empty-inline">有一侧暂时算不出来，这组没法比——换有锚点的地域再比。</p>
+          ) : (
           <div className="comparison-values" aria-live="polite">
-            <div><span>方案 A</span><b>{formatCount(comparison.population.estimate)}</b></div>
+            <div><span>方案 A</span><b>{comparison.population.displayShort}</b></div>
             <span aria-hidden="true">→</span>
-            <div><span>当前方案 B</span><b>{formatCount(result.population.estimate)}</b></div>
+            <div><span>当前方案 B</span><b>{result.population.displayShort}</b></div>
             <strong>{result.population.estimate >= comparison.population.estimate ? '+' : '−'} {formatCount(Math.abs(result.population.estimate - comparison.population.estimate))}</strong>
+            {(comparison.population.status === 'upper_bound' || result.population.status === 'upper_bound') && (
+              <small>含「上限」口径：上限与上限的比法，看个趋势就好。</small>
+            )}
           </div>
+          )
         ) : <p className="empty-inline">尚未保存方案 A。</p>}
         <button className="button button-secondary" type="button" onClick={onCaptureComparison}>{comparison ? '用当前方案更新 A' : '保存当前为方案 A'}</button>
       </article>

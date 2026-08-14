@@ -15,7 +15,7 @@ const PALETTE = ['#ffd9e2', '#ffd9b8', '#cdeafa', '#e6dbf7', '#ddefd3', '#ffeeb0
 // v3: 只有可量化维度会出现在漏斗里(身高/吸烟/饮酒);
 // 不拿收入、身体、疾病、婚史开玩笑。
 const LAST_WORDS: Record<string, string[]> = {
-  'appearance.height': ['就差 2cm 啊!!', '下辈子先长个儿', '尺子今天也很严格'],
+  'appearance.height': ['就差 2cm 啊!!', '我去踩个高跷', '尺子今天也很严格'],
   'lifestyle.smoking': ['戒烟第一天打卡', '电子烟算烟吗'],
   'lifestyle.drinking': ['先戒为敬', '只喝亿点点'],
 }

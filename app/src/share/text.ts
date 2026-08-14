@@ -6,8 +6,12 @@ export function buildTextFallback(dto: ShareDto): string {
     [dto.audience.genderLabel, dto.audience.ageRange, dto.region].filter(Boolean).join(' · '),
   ]
   if (dto.population) {
-    lines.push(`满足硬条件的估算人群：${dto.population.estimateLabel}`)
-    lines.push(`敏感度范围：${dto.population.rangeLabel}`)
+    lines.push(dto.population.upperBound
+      ? `满足已计入条件的人数上限：${dto.population.estimateLabel}`
+      : `满足硬条件的估算人群：${dto.population.estimateLabel}`)
+    lines.push(dto.population.upperBound
+      ? `敏感度范围（上限口径）：${dto.population.rangeLabel}`
+      : `敏感度范围：${dto.population.rangeLabel}`)
   }
   if (dto.fun) {
     lines.push(`稀有度：${dto.fun.tierLabel}（${dto.fun.rarityText}）—— ${dto.fun.tierComment}`)

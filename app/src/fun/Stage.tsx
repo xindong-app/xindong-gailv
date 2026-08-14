@@ -23,7 +23,11 @@ export function Stage({ result }: { result: ModelResult }) {
       <div className="stage-spotlight" aria-hidden="true" />
       <div className="stage-inner">
         <div className="stage-scoreboard">
-          <span className="stage-scoreboard-label">{available ? '池中还剩' : '这一片算不出'}</span>
+          <span className="stage-scoreboard-label">
+            {available
+              ? (result.population.zeroMeaning === 'model_underflow' ? '小到数不出来' : '池中还剩')
+              : '这一片算不出'}
+          </span>
           <SlotNumber text={result.population.displayShort} ariaLabel={result.population.display} />
           <span className="stage-scope">{scope}</span>
           <button
@@ -37,13 +41,22 @@ export function Stage({ result }: { result: ModelResult }) {
         </div>
         {!collapsed && (
           <div className="stage-arena">
-            {available ? (
+            {available && result.population.zeroMeaning !== 'model_underflow' ? (
               <FunFunnel pool={base} frames={frames} cities={cities} />
             ) : (
               <div className="stage-unavailable" role="status">
                 <span aria-hidden="true">🌫️</span>
-                <p>小人今天不上台：{result.coverage.unsupportedCities.join('、') || '当前地域'}还没有官方常住人口锚点。</p>
-                <small>不可用 ≠ 0 人；换有锚点的城市或全国口径，剧场立刻开演。</small>
+                {available ? (
+                  <>
+                    <p>小人表示演不了：这个数字小到模型都数不出来。</p>
+                    <small>数值下溢 ≠ 现实归零——现实中完全可能有人，只是低于分辨率。</small>
+                  </>
+                ) : (
+                  <>
+                    <p>小人今天不上台：{result.coverage.unsupportedCities.join('、') || '当前地域'}还没有官方常住人口锚点。</p>
+                    <small>不可用 ≠ 0 人；换有锚点的城市或全国口径，剧场立刻开演。</small>
+                  </>
+                )}
               </div>
             )}
           </div>

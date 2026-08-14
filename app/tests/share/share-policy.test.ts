@@ -122,6 +122,41 @@ describe('share privacy policy', () => {
     expect(explicitDto.fun?.verdict ?? '').not.toContain('最低年收入')
   })
 
+  it('recomputes the verdict on a public-only selection so hidden conditions cannot leak through the chain', () => {
+    // Codex 反例: 公开"过去 12 个月未饮酒"不变(显式确认公开), 仅隐藏婚史不同,
+    // 总评必须逐字一致 —— 隐藏条件连链式影响都不进入
+    const base = structuredClone(DEFAULT_SELECTION)
+    base.correlated.drinking = 'none'
+    const withHiddenMarital = structuredClone(base)
+    withHiddenMarital.target.maritalStatuses = ['divorced'] // 敏感, 默认不公开
+
+    const settingsFor = (selection: typeof base): ShareSettings => {
+      const settings = createDefaultShareSettings(selection)
+      settings.includedDimensionIds = [...settings.includedDimensionIds, 'lifestyle.drinking']
+      settings.sensitiveConsentDimensionIds = ['lifestyle.drinking']
+      return settings
+    }
+    const dtoA = buildShareDto(base, computeModel(base), settingsFor(base))
+    const dtoB = buildShareDto(withHiddenMarital, computeModel(withHiddenMarital), settingsFor(withHiddenMarital))
+    expect(dtoA.fun?.verdict).toBeTruthy()
+    expect(dtoB.fun?.verdict).toBe(dtoA.fun?.verdict)
+    expect(dtoB.fun?.verdict).toContain('饮酒')
+  })
+
+  it('derives no fun block at all when the model reports numeric underflow', () => {
+    const selection = structuredClone(DEFAULT_SELECTION)
+    selection.target.gender = 'female'
+    selection.target.heightCm = { min: 220, max: 220 } // 极端尾部 → 引擎返回 model_underflow
+    const result = computeModel(selection)
+    expect(result.population.zeroMeaning).toBe('model_underflow')
+
+    const dto = buildShareDto(selection, result, createDefaultShareSettings(selection))
+    // 下溢不是现实零人: 稀有度/幸存者/毒舌一个都不许派生
+    expect(dto.fun).toBeUndefined()
+    expect(buildTextFallback(dto)).not.toContain('全员下班')
+    expect(buildTextFallback(dto)).not.toContain('片尾字幕')
+  })
+
   it('never leaks the reciprocal-derived bidirectional score into any share output', () => {
     const selection = privateSelection() // 已填反向自评, 引擎侧派生分存在
     const result = computeModel(selection)

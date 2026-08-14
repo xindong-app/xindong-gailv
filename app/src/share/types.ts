@@ -77,6 +77,8 @@ export interface ShareDto {
     estimateLabel: string
     rangeLabel: string
     resolutionExceeded: boolean
+    /** 主数字为"已计入条件的人数上限"时置真 */
+    upperBound?: boolean
   }
   scores: {
     entertainment?: number

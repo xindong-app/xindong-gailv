@@ -20,14 +20,15 @@ export function rarityTier(perWan: number): Tier {
 }
 
 export function fmtRarity(p: number): string {
-  if (p <= 0) return '亿里挑一都悬'
+  if (p <= 0) return '低于模型分辨率, 数不出来'
   const oneIn = 1 / p
-  if (oneIn < 10) return '十里挑一'
-  if (oneIn < 100) return `${Math.round(oneIn)} 里挑一`
+  if (oneIn < 1.05) return '遍地都是款(几乎人人符合)'
+  if (oneIn < 2.5) return '两三个里就有一个'
+  if (oneIn < 10) return `${Math.round(oneIn)} 里挑一`
   if (oneIn < 10000) return `千分之 ${(p * 1000).toFixed(1)}`
   if (oneIn < 1e8) return `万分之 ${(p * 10000).toFixed(p * 10000 >= 10 ? 0 : 1)}`
   if (p * 1e8 >= 0.05) return `亿分之 ${(p * 1e8).toFixed(1)}`
-  return '概率约等于 0, 神话都编不出来'
+  return '低于模型分辨率, 数不出来'
 }
 
 // ---------- 毒舌总评 ----------

@@ -8,6 +8,7 @@ import { computeModel } from '../engine/modelEngine'
 import { Confetti } from '../fun/Confetti'
 import { buildFunnelFrames } from '../fun/funnelFrames'
 import { IntroCurtain } from '../fun/IntroCurtain'
+import { playWhoosh } from '../fun/sound'
 import { Stage } from '../fun/Stage'
 import { CoreCriteriaStep } from '../features/steps/CoreCriteriaStep'
 import { DimensionLibraryStep } from '../features/steps/DimensionLibraryStep'
@@ -19,6 +20,7 @@ import { WelcomeStep } from '../features/steps/WelcomeStep'
 import { useHistoryState } from '../hooks/useHistoryState'
 import { loadSafeSessionSelection, useSessionSelection } from '../hooks/useSessionSelection'
 import { applyRelaxation } from '../features/applyRelaxation'
+import { sanitizeHardRequirementIds } from '../features/hardDeclaration'
 import { activeConditions, removeSelectionDimension } from '../model/selectionUtils'
 import { DEFAULT_SELECTION, safeParseSelection, type GenderId, type ModelSelection } from '../model/schema'
 import { SharePreviewDialog } from '../components/SharePreviewDialog'
@@ -108,10 +110,10 @@ export default function Home() {
   const [hardRequirementIds, setHardRequirementIds] = useState<string[]>([])
   // 关系情境入口: 本人统计性别, 自愿填写, 不写入会话草稿
   const [seekerGender, setSeekerGender] = useState<GenderId | null>(null)
-  const effectiveHardRequirementIds = useMemo(() => {
-    const selected = new Set<string>(selection.softPreferenceIds)
-    return hardRequirementIds.filter((id) => selected.has(id))
-  }, [hardRequirementIds, selection.softPreferenceIds])
+  const effectiveHardRequirementIds = useMemo(
+    () => sanitizeHardRequirementIds(selection, hardRequirementIds),
+    [hardRequirementIds, selection],
+  )
   const result = useMemo(
     () => computeModel(selection, { hardRequirementIds: effectiveHardRequirementIds }),
     [selection, effectiveHardRequirementIds],
@@ -172,7 +174,9 @@ export default function Home() {
   }, [history, push])
 
   const navigate = (step: number) => {
-    setCurrentStep(Math.max(0, Math.min(STEPS.length - 1, step)))
+    const next = Math.max(0, Math.min(STEPS.length - 1, step))
+    if (next !== currentStep) playWhoosh() // 翻关纸声
+    setCurrentStep(next)
     const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
     window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' })
   }
@@ -311,7 +315,7 @@ export default function Home() {
           type="button"
           onClick={() => setMobileResultOpen(true)}
         >
-          <span><small>满足硬条件</small><b>{result.population.displayShort}</b></span>
+          <span><small>{result.population.status === 'unavailable' ? '这一片算不出' : result.population.status === 'upper_bound' ? '人数上限' : '满足硬条件'}</small><b>{result.population.displayShort}</b></span>
           <span>查看战况 ↑</span>
         </button>
       </div>

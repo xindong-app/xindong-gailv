@@ -4416,3 +4416,117 @@ body {
     transition: none !important;
   }
 }
+
+/* ============================================================
+   📱 PM 走查收尾 (2026-08-14)
+   欢迎页 CTA 上首屏 + 信任卡去班味 + 移动端前置块收编
+   ============================================================ */
+
+/* 欢迎页主 CTA: 首屏第一眼的大刷子 */
+.welcome-cta {
+  margin: 22px 0 6px;
+  font-size: 1.14rem;
+}
+
+.welcome-cta:hover {
+  animation: cta-wiggle 480ms var(--spring-soft);
+}
+
+@keyframes cta-wiggle {
+  0%, 100% { rotate: 0deg; }
+  30% { rotate: -1.6deg; }
+  60% { rotate: 1.2deg; }
+}
+
+/* 信任卡图标: 拆掉色块方盒, 大 emoji 直接上 */
+.trust-grid article > span {
+  width: auto;
+  height: auto;
+  margin-bottom: 6px;
+  place-items: center start;
+  border-radius: 0;
+  background: none;
+  font-size: 1.7rem;
+  transform: rotate(-4deg);
+  filter: drop-shadow(2px 3px 0 rgba(59, 48, 80, 0.16));
+}
+
+/* ---------- 移动端: 前置块不许喧宾夺主 ---------- */
+@media (max-width: 640px) {
+  /* 懒人模板收成横滚 chip 条(只留模板名, 描述进 title) */
+  .preset-bar {
+    padding: 13px 14px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 9px;
+  }
+
+  .preset-bar > * {
+    min-width: 0;
+  }
+
+  .preset-bar h2 {
+    font-size: 0.86rem;
+  }
+
+  .preset-list {
+    display: flex;
+    min-width: 0;
+    margin-top: 0;
+    padding-bottom: 2px;
+    overflow-x: auto;
+    gap: 8px;
+    scrollbar-width: none;
+  }
+
+  .preset-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .preset-list button {
+    display: flex;
+    min-width: max-content;
+    min-height: 40px;
+    padding: 7px 14px;
+    align-items: center;
+  }
+
+  .preset-list button span {
+    display: none;
+  }
+
+  /* 已选条件: 一行横滚小药丸 */
+  .selected-summary {
+    padding: 12px 14px;
+  }
+
+  .selected-list {
+    min-width: 0;
+    margin-top: 10px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .selected-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .selected-pill {
+    position: relative; /* 让 pill 成为 visually-hidden 的包含块, 横滚时随容器裁剪 */
+    min-height: 38px;
+    flex: 0 0 auto;
+    padding: 4px 3px 4px 10px;
+    font-size: 0.72rem;
+  }
+
+  .selected-pill .pill-remove {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-cta:hover {
+    animation: none !important;
+  }
+}

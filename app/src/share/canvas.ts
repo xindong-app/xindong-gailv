@@ -533,7 +533,13 @@ export async function renderShareCard(
     context.fillText(dto.population.estimateLabel, center, y + 4)
     context.fillStyle = '#655a75'
     context.font = '25px system-ui, "Microsoft YaHei", sans-serif'
-    context.fillText(`敏感度范围：${dto.population.rangeLabel}`, center, y + 58)
+    context.fillText(
+      dto.population.upperBound
+        ? `敏感度范围（上限口径）：${dto.population.rangeLabel}`
+        : `敏感度范围：${dto.population.rangeLabel}`,
+      center,
+      y + 58,
+    )
     y += 132
   }
 

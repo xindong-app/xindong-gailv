@@ -100,6 +100,30 @@ export function playTada(): void {
   } catch { /* 静默 */ }
 }
 
+/** 翻关: 一页纸翻过去的轻「唰」 */
+export function playWhoosh(): void {
+  if (!isSoundOn()) return
+  const context = ensureContext()
+  if (!context) return
+  try {
+    const now = context.currentTime
+    const noise = context.createBufferSource()
+    noise.buffer = noiseBuffer(context, 0.22)
+    const bandpass = context.createBiquadFilter()
+    bandpass.type = 'bandpass'
+    bandpass.Q.value = 0.9
+    bandpass.frequency.setValueAtTime(520, now)
+    bandpass.frequency.exponentialRampToValueAtTime(1650, now + 0.17)
+    const gain = context.createGain()
+    gain.gain.setValueAtTime(0.0001, now)
+    gain.gain.exponentialRampToValueAtTime(0.08, now + 0.04)
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2)
+    noise.connect(bandpass).connect(gain).connect(context.destination)
+    noise.start(now)
+    noise.stop(now + 0.22)
+  } catch { /* 静默 */ }
+}
+
 /** 点 chip: 一声短促的「啵」, 选条件上瘾音 */
 export function playPop(): void {
   if (!isSoundOn()) return

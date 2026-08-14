@@ -81,12 +81,14 @@ export function RelationshipScenarioCard({
               <span>三关叠完后的宽情境范围</span>
               <b>{scenario.combined.display.reference}</b>
               <small>保守 {scenario.combined.display.lower} · 乐观 {scenario.combined.display.upper}</small>
+              <small className="relationship-mainnote">{scenario.mainLayer.note}</small>
             </div>
           ) : (
             <div className="relationship-combined" data-state="unavailable">
               <span>组合情境</span>
               <b>{scenario.combined.status === 'not_estimated' ? '未估算' : '不可用'}</b>
               <small>{scenario.combined.note}</small>
+              <small className="relationship-mainnote">{scenario.mainLayer.note}</small>
             </div>
           )}
 

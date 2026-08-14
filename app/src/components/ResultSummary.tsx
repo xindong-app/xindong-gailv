@@ -8,7 +8,7 @@ import { buildComparisons, buildVerdict, fmtRarity, rarityTier } from '../fun/ra
 import { useCountUp } from '../fun/useCountUp'
 import { ModelConfidenceBadge } from './ui'
 
-/** 人口主数的三种 v3 状态说明卡: 不可用 / 上限 / 低于分辨率 */
+/** 人口主数的三种 v3 状态说明卡: 不可用 / 上限 / 低于分辨率(可与上限叠加) */
 function PopulationStateNotice({ result }: { result: ModelResult }) {
   const { population, coverage } = result
   if (population.status === 'unavailable') {
@@ -25,29 +25,28 @@ function PopulationStateNotice({ result }: { result: ModelResult }) {
       </article>
     )
   }
-  if (population.status === 'upper_bound') {
-    return (
-      <article className="state-notice" data-state="upper-bound">
-        <h3>这是上限，不是精确点数</h3>
-        <p>主数字只计算了有可靠人口参数的条件；下面 {coverage.unquantifiedHardConditions.length} 项硬边界保留生效，但因为证据不足没有参与砍人：</p>
-        <ul className="unquantified-list">
-          {coverage.unquantifiedHardConditions.map((item) => (
-            <li key={item.dimensionId}><b>{item.label}</b><small>{item.reason}</small></li>
-          ))}
-        </ul>
-        <small>真实人数只会更少或相等——所以它是「上限」。不猜比例，是这个产品的倔强。</small>
-      </article>
-    )
-  }
-  if (population.zeroMeaning === 'model_underflow') {
-    return (
-      <article className="state-notice" data-state="underflow">
-        <h3>数字小到数不出来了</h3>
-        <p>估算值在浮点近似中已经下溢到 0——它低于模型的分辨能力，<b>不等于</b>现实中恰好一个人都没有。</p>
-      </article>
-    )
-  }
-  return null
+  return (
+    <>
+      {population.status === 'upper_bound' && (
+        <article className="state-notice" data-state="upper-bound">
+          <h3>这是上限，不是精确点数</h3>
+          <p>主数字只计算了有可靠人口参数的条件；下面 {coverage.unquantifiedHardConditions.length} 项硬边界保留生效，但因为证据不足没有参与砍人：</p>
+          <ul className="unquantified-list">
+            {coverage.unquantifiedHardConditions.map((item) => (
+              <li key={item.dimensionId}><b>{item.label}</b><small>{item.reason}</small></li>
+            ))}
+          </ul>
+          <small>真实人数只会更少或相等——所以它是「上限」。不猜比例，是这个产品的倔强。</small>
+        </article>
+      )}
+      {population.zeroMeaning === 'model_underflow' && (
+        <article className="state-notice" data-state="underflow">
+          <h3>数字小到数不出来了</h3>
+          <p>估算值在浮点近似中已经下溢到 0——它低于模型的分辨能力，<b>不等于</b>现实中恰好一个人都没有。</p>
+        </article>
+      )}
+    </>
+  )
 }
 
 export function ResultSummary({
@@ -71,14 +70,16 @@ export function ResultSummary({
   const topImpact = result.impacts[0]
   const available = result.population.numericStatus === 'available'
   const upperBound = result.population.status === 'upper_bound'
+  // 数值下溢不是现实零人: 稀有度/毒舌/漏斗等人数派生趣味全部不演
+  const funAllowed = available && result.population.zeroMeaning !== 'model_underflow'
   const animated = useCountUp(available ? result.population.estimate : 0)
   // 帧拆解走趣味层(渐进调用引擎公开接口), result.input 身份不变时命中缓存
   const frames = useMemo(() => buildFunnelFrames(result.input), [result.input])
   const base = result.population.base
-  const probability = available && base > 0 ? result.population.estimate / base : 0
+  const probability = funAllowed && base > 0 ? result.population.estimate / base : 0
   const tier = rarityTier(probability * 10_000)
-  const verdict = available ? buildVerdict(frames) : null
-  const comparisons = available ? buildComparisons(probability) : []
+  const verdict = funAllowed ? buildVerdict(frames) : null
+  const comparisons = funAllowed ? buildComparisons(probability) : []
   const cities = result.input.target.cities
   const scope = `${cities.includes('全国') ? '全国' : cities.join('、')} · ${result.input.target.age.min}–${result.input.target.age.max} 岁 · ${result.input.target.gender === 'male' ? '男生' : '女生'}`
   const numberText = !available || result.population.resolutionExceeded
@@ -104,17 +105,17 @@ export function ResultSummary({
           {numberText}
         </div>
         <p className="result-scope">在「{scope}」的池子里捞</p>
-        {!compact && available && base > 0 && (
+        {!compact && funAllowed && base > 0 && (
           <RarityStamp tier={tier} rarityText={upperBound ? `最多 ${fmtRarity(probability)} · 仅按已计入条件` : fmtRarity(probability)} revealKey={revealKey} />
         )}
-        {!compact && available && upperBound && (
+        {!compact && funAllowed && upperBound && (
           <p className="rarity-cap-note">加入尚未量化的硬条件后，真实稀有度只会更高——这是最低稀有程度，不是最终评级。</p>
         )}
       </div>
       {!compact && (
         <>
           <PopulationStateNotice result={result} />
-          {available && (
+          {funAllowed && (
             <div className="range-grid" aria-label="估算范围">
               <div><span>保守</span><b>{formatCount(result.population.range.conservative)}</b></div>
               <div className="range-primary"><span>基准</span><b>{formatCount(result.population.range.baseline)}</b></div>
@@ -131,7 +132,7 @@ export function ResultSummary({
               )}
             </div>
           )}
-          {available && showFunnel && <FunFunnel pool={base} frames={frames} cities={result.input.target.cities} />}
+          {funAllowed && showFunnel && <FunFunnel pool={base} frames={frames} cities={result.input.target.cities} />}
           <p className="result-boundary">
             {!available
               ? '不可用不是 0 人；只是这个地域组合暂时没有可复核的人口锚点。'
@@ -153,7 +154,7 @@ export function ResultSummary({
               <p>不进入人口估算</p>
             </div>
           </div>
-          {available && topImpact && (
+          {funAllowed && topImpact && (
             <div className="top-impact">
               <span>当前最大限制项</span>
               <b>{topImpact.label}</b>

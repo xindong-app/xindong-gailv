@@ -9,7 +9,7 @@
 
 | # | 项目 | 实现路径 |
 |---|------|---------|
-| ✅ | 游乐园质感层：Baloo 2+站酷快乐体展示字体、纸张噪点、按钮弹簧触感、chip 回弹、步骤条闯关地图、欢迎页贴纸 | `index.html` 字体引入；`src/index.css` 末尾覆盖层；纯 CSS |
+| ✅ | 游乐园质感层：展示字体（后于 v3 封版轮切系统栈，移除第三方字体外联）、纸张噪点、按钮弹簧触感、chip 回弹、步骤条闯关地图、欢迎页贴纸 | `src/index.css` 覆盖层；纯 CSS |
 | ✅ | 揭榜仪式感：聚光灯扫过 + 钢印重新砸落 + tada 音效 | `ResultsStep.tsx` revealKey + `index.css` .reveal-spotlight + `fun/sound.ts` playTada |
 | ✅ | 战报卡二维码（uqr 矩阵直绘 canvas，静默降级）+ 双向命中分上卡 | `share/canvas.ts` / `dto.ts` / `types.ts` / `text.ts` |
 | ✅ | 音效默认开启（opt-out 存 localStorage） | `fun/sound.ts` |
@@ -80,10 +80,10 @@
 
 ## 六、🧱 技术债（2026-08-14 实测记录，待 Codex 审核轮处理）
 
-**JS 总预算 149.7 / 150 KiB，余量 0.3 KiB。** 实测结论（sourcemap 归因 + manualChunks 对照实验）：
+**JS 总预算 146.1 / 150 KiB（v3 证据投影裁剪后余量 3.9 KiB）。** 实测结论（sourcemap 归因 + manualChunks 对照实验）：
 
 - 预算扫描口径是 dist **全部** JS 的 gzip 总量；纯静态分包不减肥，实测反而 +4.6 KiB（已还原配置，未提交）
-- 包体实测构成：react 59.6 / 应用自身 72.9 / zod 18.1 / uqr 3.8 KiB gzip
+- 包体实测构成（v3 前）：react 59.6 / 应用自身 72.9 / zod 18.1 / uqr 3.8 KiB gzip
 - **最大赘肉 = zod 的 JSON-Schema 生成器**（json-schema-processors + to-json-schema 等约 229 KiB 源码中相当一部分）：运行时零调用，被 `import { z } from 'zod'` 命名空间导入整体物化拖进包里
 - 涉及文件：`src/model/schema.ts`、`src/engine/modelEngine.ts`、`src/data/evidence.ts`（Codex 领地，未动）
 - 建议方案：三处改为具名 core 导入（避开 `z` 命名空间物化），链式 API 全保留、语义零变化；预期 −5~7 KiB。109 个测试可兜底验证
@@ -102,7 +102,7 @@
 ## 执行铁律（全程有效）
 
 - 不改 `src/engine` / `src/data` / `src/model` 的数学与校验（Codex 领地）
-- 不改测试锚定的功能文案与组件名（106 个 vitest 必须保持绿）
+- 不改测试锚定的功能文案与组件名（181 个 vitest + 28 个 E2E 必须保持绿）
 - 所有动效 prefers-reduced-motion 降级；手机 375px 优先验收
 - JS gzip ≤ 150 KiB、CSS ≤ 25 KiB 预算不破
 - 外部素材只进本地 `public/assets/`，许可优先 CC0 / 免费可商用 / AI 自生成
