@@ -77,6 +77,18 @@ export function validateCityRoster(): CityRosterValidation {
   }
   if (CITY_POPULATION_SOURCES.rosterId !== CITY_TIER_ROSTER.rosterId ||
       CITY_POPULATION_SOURCES.populationBasis !== 'year_end_resident_population' ||
+      CITY_POPULATION_SOURCES.futureMissingAnchorPolicy.status !== 'registered_but_unused' ||
+      CITY_POPULATION_SOURCES.futureMissingAnchorPolicy.currentProxyCityCount !== 0 ||
+      CITY_POPULATION_SOURCES.futureMissingAnchorPolicy.priority.join('|') !== [
+        'latest_official_city_resident_population',
+        'prior_year_official_city_resident_population',
+        'comparable_city_proxy_scenario',
+      ].join('|') ||
+      CITY_POPULATION_SOURCES.futureMissingAnchorPolicy.proxyRequirements.maximumEvidenceGrade !== 'D' ||
+      CITY_POPULATION_SOURCES.futureMissingAnchorPolicy.proxyRequirements.mustNameReferenceCities !== true ||
+      CITY_POPULATION_SOURCES.futureMissingAnchorPolicy.proxyRequirements.mustExplainMatch !== true ||
+      CITY_POPULATION_SOURCES.futureMissingAnchorPolicy.proxyRequirements.mustUseWideRange !== true ||
+      CITY_POPULATION_SOURCES.futureMissingAnchorPolicy.proxyRequirements.mustNotPresentAsOfficialPointEstimate !== true ||
       CITY_POPULATION_SOURCES.structurePolicy.method !== 'national_2020_age_sex_share' ||
       CITY_POPULATION_SOURCES.structurePolicy.evidenceGrade !== 'C' ||
       CITY_POPULATION_SOURCES.structurePolicy.conservativeMultiplier !== 0.7 ||

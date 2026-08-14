@@ -1,10 +1,10 @@
 # 数据来源与证据等级
 
-> 数据版本：`2026.08.14.1`
+> 数据版本：`2026.08.14.2`
 > 模型版本：`3.1.0`
 > 本轮统一检索日：`2026-08-14`
 
-本文件说明「心动概率局」哪些数据可以进入人口估算、如何转换、哪些只能校准或娱乐。机器可读的完整逐条记录位于 [`app/src/data/evidence-registry.json`](../app/src/data/evidence-registry.json)，18—50岁逐单岁、分性别整数表位于 [`app/src/data/population-by-age.json`](../app/src/data/population-by-age.json)。完整登记表是质量检查和数据更新的唯一事实来源；浏览器仅加载自动生成的 [`app/src/data/evidence-runtime.json`](../app/src/data/evidence-runtime.json) 展示投影，并由发布门禁证明两者同步。学历同样采用“权威审计表 + 生产投影”双层结构：完整 [`education-by-age.json`](../app/src/data/education-by-age.json) 保存来源、哈希、总计和五岁组校验，生成的紧凑 [`education-runtime.json`](../app/src/data/education-runtime.json) 才由生产 `education.ts` 加载。本文是给维护者看的口径说明。
+本文件说明「心动概率局」哪些数据可以进入人口估算、如何转换、哪些只能校准或娱乐。机器可读的完整逐条记录位于 [`app/src/data/evidence-registry.json`](../app/src/data/evidence-registry.json)，18—50岁逐单岁、分性别整数表位于 [`app/src/data/population-by-age.json`](../app/src/data/population-by-age.json)。完整登记表是质量检查和数据更新的唯一事实来源；浏览器仅加载自动生成的 [`app/src/data/evidence-runtime.json`](../app/src/data/evidence-runtime.json) 展示投影，并由发布门禁证明两者同步。学历同样采用“权威审计表 + 生产投影”双层结构：完整 [`education-by-age.json`](../app/src/data/education-by-age.json) 保存来源、哈希、总计和五岁组校验，生成的紧凑 [`education-runtime.json`](../app/src/data/education-runtime.json) 才由生产 `education.ts` 加载。城市采用对应的双层结构：完整 [`city-population-sources.json`](../app/src/data/city-population-sources.json) 保存逐城来源和口径，`generate:city-data` 生成紧凑 [`city-runtime.json`](../app/src/data/city-runtime.json) 并同步城市证据条目。本文是给维护者看的口径说明。
 
 ## 1. 先读结论
 
@@ -17,15 +17,15 @@
 7. **D级永远不展示成“官方数据”。** 星座、MBTI、发际线、少白头、做饭、取向常数等旧参数只用于娱乐/软匹配或直接排除。登记表中D级均为 `modelUse: excluded`。
 
 8. **硬条件不等于一定能量化。** `population-policy.ts` 是主人口准入的最终政策层。`included_estimate` 才可削减主人口；`unquantified` 表示条件被尊重但缺少同口径概率，当前人数只能作为上界；`research_only` 只能进入独立标注的情景研究，主估算一律 `do_not_apply`。
-9. **城市必须有官方常住人口锚点才可估算。** `cities.ts` 保留全部46个可选城市，但只有登记了统计局/政府一手来源的城市为 `included_estimate`。其余城市 `pop=0` 是阻止旧引擎误用的哨兵，不表示城市人口为0，产品必须返回“当前不可量化”。
+9. **当前56个可选城市均有本市官方常住人口锚点。** 2025第一财经商业榜单提供4个一线、15个新一线、30个二线城市的可复现名单，另保留原有7城兼容，共56城；它不是官方行政分类。44城使用2025年本市官方值，12城诚实回退到2024年本市官方值。城市18—50岁结构仍是C级外推，不能把官方总量锚点说成城市逐岁结构的直接统计。
 
 ## 1.1 人口量化政策层
 
 机器可读政策位于 [`app/src/data/population-policy.ts`](../app/src/data/population-policy.ts)，稳定API为：
 
 - `populationPolicyForDimension(id)`：返回维度状态、主人口效果、结果语义和证据ID；未知ID默认关闭量化，不会静默进入连乘。
-- `isCityMainEstimateSupported(name)`：全国返回支持；城市仅在存在已登记官方锚点时返回支持。
-- `unsupportedSelectedCities(cities)`：返回所选城市中证据不足的唯一列表，供引擎转为“不可量化/上界”。
+- `isCityMainEstimateSupported(name)`：全国返回支持；当前56城因均存在已登记官方锚点而返回支持。
+- `unsupportedSelectedCities(cities)`：对当前名单以外或未来缺少已登记锚点的外部输入，返回证据不足的唯一列表，供引擎转为“不可量化/上界”；当前56城该列表为空。
 
 当前准入摘要：
 
@@ -111,36 +111,22 @@ pool(ageMin, ageMax, sex)
 
 全国总量、城乡与就业总量来自[中华人民共和国2025年国民经济和社会发展统计公报](https://www.stats.gov.cn/xxgk/sjfb/tjgb2020/202602/t20260228_1962662.html)。城市基础池应采用各市同年统计公报的常住人口，不应把全国城镇人口再乘到已是城市常住人口的数据上。
 
+当前城市名单以[第一财经《2025新一线城市魅力排行榜》](https://www.yicai.com/news/102638963.html)为可复现版本：4个一线、15个新一线、30个二线，共49城；为兼容既有选择，再保留兰州、乌鲁木齐、海口、银川、西宁、呼和浩特、拉萨7城，总计56城。第一财经已说明[2026年起不再发布城市总分、排名和分级](https://www.yicai.com/news/103204902.html)，所以这里的“一线/新一线/二线”只是带版本的商业榜单名单，不是国家行政层级或官方城市分类。精确名单、榜单原图哈希和兼容城市位于 [`city-tier-roster.json`](../app/src/data/city-tier-roster.json)。
+
 城市模型的最低要求：
 
-- 每个城市记录 `populationStatus`、`mainEstimateStatus`、`populationYear`、官方统计公报URL和常住人口口径。
+- 每个城市记录 `mainEstimateStatus`、`populationYear`、官方统计公报URL、常住人口口径、证据ID和明确局限。
 - 多城市先去重，再求城市人口和。
 - 城市工资只可用于明确标注的研究情景，不决定城市人口，也不校准主估算个人收入。
-- 如果某市缺少一手常住人口锚点，标记 `unsupported/unquantified`；`pop=0` 只是禁用哨兵，结果层不得解释成0人。
+- 当前名单以外或未来外部输入如缺少已登记数据，必须 fail closed 为 `unsupported/unquantified`；结果层不得把禁用数值占位解释成0人。
 
-本轮登记了20个官方城市锚点。2025年锚点包括：
+本轮56城全部登记了由统计局、调查队或政府门户承载的本市常住人口锚点：44城为2025年数据；在2025年本市官方值尚未发布或其公开页面不足以确认同口径数值时，12城使用2024年本市官方值并明确保留一年时点差。完整56城的发布者、标题、URL、原文短值、地理口径和局限只在 [`city-population-sources.json`](../app/src/data/city-population-sources.json) 维护；`npm run generate:city-data` 由该权威源表生成 [`city-runtime.json`](../app/src/data/city-runtime.json) 并同步56条城市证据到 [`evidence-registry.json`](../app/src/data/evidence-registry.json)，禁止手工维护三份相互漂移的数据。
 
-| 城市 | 常住人口（万人） | 口径 | 官方来源 |
-| --- | ---: | --- | --- |
-| 北京 | 2,180.00 | 2025年末、全市行政区域常住人口 | [北京市统计公报](https://tjj.beijing.gov.cn/tjsj_31433/tjgb_31445/ndgb_31446/202603/t20260326_4566469.html) |
-| 上海 | 2,485.41 | 2025年末、全市行政区域常住人口 | [上海市统计公报](https://tjj.sh.gov.cn/tjgb/20260330/e0772941e8e041eaaad2df850b44ef98.html) |
-| 深圳 | 1,824.85 | 2025年末、全市行政区域常住人口 | [深圳市统计公报](https://tjj.sz.gov.cn/zwgk/zfxxgkml/tjsj/tjgb/content/post_12803919.html) |
-| 广州 | 1,910.10 | 2025年末、全市行政区域常住人口 | [广州市人口公报](https://tjj.gz.gov.cn/zzfwzq/tjgb/content/post_10804088.html) |
-| 苏州 | 1,304.77 | 2025年末、全市行政区域常住人口 | [苏州市统计公报](https://tjj.suzhou.gov.cn/sztjj/tjgb/202604/3dc4b574cabd4e86b36ec5d3280e927c.shtml) |
-| 武汉 | 1,386.19 | 2025年末、全市行政区域常住人口 | [武汉市统计公报](https://tjj.wuhan.gov.cn/tjfw/tjgb/202604/t20260408_2750693.shtml) |
-| 南京 | 963.85 | 2025年末、全市行政区域常住人口 | [南京市统计公报](https://tjj.nanjing.gov.cn/bmfw/njsj/202604/t20260403_5818444.html) |
-| 西安 | 1,323.63 | 2025年末、全市行政区域常住人口 | [西安市统计公报](https://tjj.xa.gov.cn/web_files/tjj/file/2026/05/15/202605151000219859531.pdf) |
-| 重庆 | 3,187.26 | 2025年末、全市行政区域常住人口 | [重庆市统计公报](https://www.cq.gov.cn/zwgk/zfxxgkml/sjfb_120853/tjgb/202603/t20260326_15568523.html) |
-| 天津 | 1,363.00 | 2025年末、全市行政区域常住人口 | [天津市统计公报](https://www.tj.gov.cn/sq/tjgb/202603/t20260327_7271193.html) |
-| 郑州 | 1,313.80 | 2025年末、全市行政区域常住人口 | [郑州市统计局人口发布](https://tjj.zhengzhou.gov.cn/fxtj/10069073.jhtml) |
-| 东莞 | 1,080.04 | 2025年末、全市行政区域常住人口 | [东莞市统计公报](https://tjj.dg.gov.cn/tjzl/tjgb/content/post_4537415.html) |
-| 济南 | 961.60 | 2025年末、全市行政区域常住人口 | [济南市统计公报](https://jntj.jinan.gov.cn/col/col18254/art/2026/art_7dc3135bb2209f961b3c65baa8ab3d2d.html) |
-| 福州 | 852.10 | 2025年末、全市行政区域常住人口 | [福州市统计公报](https://tjj.fuzhou.gov.cn/zwgk/tjzl/ndbg/202604/t20260414_5308173.htm) |
-| 常州 | 541.54 | 2025年末、全市行政区域常住人口 | [常州市统计公报](https://tjj.changzhou.gov.cn/content/suitable/show?catid=24519&id=29035) |
-| 烟台 | 700.05 | 2025年末、全市行政区域常住人口 | [烟台市统计公报](https://tjj.yantai.gov.cn/col/col117/art/2026/art_61a619eacfd44e5bbf80e45bf2cdd6d0.html) |
-| 石家庄 | 1,124.69 | 2025年末、全市行政区域常住人口 | [石家庄市统计公报](https://tjj.sjz.gov.cn/columns/940d701f-5e56-4f5d-9ece-7968f6354993/202605/26/f062dca8-ce95-46f8-b1c9-33f507db5a29.html) |
+杭绍甬专项核对值均为2025年末全市常住人口：[杭州1270.0万人](https://tjj.hangzhou.gov.cn/col/col1229279682/art/2026/art_99cf56b3747b44b492375d4b4d4943d3.html)、[绍兴544.3万人](https://tjj.sx.gov.cn/col/col1229362069/art/2026/art_77a3b6c66a1342ca8d6cdcf1f4278971.html)、[宁波983.3万人](https://tjj.ningbo.gov.cn/col/col1229042825/art/2026/art_06881e7e7c8d4e24896d020c7cad28c3.html)，三市行政区域锚点合计2797.6万人。这个合计只是常住人口总量锚点，不是18—50岁目标人群结果。
 
-另有佛山、沈阳、南通使用2024年官方锚点，明确记录一年时点差。以上A锚点只证明城市总量，不能证明各城市18—50岁结构与全国相同；结构转换为C级，并使用0.70—1.30宽情景倍数（不是置信区间）。其余26城已经删除旧人口约数并标为 `unsupported`，不会再被显示成A等级或静默进入主估算。
+城市数据回退顺序固定为：**本市最新官方值 → 本市上一年官方值 → 同类城市代理情景**。第三层只适用于未来确实找不到本市官方锚点的城市，且必须同时列出参照城市、经济规模、区域、人口体量与迁移特征的匹配理由；输出只能是低等级宽范围并明确标注“同类城市代理情景”，不得伪装成本市官方点值。代理层在当前56城中没有启用，未来也必须先完成登记、实现和门禁，不能由未知城市自动套用。
+
+上述官方A锚点只证明城市总量，不能证明各城市18—50岁结构与全国相同。运行时仍以“本市官方常住人口 × 2020七普全国逐岁×性别份额”转换为C级结构估算，并使用0.70—1.30宽情景；这不是抽样置信区间。
 
 ## 4. 婚姻状态：存量而非登记流量
 
@@ -366,7 +352,7 @@ optimistic   = result under optimistic parameter set
 - 单身青年“本人名下、本地可用住房/车辆”的全国概率不足。
 - 成年人全国近视、牙列审美、发际线、少白头、纹身、做饭技能等同产品定义数据不足。
 - 家庭资产高尾和收入×资产联合分布的可公开、近期、代表性微观表不足。
-- 当前46城中，已登记官方常住人口锚点的20城为：北京、上海、深圳、广州、南京、武汉、苏州、西安、重庆、天津、郑州、东莞、佛山、济南、沈阳、福州、常州、南通、烟台、石家庄。其余26城保持 `unsupported`，不得使用旧历史估值回退。
+- 当前56个可选城市均已有本市官方常住人口总量锚点，但仍普遍缺少统一的城市逐岁×性别×婚姻×学历联合表；因此目标年龄结构继续按全国2020详细表份额外推并保持C级。未知或未来外部城市若没有已登记锚点，仍 fail closed；“同类城市代理情景”只有在单独登记、明确标注且实现相应宽范围门禁后才可启用。
 - 城市工资字段是旧接口兼容值，分母为单位就业人员；全部标记 `research_only`，不得用工资比校准个人收入硬条件。
 
 缺口的默认处理不是编一个精确数，而是：迁为软偏好、返回“无适用数据”，或用C级宽区间并清楚标注。

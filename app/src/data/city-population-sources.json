@@ -5,6 +5,28 @@
   "rosterId": "yicai-city-tier-2025-05-28",
   "unit": "wan",
   "populationBasis": "year_end_resident_population",
+  "futureMissingAnchorPolicy": {
+    "status": "registered_but_unused",
+    "currentProxyCityCount": 0,
+    "priority": [
+      "latest_official_city_resident_population",
+      "prior_year_official_city_resident_population",
+      "comparable_city_proxy_scenario"
+    ],
+    "proxyRequirements": {
+      "matchingFactors": [
+        "economic_scale",
+        "region",
+        "resident_population_scale",
+        "migration_profile"
+      ],
+      "mustNameReferenceCities": true,
+      "mustExplainMatch": true,
+      "mustUseWideRange": true,
+      "mustNotPresentAsOfficialPointEstimate": true,
+      "maximumEvidenceGrade": "D"
+    }
+  },
   "structurePolicy": {
     "method": "national_2020_age_sex_share",
     "evidenceGrade": "C",
