@@ -47,7 +47,7 @@ export function PopulationStep({
   return (
     <section className="step-panel" aria-labelledby="population-title">
       <div className="step-heading">
-        <span className="eyebrow">第一关 · 圈定人群</span>
+        <span className="eyebrow">第一幕 · 圈定人群</span>
         <h2 id="population-title" tabIndex={-1}>先圈出“在哪儿、几岁、什么状态”</h2>
         <p>这些是可解释的硬筛选。当前基础池已经实时计算，不需要先“开筛”。</p>
       </div>

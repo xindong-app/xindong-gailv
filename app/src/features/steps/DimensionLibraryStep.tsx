@@ -58,7 +58,7 @@ export function DimensionLibraryStep({ selection, onChange, onNext }: {
   return (
     <section className="step-panel" aria-labelledby="library-title">
       <div className="step-heading">
-        <span className="eyebrow">第三关 · 维度宝库</span>
+        <span className="eyebrow">第三幕 · 维度宝库</span>
         <h2 id="library-title" tabIndex={-1}>想找得细，不必把人群砍成粉末</h2>
         <p>69 个原子维度按作用分类。搜得到、看得懂，也能知道它到底改人数还是只改契合度。</p>
       </div>

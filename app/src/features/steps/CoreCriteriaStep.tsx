@@ -78,7 +78,7 @@ export function CoreCriteriaStep({ selection, onChange, onNext }: {
   return (
     <section className="step-panel" aria-labelledby="core-title">
       <div className="step-heading">
-        <span className="eyebrow">第二关 · 硬核条件</span>
+        <span className="eyebrow">第二幕 · 硬核条件</span>
         <h2 id="core-title" tabIndex={-1}>把最在意的硬门槛放这里</h2>
         <p>真砍人的是身高和学历（官方口径逐岁计入）；收入、资产证据不足——选中后主数字标为「上限」并逐项列明，绝不编造比例乱砍。体型、烟酒、健康与房车等敏感项放在下一步主动展开。</p>
       </div>

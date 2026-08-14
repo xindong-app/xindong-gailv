@@ -30,7 +30,7 @@ export function SensitiveFunStep({ selection, onChange, onNext }: { selection: M
 
   return (
     <section className="step-panel" aria-labelledby="sensitive-title">
-      <div className="step-heading"><span className="eyebrow">第四关 · 彩蛋与边界</span><h2 id="sensitive-title" tabIndex={-1}>彩蛋随便玩，敏感的有护栏</h2><p>敏感人口条件与敏感偏好都默认折叠、默认不分享；星座和 MBTI 只生成娱乐指数。</p></div>
+      <div className="step-heading"><span className="eyebrow">第四幕 · 彩蛋与边界</span><h2 id="sensitive-title" tabIndex={-1}>彩蛋随便玩，敏感的有护栏</h2><p>敏感人口条件与敏感偏好都默认折叠、默认不分享；星座和 MBTI 只生成娱乐指数。</p></div>
       <section className="sensitive-box">
         <button aria-controls="sensitive-options" aria-expanded={sensitiveOpen} className="disclosure-button" type="button" onClick={() => setSensitiveOpen((value) => !value)}><span><b>敏感人口条件与偏好</b><small>房车、健康、外形、家庭财务、关系边界等 · 默认不分享</small></span><span aria-hidden="true">{sensitiveOpen ? '−' : '+'}</span></button>
         {sensitiveOpen && <div id="sensitive-options">

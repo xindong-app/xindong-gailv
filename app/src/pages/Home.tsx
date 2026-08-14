@@ -27,10 +27,10 @@ import { SharePreviewDialog } from '../components/SharePreviewDialog'
 
 const STEPS: readonly StepDefinition[] = [
   { id: 'welcome', label: '开局须知', shortLabel: '开局', description: '了解模型边界' },
-  { id: 'population', label: '第一关 · 圈定人群', shortLabel: '圈人', description: '性别、年龄、城市与婚史' },
-  { id: 'core', label: '第二关 · 硬核条件', shortLabel: '硬核', description: '身高、教育、经济与生活习惯' },
-  { id: 'library', label: '第三关 · 维度宝库', shortLabel: '宝库', description: '搜索进阶维度' },
-  { id: 'sensitive', label: '第四关 · 彩蛋与边界', shortLabel: '彩蛋', description: '主动展开敏感条件与娱乐彩蛋' },
+  { id: 'population', label: '第一幕 · 圈定人群', shortLabel: '圈人', description: '性别、年龄、城市与婚史' },
+  { id: 'core', label: '第二幕 · 硬核条件', shortLabel: '硬核', description: '身高、教育、经济与生活习惯' },
+  { id: 'library', label: '第三幕 · 维度宝库', shortLabel: '宝库', description: '搜索进阶维度' },
+  { id: 'sensitive', label: '第四幕 · 彩蛋与边界', shortLabel: '彩蛋', description: '主动展开敏感条件与娱乐彩蛋' },
   { id: 'results', label: '揭榜时刻', shortLabel: '揭榜', description: '查看范围、影响和灵敏度' },
   { id: 'share', label: '生成战报', shortLabel: '战报', description: '本地生成隐私安全的战报' },
 ]
@@ -142,7 +142,7 @@ export default function Home() {
   })
   const [online, setOnline] = useState(() => navigator.onLine)
   const { messages, push, dismiss } = useToasts()
-  const initialFocusSkipped = useRef(false)
+  const prevStepRef = useRef(0)
 
   const clearSavedSession = useSessionSelection(selection)
 
@@ -157,10 +157,9 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    if (!initialFocusSkipped.current) {
-      initialFocusSkipped.current = true
-      return
-    }
+    // 仅在真正换步时聚焦标题; 初始挂载不聚焦(StrictMode 双跑也不聚焦)
+    if (prevStepRef.current === currentStep) return
+    prevStepRef.current = currentStep
     const headingId = `${STEPS[currentStep].id}-title`
     window.requestAnimationFrame(() => document.getElementById(headingId)?.focus())
   }, [currentStep])
