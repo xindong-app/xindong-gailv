@@ -593,12 +593,6 @@ export async function renderShareCard(
     context.fillText(`娱乐指数 ${dto.scores.entertainment}/100`, center, y)
     y += 42
   }
-  if (dto.scores.bidirectional != null) {
-    context.fillStyle = '#655a75'
-    context.font = '600 24px system-ui, "Microsoft YaHei", sans-serif'
-    context.fillText(`双向命中示意 ${dto.scores.bidirectional}/100（示意，非预测）`, center, y)
-    y += 42
-  }
 
   if (dto.conditions && dto.conditions.length > 0) {
     y += 10

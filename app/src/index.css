@@ -708,11 +708,12 @@ h4 {
 
 .preset-list {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 }
 
 .preset-list button {
+  min-width: 0;
   min-height: 60px;
   padding: 9px 12px;
   border: 1px solid var(--line);
@@ -3135,7 +3136,8 @@ input[aria-invalid="true"] {
    ============================================================ */
 
 :root {
-  --font-display: "Baloo 2", "ZCOOL KuaiLe", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  /* 系统字体栈: 不请求第三方字体(隐私承诺), 中文用系统黑体加粗撑起展示感 */
+  --font-display: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Source Han Sans SC", sans-serif;
   --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --spring-soft: cubic-bezier(0.22, 1.2, 0.36, 1);
 }
@@ -4100,5 +4102,317 @@ body {
   .criteria-card,
   .dimension-card {
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   🧭 v3 契约接入层 (2026-08-14)
+   状态卡 / 关系情境卡 / 硬边界声明 / 空舞台 —— 全部去框化色块
+   ============================================================ */
+
+/* ---------- 结果三态说明卡 ---------- */
+.state-notice {
+  margin: 0 0 16px;
+  padding: 16px 18px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--sun) 30%, var(--surface-strong));
+}
+
+.state-notice[data-state="unavailable"] {
+  background: color-mix(in srgb, var(--lilac) 32%, var(--surface-strong));
+}
+
+.state-notice[data-state="underflow"] {
+  background: color-mix(in srgb, var(--sky) 30%, var(--surface-strong));
+}
+
+.state-notice h3 {
+  margin: 0 0 6px;
+  font-size: 0.98rem;
+}
+
+.state-notice p {
+  margin: 0 0 6px;
+  color: var(--ink-soft);
+  font-size: 0.84rem;
+  line-height: 1.6;
+}
+
+.state-notice small {
+  color: var(--ink-soft);
+  font-size: 0.76rem;
+  font-weight: 650;
+}
+
+.state-notice-cities {
+  font-weight: 760;
+}
+
+.unquantified-list {
+  display: grid;
+  margin: 8px 0 10px;
+  padding: 0;
+  gap: 8px;
+  list-style: none;
+}
+
+.unquantified-list li {
+  padding: 9px 12px;
+  border-left: 3px solid var(--sun-strong, #d6a419);
+  border-radius: 0 10px 10px 0;
+  background: color-mix(in srgb, var(--surface-strong) 78%, transparent);
+}
+
+.unquantified-list b {
+  display: block;
+  font-size: 0.84rem;
+}
+
+.unquantified-list small {
+  font-size: 0.74rem;
+  font-weight: 500;
+}
+
+/* ---------- 上限徽章 + 稀有度口径注 ---------- */
+.status-badge {
+  display: inline-flex;
+  min-height: 25px;
+  padding: 3px 10px;
+  align-items: center;
+  border-radius: 999px;
+  background: var(--sun);
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 860;
+  letter-spacing: 0.08em;
+}
+
+.rarity-cap-note {
+  margin: 8px 0 0;
+  color: var(--ink);
+  font-size: 0.84rem;
+  font-weight: 720;
+  text-align: center;
+}
+
+/* ---------- 空舞台(城市无锚点) ---------- */
+.stage-unavailable {
+  display: grid;
+  justify-items: center;
+  padding: 28px 20px;
+  color: #cdbceb;
+  text-align: center;
+  gap: 8px;
+}
+
+.stage-unavailable span {
+  font-size: 2rem;
+}
+
+.stage-unavailable p {
+  margin: 0;
+  color: #f4eefb;
+  font-weight: 760;
+}
+
+.stage-unavailable small {
+  color: #b9a9d6;
+}
+
+/* ---------- 硬边界声明(高级) ---------- */
+.hard-declare-card {
+  margin: 0 0 16px;
+  padding: 18px 20px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--peach) 26%, var(--surface-strong));
+}
+
+.hard-declare-card h3 {
+  margin: 6px 0 6px;
+}
+
+.hard-declare-card p {
+  margin: 0 0 12px;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  line-height: 1.65;
+}
+
+.hard-declare-note {
+  display: inline-block;
+  margin-top: 10px;
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 720;
+}
+
+/* ---------- 关系情境卡(第二层 · lilac 低可信区) ---------- */
+.relationship-card {
+  margin: 0 0 16px;
+  padding: 20px 22px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--lilac) 26%, var(--surface-strong));
+}
+
+.relationship-card h3 {
+  margin: 6px 0 6px;
+}
+
+.relationship-card > div > p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  line-height: 1.65;
+}
+
+.relationship-seeker {
+  margin-top: 14px;
+}
+
+.relationship-seeker > span {
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  font-weight: 760;
+}
+
+.relationship-seeker .chip-row {
+  margin: 7px 0 7px;
+}
+
+.relationship-seeker small {
+  color: var(--ink-soft);
+  font-size: 0.74rem;
+}
+
+.relationship-result {
+  margin-top: 16px;
+}
+
+.relationship-factors {
+  display: grid;
+  margin-top: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.relationship-factor {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--surface-strong);
+}
+
+.relationship-factor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.relationship-factor-head b {
+  font-size: 0.86rem;
+}
+
+.relationship-factor p {
+  margin: 7px 0 0;
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 800;
+}
+
+.relationship-factor p small {
+  color: var(--ink-soft);
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 650;
+}
+
+.rel-grade {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--surface-strong);
+  font-size: 0.68rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.relationship-combined {
+  display: grid;
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--surface-strong);
+  gap: 3px;
+  text-align: center;
+}
+
+.relationship-combined span {
+  color: var(--ink-soft);
+  font-size: 0.76rem;
+  font-weight: 760;
+}
+
+.relationship-combined b {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+}
+
+.relationship-combined small {
+  color: var(--ink-soft);
+  font-size: 0.76rem;
+}
+
+.relationship-combined[data-state="unavailable"] b {
+  font-size: 1.1rem;
+}
+
+.relationship-disclaimer {
+  margin: 12px 0 0;
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 760;
+  text-align: center;
+}
+
+.relationship-sources {
+  margin-top: 10px;
+}
+
+.relationship-sources summary {
+  color: var(--ink-soft);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 720;
+}
+
+.relationship-sources ul {
+  display: grid;
+  margin: 8px 0 0;
+  padding: 0;
+  gap: 8px;
+  list-style: none;
+}
+
+.relationship-sources li b {
+  display: block;
+  font-size: 0.78rem;
+}
+
+.relationship-sources li small {
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+}
+
+@media (max-width: 640px) {
+  .relationship-factors {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .state-notice,
+  .relationship-card,
+  .hard-declare-card {
+    transition: none !important;
   }
 }

@@ -12,17 +12,12 @@ const INK = '#3b3050'
 const PALETTE = ['#ffd9e2', '#ffd9b8', '#cdeafa', '#e6dbf7', '#ddefd3', '#ffeeb0', '#f5c1d4']
 
 // ---------- 各关卡遗言弹幕 ----------
+// v3: 只有可量化维度会出现在漏斗里(身高/吸烟/饮酒);
+// 不拿收入、身体、疾病、婚史开玩笑。
 const LAST_WORDS: Record<string, string[]> = {
-  'appearance.height': ['就差 2cm 啊!!', '我恨我的基因', '下辈子先长个儿'],
-  'appearance.body_type': ['奶茶害我不轻', '明天就减肥…真的', '身材管理大失败'],
-  'economy.income': ['搞钱去了, 勿念', '穷是我的错吗', '我先去加班了'],
-  'economy.wealth': ['输在起跑线的存折', '家里没矿, 告辞', '六个钱包都是空的'],
-  'economy.house': ['房价你赔我青春', '六个钱包也不够', '租房也有尊严!'],
-  'economy.vehicle': ['地铁其实挺好', '驾照白考了', '摇号八年没中'],
-  'education.level': ['当年该考研的', '学历改变命运…吗', '专升本了解一下'],
+  'appearance.height': ['就差 2cm 啊!!', '下辈子先长个儿', '尺子今天也很严格'],
   'lifestyle.smoking': ['戒烟第一天打卡', '电子烟算烟吗'],
-  'lifestyle.drinking': ['为了爱情我戒', '只喝亿点点'],
-  'appearance.hair_full': ['秃然离场', '假发已经下单', '植发分期中'],
+  'lifestyle.drinking': ['先戒为敬', '只喝亿点点'],
 }
 const GENERIC_LAST_WORDS = ['我不服!', '下次一定', '先走一步']
 

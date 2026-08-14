@@ -18,8 +18,9 @@ import { ShareStep } from '../features/steps/ShareStep'
 import { WelcomeStep } from '../features/steps/WelcomeStep'
 import { useHistoryState } from '../hooks/useHistoryState'
 import { loadSafeSessionSelection, useSessionSelection } from '../hooks/useSessionSelection'
+import { applyRelaxation } from '../features/applyRelaxation'
 import { activeConditions, removeSelectionDimension } from '../model/selectionUtils'
-import { DEFAULT_SELECTION, safeParseSelection, type ModelSelection } from '../model/schema'
+import { DEFAULT_SELECTION, safeParseSelection, type GenderId, type ModelSelection } from '../model/schema'
 import { SharePreviewDialog } from '../components/SharePreviewDialog'
 
 const STEPS: readonly StepDefinition[] = [
@@ -102,7 +103,19 @@ export default function Home() {
   const initialSelection = useMemo(() => loadSafeSessionSelection(structuredClone(DEFAULT_SELECTION)), [])
   const history = useHistoryState(initialSelection)
   const selection = history.value
-  const result = useMemo(() => computeModel(selection), [selection])
+  // 硬边界声明(v3): 已选软偏好可被显式声明为硬条件;
+  // 只传"仍处选中态"的 id, 防止预设/清空后 ModelRequirementError 崩屏
+  const [hardRequirementIds, setHardRequirementIds] = useState<string[]>([])
+  // 关系情境入口: 本人统计性别, 自愿填写, 不写入会话草稿
+  const [seekerGender, setSeekerGender] = useState<GenderId | null>(null)
+  const effectiveHardRequirementIds = useMemo(() => {
+    const selected = new Set<string>(selection.softPreferenceIds)
+    return hardRequirementIds.filter((id) => selected.has(id))
+  }, [hardRequirementIds, selection.softPreferenceIds])
+  const result = useMemo(
+    () => computeModel(selection, { hardRequirementIds: effectiveHardRequirementIds }),
+    [selection, effectiveHardRequirementIds],
+  )
   const conditions = useMemo(() => activeConditions(selection), [selection])
   // SSR 及以上稀有度下彩带雨; seed 随结果变化, 同一份结果同一场雨
   const celebrationSeed = useMemo(() => {
@@ -185,9 +198,17 @@ export default function Home() {
   const clearAll = () => {
     clearSavedSession(DEFAULT_SELECTION)
     history.reset(structuredClone(DEFAULT_SELECTION))
+    setHardRequirementIds([])
     setComparison(null)
     setClearOpen(false)
     push('success', '已清空条件和安全会话草稿。')
+  }
+
+  const toggleHardRequirement = (dimensionId: string) => {
+    setHardRequirementIds((current) =>
+      current.includes(dimensionId)
+        ? current.filter((id) => id !== dimensionId)
+        : [...current, dimensionId])
   }
 
   const clearSession = () => {
@@ -251,12 +272,16 @@ export default function Home() {
           {currentStep === 5 && (
             <ResultsStep
               comparison={comparison}
+              hardRequirementIds={effectiveHardRequirementIds}
               result={result}
+              seekerGender={seekerGender}
               selection={selection}
               onCaptureComparison={() => { setComparison(result); push('success', '已保存当前方案 A，可以调整条件后比较。') }}
               onChange={updateSelection}
-              onRelax={(dimensionId) => updateSelection(removeSelectionDimension(selection, dimensionId))}
+              onRelax={(dimensionId) => updateSelection(applyRelaxation(selection, dimensionId))}
+              onSeekerGender={setSeekerGender}
               onShare={() => setShareOpen(true)}
+              onToggleHardRequirement={toggleHardRequirement}
             />
           )}
           {currentStep === 6 && <ShareStep result={result} selection={selection} onClearSession={clearSession} onShare={() => setShareOpen(true)} />}

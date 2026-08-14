@@ -55,6 +55,8 @@ export interface ShareFunDto {
   /** 80 小人剧场里还站着的数量(0–80) */
   survivors: number
   survivor: { name: string; emoji: string }
+  /** 主人数为"已计入条件上限"时置真: 稀有度按上限口径表达, 真实只会更稀有 */
+  upperBound?: boolean
   /** 仅当条件列表公开时才带上毒舌总评(避免泄露被隐藏的维度) */
   verdict?: string
 }
@@ -78,8 +80,6 @@ export interface ShareDto {
   }
   scores: {
     entertainment?: number
-    /** 双向命中示意(0-100), 仅当用户填了反向自评且公开娱乐指数时携带 */
-    bidirectional?: number
   }
   confidenceGrade: 'A' | 'B' | 'C' | 'D' | 'NA'
   conditions?: ShareConditionDto[]

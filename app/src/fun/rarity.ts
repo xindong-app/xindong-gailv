@@ -11,12 +11,12 @@ export interface Tier {
 
 /** 稀有度按「每万人中的数量」分级, perWan = estimate / base * 10000 */
 export function rarityTier(perWan: number): Tier {
-  if (perWan >= 500) return { key: 'N', label: 'N · 普通款', comment: '量大管饱, 下楼买杯奶茶都能撞见仨', bg: '#E5DCD5', fg: '#3b3050' }
-  if (perWan >= 50) return { key: 'R', label: 'R · 稀有', comment: '池子还行, 主动一点就有戏', bg: '#cdeafa', fg: '#2b5d6e' }
-  if (perWan >= 5) return { key: 'SR', label: 'SR · 超级稀有', comment: '朋友圈扩列三轮, 也许能刷到一个', bg: '#e6dbf7', fg: '#4a3a6e' }
-  if (perWan >= 0.5) return { key: 'SSR', label: 'SSR · 极度稀有', comment: '遇见了别犹豫, 直接锁死 🔒', bg: '#ffd9e2', fg: '#a03d7a' }
-  if (perWan >= 0.05) return { key: 'UR', label: 'UR · 传说', comment: '全服限量款, 刷到就是天大的缘分', bg: '#ffeeb0', fg: '#7a4a12' }
-  return { key: 'M', label: '??? · 神话级', comment: '理论上存在, 遇见概率≈彩票头奖, 建议顺手买张彩票对冲', bg: '#ffd9b8', fg: '#7a2b12' }
+  if (perWan >= 500) return { key: 'N', label: 'N · 普通款', comment: '人山人海款, 数据表示毫无压力', bg: '#E5DCD5', fg: '#3b3050' }
+  if (perWan >= 50) return { key: 'R', label: 'R · 稀有', comment: '池子还大, 条件组合算友好', bg: '#cdeafa', fg: '#2b5d6e' }
+  if (perWan >= 5) return { key: 'SR', label: 'SR · 超级稀有', comment: '千里挑一级别, 组合开始小众', bg: '#e6dbf7', fg: '#4a3a6e' }
+  if (perWan >= 0.5) return { key: 'SSR', label: 'SSR · 极度稀有', comment: '万里挑一级别, 数据都开始孤单', bg: '#ffd9e2', fg: '#a03d7a' }
+  if (perWan >= 0.05) return { key: 'UR', label: 'UR · 传说', comment: '贴近模型分辨率边缘, 稀有度拉满', bg: '#ffeeb0', fg: '#7a4a12' }
+  return { key: 'M', label: '??? · 神话级', comment: '低于模型分辨率的人间传说——不说不存在, 只说数不出来', bg: '#ffd9b8', fg: '#7a2b12' }
 }
 
 export function fmtRarity(p: number): string {
@@ -31,31 +31,19 @@ export function fmtRarity(p: number): string {
 }
 
 // ---------- 毒舌总评 ----------
+// v3: 只有可量化维度会进入漏斗帧, 玩笑只保留它们的份;
+// 收入/资产/房车/体型/疾病等不砍人数的维度, 不做"淘汰最多"的玩笑。
 const VERDICT_JOKES: Record<string, string> = {
-  'appearance.height': '这关不怪他们, 怪基因',
-  'appearance.body_type': '奶茶战队全军覆没',
-  'economy.income': '现实稳定发挥, 从不让人失望',
-  'economy.wealth': '投胎确实是门技术活',
-  'economy.house': '房价才是最佳守门员',
-  'economy.vehicle': '四个轮子碾过一片真心',
-  'education.level': '知识确实改变命运…的择偶概率',
+  'appearance.height': '海拔这关, 刻度说了算',
   'lifestyle.smoking': '一根烟烧掉一大片缘分',
   'lifestyle.drinking': '感情深一口闷, 缘分浅全筛完',
-  'appearance.hair_full': '比收入还能打, 秃然真实',
 }
 
-export function buildVerdict(
-  frames: readonly FunnelFrame[],
-  options: { publicDimensionIds?: ReadonlySet<string> } = {},
-): string | null {
+export function buildVerdict(frames: readonly FunnelFrame[]): string | null {
   if (frames.length === 0) return null
   const worst = frames.reduce((a, b) => (b.factor < a.factor ? b : a))
-  const pct = ((1 - worst.factor) * 100).toFixed(worst.factor > 0.1 ? 0 : 1)
-  // 分享场景: 未公开的维度只亮刀法不亮名号(专属玩笑会泄身份, 一并换通用梗)
-  if (options.publicDimensionIds && !options.publicDimensionIds.has(worst.dimensionId)) {
-    return `致命一击是「某个神秘条件」, 一刀淘汰 ${pct}% 的选手 —— 名字保密, 刀是真的快`
-  }
   const joke = VERDICT_JOKES[worst.dimensionId] ?? '这一关是真·守门员'
+  const pct = ((1 - worst.factor) * 100).toFixed(worst.factor > 0.1 ? 0 : 1)
   return `致命一击是「${worst.label}」, 一刀淘汰 ${pct}% 的选手 —— ${joke}`
 }
 
@@ -63,12 +51,8 @@ export function buildComparisons(p: number): string[] {
   const out: string[] = []
   if (p <= 0) return out
   const oneIn = 1 / p
-  // 考上清华: 同龄人口约 0.05% → 1/2000
-  if (oneIn > 2000) out.push(`比考上清华还难 ${Math.round(oneIn / 2000)} 倍(清华: 这锅我不背)`)
-  else out.push('比考上清华容易点儿(清华录取约 1/2000)')
-  // 双色球一等奖 1/17721088
-  if (oneIn > 17721088 / 100) {
-    out.push(`中双色球头奖都比这容易 ${(oneIn / 17721088).toFixed(1)} 倍`)
-  }
+  // 只和"同龄人里考上清华的占比"这种人群频率做参照, 不与彩票等随机事件类比
+  if (oneIn > 2000) out.push(`这个占比比同龄人考上清华还低 ${Math.round(oneIn / 2000)} 倍(清华: 这锅我不背)`)
+  else out.push('比"同龄人考上清华"的占比高一点儿(清华录取约 1/2000)')
   return out
 }

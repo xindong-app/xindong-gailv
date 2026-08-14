@@ -6,6 +6,7 @@
 // 第 k 关条件概率 = 引擎在「前 k 关全开」下的联合估算 ÷「前 k- 1关」的联合估算,
 // 每一帧都由引擎亲自算出, 帧因子相乘精确望远镜回最终估算。
 import { computeModel } from '../engine/modelEngine'
+import { isDimensionAppliedToMainEstimate } from '../data/population-policy'
 import { DIMENSION_BY_ID, type EvidenceGrade } from '../model/dimensions'
 import type { ModelSelection } from '../model/schema'
 
@@ -42,43 +43,14 @@ interface FrameRule {
   enable: (draft: ModelSelection, full: ModelSelection) => void
 }
 
-// 出刀顺序固定: 基础圈 → 身高 → 学历 → 收入 → 资产 → 房车 → 生活习惯/健康
+// 出刀顺序固定: 基础圈 → 身高 → 吸烟 → 饮酒
+// v3: 收入/资产/房车/体型/学历/发际线等维度不对主估算产生扣减(do_not_apply),
+// 把它们画成"淘汰 0%"会误导成"现实中没有筛选作用", 因此只保留可量化关卡。
 const FRAME_RULES: readonly FrameRule[] = [
   {
     dimensionId: 'appearance.height',
     isActive: (s) => s.target.heightCm != null && (s.target.heightCm.min != null || s.target.heightCm.max != null),
     enable: (draft, full) => { draft.target.heightCm = full.target.heightCm == null ? null : { ...full.target.heightCm } },
-  },
-  {
-    dimensionId: 'education.level',
-    isActive: (s) => s.correlated.educationLevels.length > 0,
-    enable: (draft, full) => { draft.correlated.educationLevels = [...full.correlated.educationLevels] },
-  },
-  {
-    dimensionId: 'economy.income',
-    isActive: (s) => s.correlated.minAnnualIncomeWan != null,
-    enable: (draft, full) => { draft.correlated.minAnnualIncomeWan = full.correlated.minAnnualIncomeWan },
-  },
-  {
-    dimensionId: 'economy.wealth',
-    isActive: (s) => s.correlated.minHouseholdWealthWan != null,
-    enable: (draft, full) => { draft.correlated.minHouseholdWealthWan = full.correlated.minHouseholdWealthWan },
-  },
-  {
-    dimensionId: 'economy.house',
-    isActive: (s) => s.correlated.housing.required || s.correlated.housing.location != null
-      || s.correlated.housing.minAreaSqm != null || s.correlated.housing.type != null,
-    enable: (draft, full) => { draft.correlated.housing = { ...full.correlated.housing } },
-  },
-  {
-    dimensionId: 'economy.vehicle',
-    isActive: (s) => s.correlated.vehicle.required || s.correlated.vehicle.priceBands.length > 0,
-    enable: (draft, full) => { draft.correlated.vehicle = { ...full.correlated.vehicle, priceBands: [...full.correlated.vehicle.priceBands] } },
-  },
-  {
-    dimensionId: 'appearance.body_type',
-    isActive: (s) => s.correlated.bodyTypes.length > 0,
-    enable: (draft, full) => { draft.correlated.bodyTypes = [...full.correlated.bodyTypes] },
   },
   {
     dimensionId: 'lifestyle.smoking',
@@ -90,12 +62,12 @@ const FRAME_RULES: readonly FrameRule[] = [
     isActive: (s) => s.correlated.drinking !== 'any',
     enable: (draft, full) => { draft.correlated.drinking = full.correlated.drinking },
   },
-  {
-    dimensionId: 'appearance.hair_full',
-    isActive: (s) => s.correlated.hairCriteria.length > 0,
-    enable: (draft, full) => { draft.correlated.hairCriteria = [...full.correlated.hairCriteria] },
-  },
 ]
+
+// v3: 收入/资产/房车/体型/学历/发际线等维度不对主估算产生扣减(do_not_apply),
+// 把它们画成"淘汰 0%"会误导成"现实中没有筛选作用", 因此只保留可量化关卡。
+const ACTIVE_FRAME_RULES: readonly FrameRule[] = FRAME_RULES.filter((rule) =>
+  isDimensionAppliedToMainEstimate(rule.dimensionId))
 
 /** 剥掉全部漏斗条件的基础选择(保留性别/年龄/城市/婚史) */
 function stripFunnelConditions(selection: ModelSelection): ModelSelection {
@@ -121,7 +93,7 @@ export function buildFunnelFrames(selection: ModelSelection): FunnelFrame[] {
   const cached = frameCache.get(selection)
   if (cached) return cached
 
-  const activeRules = FRAME_RULES.filter((rule) => rule.isActive(selection))
+  const activeRules = ACTIVE_FRAME_RULES.filter((rule) => rule.isActive(selection))
   if (activeRules.length === 0) {
     frameCache.set(selection, [])
     return []

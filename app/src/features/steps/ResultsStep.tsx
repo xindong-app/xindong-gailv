@@ -2,20 +2,26 @@ import { useEffect, useState } from 'react'
 import type { ModelResult } from '../../engine/modelEngine'
 import { formatCount } from '../../engine/modelEngine'
 import { ResultSummary } from '../../components/ResultSummary'
+import { RelationshipScenarioCard } from '../../components/RelationshipScenarioCard'
 import { playTada } from '../../fun/sound'
-import type { ModelSelection, SoftPreferenceId } from '../../model/schema'
+import type { GenderId, ModelSelection, SoftPreferenceId } from '../../model/schema'
 import { DIMENSION_BY_ID } from '../../model/dimensions'
 import { toggleArrayValue } from '../../model/selectionUtils'
 import { Chip, EvidenceStatusBadge } from '../../components/ui'
 
-export function ResultsStep({ result, selection, comparison, onChange, onRelax, onShare, onCaptureComparison }: {
+export function ResultsStep({ result, selection, comparison, hardRequirementIds, seekerGender, onChange, onRelax, onShare, onCaptureComparison, onSeekerGender, onToggleHardRequirement }: {
   result: ModelResult
   selection: ModelSelection
   comparison: ModelResult | null
+  /** 已声明为硬边界的已选软偏好(v3) */
+  hardRequirementIds: readonly string[]
+  seekerGender: GenderId | null
   onChange: (next: ModelSelection) => void
   onRelax: (dimensionId: string) => void
   onShare: () => void
   onCaptureComparison: () => void
+  onSeekerGender: (gender: GenderId | null) => void
+  onToggleHardRequirement: (dimensionId: string) => void
 }) {
   // 揭榜仪式感: 进入本步时钢印重新砸落 + 聚光灯扫过 + tada 音效
   const [revealKey] = useState(() => Date.now())
@@ -25,11 +31,37 @@ export function ResultsStep({ result, selection, comparison, onChange, onRelax, 
   if (selection.correlated.healthCriteria.includes('no_myopia')) targetSoftIds.add('health.myopia')
   if (selection.correlated.healthCriteria.includes('no_major_chronic')) targetSoftIds.add('health.chronic')
   const reciprocalOptions = [...targetSoftIds].map((id) => DIMENSION_BY_ID.get(id)).filter(Boolean)
+  // 可声明为硬边界的候选: 已选软偏好(声明后数值不变, 主数字诚实转为上限)
+  const declarableSoftIds = selection.softPreferenceIds
   return (
     <section className="step-panel results-step" aria-labelledby="results-title">
       <div className="reveal-spotlight" aria-hidden="true" />
       <div className="step-heading"><span className="eyebrow">揭榜时刻</span><h2 id="results-title" tabIndex={-1}>先看战况，再看谁是守门员</h2><p>数字不是名单，范围不是置信区间，双向命中也不是爱情预测。每一层都能展开复核。</p></div>
       <ResultSummary headingId="main-result-summary-title" result={result} onShare={onShare} revealKey={revealKey} showFunnel={false} />
+      {declarableSoftIds.length > 0 && (
+        <article className="hard-declare-card" aria-labelledby="hard-declare-title">
+          <div>
+            <span className="eyebrow">高级 · 硬边界声明</span>
+            <h3 id="hard-declare-title">把软偏好升级为硬边界</h3>
+            <p>软偏好默认只影响契合度。声明为硬边界后，它会被当作严格条件列出——但因为缺少同口径数据，模型不会编造扣减比例，主数字会诚实地标为「上限」。</p>
+          </div>
+          <div className="chip-row">
+            {declarableSoftIds.map((id) => {
+              const dimension = DIMENSION_BY_ID.get(id)
+              if (!dimension) return null
+              const declared = hardRequirementIds.includes(id)
+              return (
+                <Chip key={id} active={declared} tone="peach" onClick={() => onToggleHardRequirement(id)}>
+                  {declared ? '硬边界 · ' : ''}{dimension.label}
+                </Chip>
+              )
+            })}
+          </div>
+          {hardRequirementIds.length > 0 && (
+            <small className="hard-declare-note">已声明 {hardRequirementIds.length} 项：主人数现在是「满足已量化条件的人数上限」。</small>
+          )}
+        </article>
+      )}
       <article className="comparison-card">
         <div>
           <span className="eyebrow">方案 A / B</span>
@@ -59,6 +91,7 @@ export function ResultsStep({ result, selection, comparison, onChange, onRelax, 
         {reciprocalOptions.length === 0 ? <p className="empty-inline">先在维度库加入软偏好，才能填写对方也在意什么。</p> : <div className="chip-row">{reciprocalOptions.map((dimension) => dimension && <Chip key={dimension.id} active={selection.selfPreferenceIds.includes(dimension.id as SoftPreferenceId)} tone="mint" onClick={() => { const next = structuredClone(selection); next.selfPreferenceIds = toggleArrayValue(next.selfPreferenceIds, dimension.id as SoftPreferenceId); onChange(next) }}>{dimension.label}</Chip>)}</div>}
         <div className="intersection-score"><span>当前双向命中示意</span><b>{result.scores.bidirectionalIllustration}<small>/100</small></b><p>{result.scoreDetails.disclaimer}</p></div>
       </article>
+      <RelationshipScenarioCard result={result} seekerGender={seekerGender} onSeekerGender={onSeekerGender} />
       <article className="model-boundaries"><h3>模型知道什么，也知道自己不知道什么</h3><ul>{result.explanation.map((item) => <li key={item}>{item}</li>)}</ul><p>可信度 {result.confidence.grade}（{Math.round(result.confidence.score * 100)}% 方法评分）· 分辨率下限 {formatCount(result.population.resolutionFloor)}</p></article>
     </section>
   )

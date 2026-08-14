@@ -84,25 +84,64 @@ describe('share privacy policy', () => {
       .toEqual(expect.arrayContaining([expect.objectContaining({ dimensionId: 'economy.income' })]))
   })
 
-  it('masks the verdict top killer when that sensitive dimension is not public', () => {
+  it('computes the verdict only from public quantified conditions, omitting it otherwise', () => {
     const selection = privateSelection()
-    selection.correlated.minAnnualIncomeWan = 10_000 // 确保收入是淘汰最多的那一刀
+    selection.correlated.minAnnualIncomeWan = 10_000
     const result = computeModel(selection)
     const defaults = createDefaultShareSettings(selection)
 
-    // 默认(收入未二次确认): 毒舌总评只亮"神秘条件", 不点名最低年收入
+    // 默认: 唯一可量化的附加条件是吸烟(敏感且未公开) → 总评整段省略,
+    // 不点名, 也不出现"神秘条件"这种泄露存在性的说法
     const dto = buildShareDto(selection, result, defaults)
-    expect(dto.fun?.verdict).toContain('某个神秘条件')
-    expect(dto.fun?.verdict).not.toContain('最低年收入')
+    expect(dto.fun?.verdict).toBeUndefined()
+    expect(JSON.stringify(dto)).not.toContain('神秘条件')
     expect(buildTextFallback(dto)).not.toContain('最低年收入')
 
-    // 用户明确公开收入后: 恢复点名与专属玩笑
+    // 有公开的可量化条件(身高)时: 总评只基于公开帧重算;
+    // 隐藏的吸烟条件对总评措辞零影响
+    const withHeight = structuredClone(selection)
+    withHeight.target.heightCm = { min: 180, max: null }
+    const publicDto = buildShareDto(withHeight, computeModel(withHeight), createDefaultShareSettings(withHeight))
+    expect(publicDto.fun?.verdict).toContain('身高')
+    expect(publicDto.fun?.verdict).not.toContain('吸烟')
+
+    const heightOnly = structuredClone(withHeight)
+    heightOnly.correlated.smoking = 'any'
+    const heightOnlyDto = buildShareDto(heightOnly, computeModel(heightOnly), createDefaultShareSettings(heightOnly))
+    expect(publicDto.fun?.verdict).toBe(heightOnlyDto.fun?.verdict)
+
+    // 明确公开收入后: 收入仍是未量化维度, 不能被称作"淘汰最多的一刀"
     const explicit: ShareSettings = {
       ...defaults,
       includedDimensionIds: [...defaults.includedDimensionIds, 'economy.income'],
       sensitiveConsentDimensionIds: ['economy.income'],
     }
-    expect(buildShareDto(selection, result, explicit).fun?.verdict).toContain('最低年收入')
+    const explicitDto = buildShareDto(selection, result, explicit)
+    expect(explicitDto.conditions)
+      .toEqual(expect.arrayContaining([expect.objectContaining({ dimensionId: 'economy.income' })]))
+    expect(explicitDto.fun?.verdict ?? '').not.toContain('最低年收入')
+  })
+
+  it('never leaks the reciprocal-derived bidirectional score into any share output', () => {
+    const selection = privateSelection() // 已填反向自评, 引擎侧派生分存在
+    const result = computeModel(selection)
+    expect(result.scoreDetails.reciprocalPreferencesProvided).toBe(true)
+
+    const dto = buildShareDto(selection, result, createDefaultShareSettings(selection))
+    expect(dto.scores).not.toHaveProperty('bidirectional')
+    expect(JSON.stringify(dto)).not.toContain('bidirectional')
+    expect(buildTextFallback(dto)).not.toContain('双向命中')
+  })
+
+  it('uses only nationwide generic people on the card when region is hidden', () => {
+    const selection = structuredClone(DEFAULT_SELECTION)
+    selection.target.cities = ['北京']
+    const result = computeModel(selection)
+    const settings = { ...createDefaultShareSettings(selection), showRegion: false }
+
+    const dto = buildShareDto(selection, result, settings)
+    // 北京皮肤角色(胡同大爷/京剧名角)不得出现在幸存者报幕里
+    expect(dto.fun?.survivor.name && ['胡同大爷', '京剧名角'].includes(dto.fun.survivor.name)).toBe(false)
   })
 
   it('strictly ignores unknown ids instead of copying arbitrary input into the DTO', () => {
