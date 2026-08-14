@@ -1,17 +1,19 @@
 {
-  "dataVersion": "2026.08.13",
+  "dataVersion": "2026.08.14.1",
   "publisher": "国家统计局、国务院第七次全国人口普查领导小组办公室",
   "sourceTitle": "中国人口普查年鉴-2020 表3-1 全国分年龄、性别的人口",
-  "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/A0301.jpg",
-  "retrievedAt": "2026-08-13",
+  "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/A0301.xls",
+  "companionImageUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/A0301.jpg",
+  "sourceSha256": "EF295785D3619A72A3B5FDDE35BB832CEE43608C459404E4584E79F9FAA477AC",
+  "retrievedAt": "2026-08-14",
   "referenceTime": "2020-11-01T00:00:00+08:00",
-  "geography": "中国大陆31省份和现役军人；不含港澳台居民和外籍人员",
+  "geography": "中国大陆31省份；不含另表列示的现役军人、港澳台居民和外籍人员",
   "unit": "people",
   "ageRange": { "min": 18, "max": 50 },
   "notes": [
-    "数值逐行抄录自表3-1公开原表，保留原表整数，不把5岁组均匀摊到单岁。",
+    "数值逐行读取表3-1官方XLS，保留原表整数，不把5岁组均匀摊到单岁。",
     "每行均满足 total = male + female；使用时按闭区间逐岁求和。",
-    "这是2020年人口普查时点存量，不是2026年实时人口登记。"
+    "这是2020年人口普查时点存量，不是2026年实时人口登记；详细表不含公报另列的200万现役军人。"
   ],
   "rows": [
     { "age": 18, "total": 14043179, "male": 7560195, "female": 6482984 },

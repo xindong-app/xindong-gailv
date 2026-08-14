@@ -1,6 +1,6 @@
 {
-  "dataVersion": "2026.08.14",
-  "modelVersion": "3.0.0",
+  "dataVersion": "2026.08.14.1",
+  "modelVersion": "3.1.0",
   "retrievedAt": "2026-08-14",
   "entries": [
     {
@@ -9,7 +9,7 @@
       "grade": "A",
       "modelUse": "direct",
       "sourceTitle": "中国人口普查年鉴-2020 表3-1 全国分年龄、性别的人口",
-      "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/A0301.jpg",
+      "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/A0301.xls",
       "publisher": "国家统计局、国务院第七次全国人口普查领导小组办公室",
       "dataYear": "2020-11-01"
     },
@@ -38,8 +38,8 @@
       "dimensionId": "base.region",
       "grade": "A",
       "modelUse": "direct",
-      "sourceTitle": "第七次全国人口普查公报（第二号）——全国人口情况",
-      "sourceUrl": "https://www.stats.gov.cn/sj/tjgb/rkpcgb/qgrkpcgb/202302/t20230206_1902002.html",
+      "sourceTitle": "中国人口普查年鉴-2020 表3-1 全国分年龄、性别的人口",
+      "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/A0301.xls",
       "publisher": "国家统计局、国务院第七次全国人口普查领导小组办公室",
       "dataYear": "2020-11-01"
     },
@@ -109,7 +109,7 @@
       "grade": "A",
       "modelUse": "direct",
       "sourceTitle": "中国人口普查年鉴-2020 表4-1 全国分年龄、性别、受教育程度的3岁及以上人口",
-      "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/A0401.jpg",
+      "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/A0401.xls",
       "publisher": "国家统计局、国务院第七次全国人口普查领导小组办公室",
       "dataYear": "2020-11-01"
     },

@@ -13,6 +13,7 @@ export type PopulationScenarioMethod =
   | 'city_structure_multiplier'
   | 'five_year_group_mapping'
   | 'height_parameter_endpoints'
+  | 'education_age_sex_direct'
   | 'all_age_to_target_age_multiplier'
   | 'drinking_raking_endpoints'
   | 'not_applied'
@@ -78,7 +79,7 @@ export const POPULATION_QUANTIFICATION_POLICY: Readonly<Record<string, Populatio
   'base.region': policy(
     'base.region', 'included_estimate', 'apply', 'estimate',
     ['evidence.base.region.census-mainland-total-2020', 'evidence.base.region.population-2025'],
-    '全国可量化；2025全国总量只作宏观校准。城市只有在cities.ts登记官方常住人口锚点时可量化，并固定使用2020七普大陆人口141,177.8724万人作为年龄×性别份额分母；城市结构外推采用C级宽情景。',
+    '全国可量化；2025全国总量只作宏观校准。城市只有在cities.ts登记官方常住人口锚点时可量化，并固定使用与单岁表同口径的2020七普31省份人口140,977.8724万人作为年龄×性别份额分母；另列的200万现役军人不在详细表分子和分母中。城市结构外推采用C级宽情景。',
     C_WIDE_RANGE,
     'city_structure_multiplier',
   ),
@@ -102,9 +103,11 @@ export const POPULATION_QUANTIFICATION_POLICY: Readonly<Record<string, Populatio
     '产品体型标签是主观语义，无法由全国BMI超重/肥胖率可靠映射；选择后只记录条件并把主人数解释为上界。',
   ),
   'education.level': policy(
-    'education.level', 'unquantified', 'do_not_apply', 'upper_bound',
+    'education.level', 'included_estimate', 'apply', 'estimate',
     ['evidence.education.level.census-2020'],
-    '证据表可直接提取，但完整18—50岁逐岁×性别机器表尚未进入运行时；在提取验收前禁止常量近似砍人。',
+    '七普表4-1直接提供18—50岁逐岁×性别×最高受教育程度人数；四个产品学历类别与原表互斥列一一对应，多选按并集相加。',
+    undefined,
+    'education_age_sex_direct',
   ),
   'economy.income': policy(
     'economy.income', 'research_only', 'do_not_apply', 'research_scenario_only',

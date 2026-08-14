@@ -1,0 +1,83 @@
+{
+  "dataVersion": "2026.08.14.1",
+  "publisher": "国家统计局、国务院第七次全国人口普查领导小组办公室",
+  "sourceTitle": "中国人口普查年鉴-2020 表4-1 全国分年龄、性别、受教育程度的3岁及以上人口",
+  "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/A0401.xls",
+  "companionImageUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/A0401.jpg",
+  "fillingInstructionsUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/fu06.pdf",
+  "sourceSha256": "89E5B9E95471DB7BD0128BD99DF330CF054A5820C6CB5CDBD46F2C1283B91A95",
+  "retrievedAt": "2026-08-14",
+  "referenceTime": "2020-11-01T00:00:00+08:00",
+  "geography": "中国大陆31省份；不含现役军人、港澳台居民和外籍人员",
+  "unit": "people",
+  "ageRange": { "min": 18, "max": 50 },
+  "sourceLayout": {
+    "worksheetIndex": 1,
+    "physicalRowsOneBased": true,
+    "ageRows": [30, 31, 34, 35, 36, 37, 38, 41, 42, 43, 44, 45, 48, 49, 50, 51, 52, 55, 56, 57, 58, 59, 62, 63, 64, 65, 66, 69, 70, 71, 72, 73, 76],
+    "fiveYearSummaryRows": [33, 40, 47, 54, 61, 68],
+    "columnTriples": {
+      "population": [2, 3, 4],
+      "junior_college": [20, 21, 22],
+      "bachelor": [23, 24, 25],
+      "master": [26, 27, 28],
+      "doctorate": [29, 30, 31]
+    },
+    "columnOrder": ["total", "male", "female"]
+  },
+  "categoryMapping": {
+    "junior_college": "大学专科",
+    "bachelor": "大学本科",
+    "master": "硕士研究生",
+    "doctorate": "博士研究生"
+  },
+  "notes": [
+    "数值直接读取官方A0401.xls，不使用OCR值；图片版仅用于版式抽检。",
+    "四个学历类别均为最高受教育程度的互斥类别；多选按并集相加，不把硕士或博士重复计入本科。",
+    "每行及完整五岁组均做总计=男+女、逐岁求和=原表五岁组的严格整数校验。",
+    "这是2020年人口普查时点存量；城市结果仍使用全国年龄×性别×学历结构外推，不是城市直接学历统计。"
+  ],
+  "rows": [
+    { "age": 18, "population": { "total": 14043179, "male": 7560195, "female": 6482984 }, "junior_college": { "total": 2916350, "male": 1481073, "female": 1435277 }, "bachelor": { "total": 2594245, "male": 1200184, "female": 1394061 }, "master": { "total": 2765, "male": 1504, "female": 1261 }, "doctorate": { "total": 217, "male": 172, "female": 45 } },
+    { "age": 19, "population": { "total": 14368955, "male": 7670204, "female": 6698751 }, "junior_college": { "total": 4175383, "male": 2120163, "female": 2055220 }, "bachelor": { "total": 3911536, "male": 1827800, "female": 2083736 }, "master": { "total": 4297, "male": 2258, "female": 2039 }, "doctorate": { "total": 815, "male": 548, "female": 267 } },
+    { "age": 20, "population": { "total": 14563347, "male": 7742857, "female": 6820490 }, "junior_college": { "total": 4108835, "male": 2088756, "female": 2020079 }, "bachelor": { "total": 4398833, "male": 2049637, "female": 2349196 }, "master": { "total": 9844, "male": 4633, "female": 5211 }, "doctorate": { "total": 1225, "male": 754, "female": 471 } },
+    { "age": 21, "population": { "total": 13935509, "male": 7389412, "female": 6546097 }, "junior_college": { "total": 3455154, "male": 1747441, "female": 1707713 }, "bachelor": { "total": 4181742, "male": 1942549, "female": 2239193 }, "master": { "total": 67261, "male": 28073, "female": 39188 }, "doctorate": { "total": 3394, "male": 1928, "female": 1466 } },
+    { "age": 22, "population": { "total": 15249809, "male": 8078183, "female": 7171626 }, "junior_college": { "total": 3635179, "male": 1812826, "female": 1822353 }, "bachelor": { "total": 3858873, "male": 1800590, "female": 2058283 }, "master": { "total": 329645, "male": 144688, "female": 184957 }, "doctorate": { "total": 12461, "male": 7073, "female": 5388 } },
+    { "age": 23, "population": { "total": 15325970, "male": 8103460, "female": 7222510 }, "junior_college": { "total": 3625315, "male": 1803000, "female": 1822315 }, "bachelor": { "total": 3316938, "male": 1547604, "female": 1769334 }, "master": { "total": 517923, "male": 226795, "female": 291128 }, "doctorate": { "total": 19363, "male": 10641, "female": 8722 } },
+    { "age": 24, "population": { "total": 15867040, "male": 8362083, "female": 7504957 }, "junior_college": { "total": 3634540, "male": 1808003, "female": 1826537 }, "bachelor": { "total": 3130661, "male": 1454194, "female": 1676467 }, "master": { "total": 554992, "male": 243934, "female": 311058 }, "doctorate": { "total": 31167, "male": 17002, "female": 14165 } },
+    { "age": 25, "population": { "total": 17146447, "male": 9042474, "female": 8103973 }, "junior_college": { "total": 3775525, "male": 1888867, "female": 1886658 }, "bachelor": { "total": 3255567, "male": 1515303, "female": 1740264 }, "master": { "total": 531633, "male": 234101, "female": 297532 }, "doctorate": { "total": 48366, "male": 26288, "female": 22078 } },
+    { "age": 26, "population": { "total": 16826988, "male": 8845171, "female": 7981817 }, "junior_college": { "total": 3539259, "male": 1780170, "female": 1759089 }, "bachelor": { "total": 3143163, "male": 1467380, "female": 1675783 }, "master": { "total": 453924, "male": 197127, "female": 256797 }, "doctorate": { "total": 57057, "male": 30851, "female": 26206 } },
+    { "age": 27, "population": { "total": 18298935, "male": 9588428, "female": 8710507 }, "junior_college": { "total": 3668005, "male": 1848480, "female": 1819525 }, "bachelor": { "total": 3268838, "male": 1536399, "female": 1732439 }, "master": { "total": 428147, "male": 185290, "female": 242857 }, "doctorate": { "total": 61574, "male": 33758, "female": 27816 } },
+    { "age": 28, "population": { "total": 19060645, "male": 9975395, "female": 9085250 }, "junior_college": { "total": 3648555, "male": 1841166, "female": 1807389 }, "bachelor": { "total": 3249955, "male": 1545193, "female": 1704762 }, "master": { "total": 404920, "male": 176299, "female": 228621 }, "doctorate": { "total": 59430, "male": 33186, "female": 26244 } },
+    { "age": 29, "population": { "total": 20514317, "male": 10710802, "female": 9803515 }, "junior_college": { "total": 3776087, "male": 1905746, "female": 1870341 }, "bachelor": { "total": 3262391, "male": 1566133, "female": 1696258 }, "master": { "total": 394781, "male": 174722, "female": 220059 }, "doctorate": { "total": 57103, "male": 32331, "female": 24772 } },
+    { "age": 30, "population": { "total": 25973082, "male": 13463923, "female": 12509159 }, "junior_college": { "total": 4581541, "male": 2297790, "female": 2283751 }, "bachelor": { "total": 3840266, "male": 1852089, "female": 1988177 }, "master": { "total": 473475, "male": 211668, "female": 261807 }, "doctorate": { "total": 65807, "male": 37704, "female": 28103 } },
+    { "age": 31, "population": { "total": 25451203, "male": 13094627, "female": 12356576 }, "junior_college": { "total": 4326115, "male": 2158830, "female": 2167285 }, "bachelor": { "total": 3623974, "male": 1750035, "female": 1873939 }, "master": { "total": 458505, "male": 207068, "female": 251437 }, "doctorate": { "total": 61138, "male": 35181, "female": 25957 } },
+    { "age": 32, "population": { "total": 24037711, "male": 12335076, "female": 11702635 }, "junior_college": { "total": 3965430, "male": 1981931, "female": 1983499 }, "bachelor": { "total": 3365450, "male": 1638607, "female": 1726843 }, "master": { "total": 421560, "male": 192942, "female": 228618 }, "doctorate": { "total": 55198, "male": 32245, "female": 22953 } },
+    { "age": 33, "population": { "total": 25946853, "male": 13315974, "female": 12630879 }, "junior_college": { "total": 4112686, "male": 2061671, "female": 2051015 }, "bachelor": { "total": 3506553, "male": 1726046, "female": 1780507 }, "master": { "total": 423926, "male": 199217, "female": 224709 }, "doctorate": { "total": 54590, "male": 32097, "female": 22493 } },
+    { "age": 34, "population": { "total": 22736341, "male": 11662208, "female": 11074133 }, "junior_college": { "total": 3445701, "male": 1736180, "female": 1709521 }, "bachelor": { "total": 3060030, "male": 1524401, "female": 1535629 }, "master": { "total": 370398, "male": 177524, "female": 192874 }, "doctorate": { "total": 48392, "male": 28699, "female": 19693 } },
+    { "age": 35, "population": { "total": 19586332, "male": 10077433, "female": 9508899 }, "junior_college": { "total": 2761283, "male": 1405792, "female": 1355491 }, "bachelor": { "total": 2571697, "male": 1300944, "female": 1270753 }, "master": { "total": 316568, "male": 155431, "female": 161137 }, "doctorate": { "total": 42030, "male": 24884, "female": 17146 } },
+    { "age": 36, "population": { "total": 19499941, "male": 10034259, "female": 9465682 }, "junior_college": { "total": 2617755, "male": 1339939, "female": 1277816 }, "bachelor": { "total": 2534112, "male": 1295006, "female": 1239106 }, "master": { "total": 322105, "male": 161492, "female": 160613 }, "doctorate": { "total": 43478, "male": 25887, "female": 17591 } },
+    { "age": 37, "population": { "total": 19063741, "male": 9815714, "female": 9248027 }, "junior_college": { "total": 2497223, "male": 1269428, "female": 1227795 }, "bachelor": { "total": 2450499, "male": 1252983, "female": 1197516 }, "master": { "total": 320890, "male": 163160, "female": 157730 }, "doctorate": { "total": 43727, "male": 26075, "female": 17652 } },
+    { "age": 38, "population": { "total": 21799284, "male": 11217120, "female": 10582164 }, "junior_college": { "total": 2770838, "male": 1403874, "female": 1366964 }, "bachelor": { "total": 2636198, "male": 1351779, "female": 1284419 }, "master": { "total": 349371, "male": 180014, "female": 169357 }, "doctorate": { "total": 49808, "male": 29627, "female": 20181 } },
+    { "age": 39, "population": { "total": 19063634, "male": 9787511, "female": 9276123 }, "junior_college": { "total": 2257925, "male": 1147522, "female": 1110403 }, "bachelor": { "total": 2027006, "male": 1046816, "female": 980190 }, "master": { "total": 268885, "male": 142580, "female": 126305 }, "doctorate": { "total": 41915, "male": 25019, "female": 16896 } },
+    { "age": 40, "population": { "total": 17540717, "male": 8997291, "female": 8543426 }, "junior_college": { "total": 1960755, "male": 1004401, "female": 956354 }, "bachelor": { "total": 1678040, "male": 871706, "female": 806334 }, "master": { "total": 217879, "male": 118175, "female": 99704 }, "doctorate": { "total": 36876, "male": 22115, "female": 14761 } },
+    { "age": 41, "population": { "total": 19339617, "male": 9934985, "female": 9404632 }, "junior_college": { "total": 1996503, "male": 1028075, "female": 968428 }, "bachelor": { "total": 1626100, "male": 851285, "female": 774815 }, "master": { "total": 205732, "male": 115512, "female": 90220 }, "doctorate": { "total": 37645, "male": 22825, "female": 14820 } },
+    { "age": 42, "population": { "total": 18564211, "male": 9492205, "female": 9072006 }, "junior_college": { "total": 1827912, "male": 946913, "female": 880999 }, "bachelor": { "total": 1441583, "male": 758429, "female": 683154 }, "master": { "total": 169803, "male": 97332, "female": 72471 }, "doctorate": { "total": 32723, "male": 20001, "female": 12722 } },
+    { "age": 43, "population": { "total": 17758286, "male": 9097039, "female": 8661247 }, "junior_college": { "total": 1620059, "male": 847440, "female": 772619 }, "bachelor": { "total": 1239330, "male": 660452, "female": 578878 }, "master": { "total": 136641, "male": 80096, "female": 56545 }, "doctorate": { "total": 27322, "male": 16900, "female": 10422 } },
+    { "age": 44, "population": { "total": 19752499, "male": 10111174, "female": 9641325 }, "junior_college": { "total": 1660949, "male": 882510, "female": 778439 }, "bachelor": { "total": 1236699, "male": 676192, "female": 560507 }, "master": { "total": 126365, "male": 76658, "female": 49707 }, "doctorate": { "total": 25805, "male": 16456, "female": 9349 } },
+    { "age": 45, "population": { "total": 20259918, "male": 10335133, "female": 9924785 }, "junior_college": { "total": 1577675, "male": 843558, "female": 734117 }, "bachelor": { "total": 1139879, "male": 631245, "female": 508634 }, "master": { "total": 111642, "male": 69175, "female": 42467 }, "doctorate": { "total": 22803, "male": 14580, "female": 8223 } },
+    { "age": 46, "population": { "total": 22208985, "male": 11305313, "female": 10903672 }, "junior_college": { "total": 1592650, "male": 860616, "female": 732034 }, "bachelor": { "total": 1122553, "male": 634143, "female": 488410 }, "master": { "total": 106530, "male": 67249, "female": 39281 }, "doctorate": { "total": 22444, "male": 14618, "female": 7826 } },
+    { "age": 47, "population": { "total": 23233417, "male": 11844299, "female": 11389118 }, "junior_college": { "total": 1589157, "male": 863887, "female": 725270 }, "bachelor": { "total": 1113939, "male": 633917, "female": 480022 }, "master": { "total": 107525, "male": 67986, "female": 39539 }, "doctorate": { "total": 22638, "male": 14661, "female": 7977 } },
+    { "age": 48, "population": { "total": 23862010, "male": 12147117, "female": 11714893 }, "junior_college": { "total": 1527504, "male": 838966, "female": 688538 }, "bachelor": { "total": 1052699, "male": 607573, "female": 445126 }, "master": { "total": 96726, "male": 62363, "female": 34363 }, "doctorate": { "total": 20189, "male": 13324, "female": 6865 } },
+    { "age": 49, "population": { "total": 24660557, "male": 12559824, "female": 12100733 }, "junior_college": { "total": 1466054, "male": 806796, "female": 659258 }, "bachelor": { "total": 1008195, "male": 583593, "female": 424602 }, "master": { "total": 89743, "male": 58107, "female": 31636 }, "doctorate": { "total": 18409, "male": 12350, "female": 6059 } },
+    { "age": 50, "population": { "total": 26062036, "male": 13149971, "female": 12912065 }, "junior_college": { "total": 1423796, "male": 787914, "female": 635882 }, "bachelor": { "total": 963622, "male": 563837, "female": 399785 }, "master": { "total": 81787, "male": 53554, "female": 28233 }, "doctorate": { "total": 16574, "male": 11366, "female": 5208 } }
+  ],
+  "fiveYearChecks": [
+    { "minAge": 20, "maxAge": 24, "population": { "total": 74941675, "male": 39675995, "female": 35265680 }, "junior_college": { "total": 18459023, "male": 9260026, "female": 9198997 }, "bachelor": { "total": 18887047, "male": 8794574, "female": 10092473 }, "master": { "total": 1479665, "male": 648123, "female": 831542 }, "doctorate": { "total": 67610, "male": 37398, "female": 30212 } },
+    { "minAge": 25, "maxAge": 29, "population": { "total": 91847332, "male": 48162270, "female": 43685062 }, "junior_college": { "total": 18407431, "male": 9264429, "female": 9143002 }, "bachelor": { "total": 16179914, "male": 7630408, "female": 8549506 }, "master": { "total": 2213405, "male": 967539, "female": 1245866 }, "doctorate": { "total": 283530, "male": 156414, "female": 127116 } },
+    { "minAge": 30, "maxAge": 34, "population": { "total": 124145190, "male": 63871808, "female": 60273382 }, "junior_college": { "total": 20431473, "male": 10236402, "female": 10195071 }, "bachelor": { "total": 17396273, "male": 8491178, "female": 8905095 }, "master": { "total": 2147864, "male": 988419, "female": 1159445 }, "doctorate": { "total": 285125, "male": 165926, "female": 119199 } },
+    { "minAge": 35, "maxAge": 39, "population": { "total": 99012932, "male": 50932037, "female": 48080895 }, "junior_college": { "total": 12905024, "male": 6566555, "female": 6338469 }, "bachelor": { "total": 12219512, "male": 6247528, "female": 5971984 }, "master": { "total": 1577819, "male": 802677, "female": 775142 }, "doctorate": { "total": 220958, "male": 131492, "female": 89466 } },
+    { "minAge": 40, "maxAge": 44, "population": { "total": 92955330, "male": 47632694, "female": 45322636 }, "junior_college": { "total": 9066178, "male": 4709339, "female": 4356839 }, "bachelor": { "total": 7221752, "male": 3818064, "female": 3403688 }, "master": { "total": 856420, "male": 487773, "female": 368647 }, "doctorate": { "total": 160371, "male": 98297, "female": 62074 } },
+    { "minAge": 45, "maxAge": 49, "population": { "total": 114224887, "male": 58191686, "female": 56033201 }, "junior_college": { "total": 7753040, "male": 4213823, "female": 3539217 }, "bachelor": { "total": 5437265, "male": 3090471, "female": 2346794 }, "master": { "total": 512166, "male": 324880, "female": 187286 }, "doctorate": { "total": 106483, "male": 69533, "female": 36950 } }
+  ]
+}

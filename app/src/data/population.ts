@@ -15,6 +15,8 @@ export interface PopulationByAgeRow {
 /**
  * Direct rows from Seventh Census table A0301, not a five-year-band average.
  * 18–50 are all present and each row is checked below for total=male+female.
+ * Detailed census tables cover the 31 provinces and exclude the separately
+ * reported 2,000,000 active servicemembers.
  */
 export const POPULATION_BY_AGE: readonly PopulationByAgeRow[] = populationByAgeJson.rows
 const populationByAge = new Map(POPULATION_BY_AGE.map((row) => [row.age, row]))
@@ -24,11 +26,14 @@ const populationByAge = new Map(POPULATION_BY_AGE.map((row) => [row.age, row]))
 // for a 2020 single-age numerator because that silently mixes denominators.
 export const NATIONAL_POPULATION_WAN = 140_489
 
-// Seventh Census mainland total. A supported city's current resident anchor
-// is multiplied by the 2020 target age/sex/marital share of this total. This
+// Seventh Census 31-province total, matching the A0301/A0401 detailed-table
+// universe. The separate 2,000,000 active servicemembers are deliberately not
+// in this divisor because they are absent from the single-age numerators.
+// A supported city's current resident anchor is multiplied by the 2020 target
+// age/sex/marital/education share of this total. This
 // still assumes the city has the national demographic shape, so city results
 // remain C-grade sensitivity estimates rather than direct city counts.
-export const CENSUS_2020_MAINLAND_POPULATION_WAN = 141_177.8724
+export const CENSUS_2020_MAINLAND_POPULATION_WAN = 140_977.8724
 
 export function populationWanAtAge(age: number): number {
   if (!Number.isInteger(age) || age < MIN_MODEL_AGE || age > MAX_MODEL_AGE) return 0

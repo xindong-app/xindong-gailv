@@ -294,8 +294,11 @@ describe('v3 range and result-state integrity', () => {
     )
     expect(extreme.population.status).toBe('upper_bound')
     expect(extreme.coverage.unquantifiedHardConditions.map((item) => item.dimensionId)).toEqual(
-      expect.arrayContaining(['economy.income', 'economy.wealth', 'education.level']),
+      expect.arrayContaining(['economy.income', 'economy.wealth']),
     )
+    expect(extreme.coverage.unquantifiedHardConditions.map((item) => item.dimensionId))
+      .not.toContain('education.level')
+    expect(extreme.coverage.includedHardConditions).toContain('education.level')
     expect(extreme.population.display).toContain('未计入')
     expect(extreme.population.display).not.toMatch(/现实中(?:约|为)?\s*0\s*人/)
   })

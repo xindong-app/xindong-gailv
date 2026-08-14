@@ -126,9 +126,9 @@ describe('registered 2025 anchors', () => {
     const national2025Calibration = evidenceById('evidence.base.region.population-2025')
 
     expect(NATIONAL_POPULATION_WAN).toBe(140_489)
-    expect(CENSUS_2020_MAINLAND_POPULATION_WAN).toBe(141_177.8724)
+    expect(CENSUS_2020_MAINLAND_POPULATION_WAN).toBe(140_977.8724)
     expect(censusDenominator?.estimate.unit).toBe('people')
-    expect(censusDenominator?.estimate.baseline).toBe(1_411_778_724)
+    expect(censusDenominator?.estimate.baseline).toBe(1_409_778_724)
     expect(censusDenominator!.estimate.baseline! / 10_000).toBe(CENSUS_2020_MAINLAND_POPULATION_WAN)
     expect(censusDenominator?.modelUse).toBe('direct')
     expect(national2025Calibration?.estimate.baseline).toBe(NATIONAL_POPULATION_WAN * 10_000)
@@ -155,8 +155,8 @@ describe('registered 2025 anchors', () => {
     for (const city of supportedCities) {
       const evidence = evidenceById(city.sourceEvidenceId!)
       expect(evidence?.modelUse, city.name).toBe('anchor')
-      expect(evidence?.transformation, city.name).toContain('141,177.8724万人')
-      expect(evidence?.transformation, city.name).toContain('1,411,778,724人')
+      expect(evidence?.transformation, city.name).toContain('140,977.8724万人')
+      expect(evidence?.transformation, city.name).toContain('1,409,778,724人')
       expect(evidence?.transformation, city.name).toContain('2025全国人口只作宏观校准')
       expect(evidence?.transformation, city.name).toContain('不参与该比例')
       expect(cityPopulationScale([city.name]), city.name)

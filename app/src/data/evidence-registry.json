@@ -1,6 +1,6 @@
 {
-  "dataVersion": "2026.08.14",
-  "modelVersion": "3.0.0",
+  "dataVersion": "2026.08.14.1",
+  "modelVersion": "3.1.0",
   "retrievedAt": "2026-08-14",
   "methodology": {
     "scope": "中国大陆、18—50岁成年人；人口估算以常住人口和人口普查/抽样调查口径为主。",
@@ -22,7 +22,7 @@
       "id": "evidence.base.age.census-2020-single-year",
       "dimensionId": "base.age",
       "dimensionName": "单岁年龄人口",
-      "definition": "2020年11月1日中国大陆31省份和现役军人中，各周岁年龄、性别的人口数。",
+      "definition": "2020年11月1日中国大陆31省份中，各周岁年龄、性别的人口数；详细表不含另表列示的现役军人。",
       "classification": "hard",
       "applicablePopulation": "中国大陆常住人口（不含港澳台居民和外籍人员）",
       "geography": "中国大陆31省份",
@@ -31,9 +31,9 @@
       "dataYear": "2020-11-01",
       "publisher": "国家统计局、国务院第七次全国人口普查领导小组办公室",
       "sourceTitle": "中国人口普查年鉴-2020 表3-1 全国分年龄、性别的人口",
-      "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/A0301.jpg",
-      "retrievedAt": "2026-08-13",
-      "denominator": "普查登记的中国大陆人口；表内单位为人",
+      "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/A0301.xls",
+      "retrievedAt": "2026-08-14",
+      "denominator": "普查登记的中国大陆31省份人口；不含另表列示的200万现役军人；表内单位为人",
       "directValue": "18岁：14,043,179人；19岁：14,368,955人；20—24岁：74,941,675人；25—29岁：91,847,332人；30—34岁：124,145,190人；35—39岁：99,012,932人；40—44岁：92,955,330人；45—49岁：114,224,887人；50岁：26,062,036人。完整18—50岁逐岁、分性别整数见population-by-age.json。",
       "transformation": "逐行读取18—50岁单岁总人口、男性和女性人数；任意年龄区间为闭区间逐岁求和，不做5岁组均分。",
       "adjustments": [
@@ -43,12 +43,12 @@
       "estimate": { "baseline": 14043179, "optimistic": 14043179, "conservative": 14043179, "unit": "people" },
       "grade": "A",
       "limitations": [
-        "公开机器表是图片；逐岁整数已抄录到population-by-age.json，仍需用年龄连续性、男女求和及原表5岁组汇总做校验测试。",
+        "逐岁整数由官方A0301.xls进入population-by-age.json，并用年龄连续性、男女求和及原表5岁组汇总做校验测试。",
         "2020后各 cohort 的迁移、死亡和跨地区流动未由本表直接覆盖。",
         "estimate字段仅用18岁人口作机器可读示例，模型应读取population-by-age.json完整单岁数组。"
       ],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "direct"
     },
     {
@@ -76,8 +76,8 @@
         "公报没有18—50岁单岁数据。",
         "2025年11月1日时点与2025年末公报时点不同，二者总量不可直接判为矛盾。"
       ],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "calibration"
     },
     {
@@ -97,43 +97,46 @@
       "retrievedAt": "2026-08-13",
       "denominator": "年末全国人口，不含港澳台",
       "directValue": "总人口140,489万人；城镇95,380万人（67.9%）；乡村45,109万人；就业人员72,504万人，其中城镇就业47,535万人。",
-      "transformation": "本条只用于2025年全国场景的宏观总量校准；城市18—50岁年龄×性别份额不以本条为分母。城市计算固定使用2020七普大陆人口1,411,778,724人（141,177.8724万人）作份额分母。",
+      "transformation": "本条只用于2025年全国场景的宏观总量校准；城市18—50岁年龄×性别份额不以本条为分母。城市计算固定使用与A0301/A0401分子同口径的2020七普31省份人口1,409,778,724人（140,977.8724万人）作份额分母。",
       "adjustments": ["多城市人口池按城市常住人口求和并去除重复城市；不再额外乘全国城镇化率。"],
       "estimate": { "baseline": 1404890000, "optimistic": 1404890000, "conservative": 1404890000, "unit": "people" },
       "grade": "A",
       "limitations": ["本条不含市级人口；各城市仍需逐市统计公报和年份字段。", "2025年末总量与2020七普单岁分子不是同一时点，禁止用140,489万人除2020单岁人口。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "calibration"
     },
     {
       "id": "evidence.base.region.census-mainland-total-2020",
       "dimensionId": "base.region",
-      "dimensionName": "2020七普大陆人口份额分母",
-      "definition": "2020年11月1日零时，第七次全国人口普查登记的大陆31个省、自治区、直辖市和现役军人总人口；用于把同次普查的目标年龄×性别人数转换为全国人口份额。",
+      "dimensionName": "2020七普详细表同口径人口份额分母",
+      "definition": "2020年11月1日零时，七普表3-1/4-1覆盖的大陆31个省、自治区、直辖市人口；用于把同一人口宇宙的目标年龄×性别×学历人数转换为全国人口份额。",
       "classification": "hard",
-      "applicablePopulation": "大陆31个省、自治区、直辖市和现役军人，不含居住在大陆31省份的港澳台居民和外籍人员",
-      "geography": "中国大陆31省份和现役军人",
+      "applicablePopulation": "大陆31个省、自治区、直辖市人口；不含另表列示的现役军人、港澳台居民和外籍人员",
+      "geography": "中国大陆31省份",
       "ageRange": { "min": 0, "max": null },
       "sexBasis": "both",
       "dataYear": "2020-11-01",
       "publisher": "国家统计局、国务院第七次全国人口普查领导小组办公室",
-      "sourceTitle": "第七次全国人口普查公报（第二号）——全国人口情况",
-      "sourceUrl": "https://www.stats.gov.cn/sj/tjgb/rkpcgb/qgrkpcgb/202302/t20230206_1902002.html",
+      "sourceTitle": "中国人口普查年鉴-2020 表3-1 全国分年龄、性别的人口",
+      "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/A0301.xls",
       "retrievedAt": "2026-08-14",
-      "denominator": "普查登记的大陆31省、自治区、直辖市和现役军人；不含港澳台人口，也不含居住在大陆31省份的港澳台居民和外籍人员",
-      "directValue": "公报直接值为1,411,778,724人；精确换算为141,177.8724万人。",
-      "transformation": "CENSUS_2020_MAINLAND_POPULATION_WAN=1,411,778,724÷10,000=141,177.8724万人。城市基础池（人）=2020七普目标年龄×性别人数×城市官方年末常住人口（万人）÷141,177.8724万人；2025全国人口只作宏观校准，不参与该比例。",
-      "adjustments": ["多城市先按城市名去重，再对已登记的官方年末常住人口锚点求和；无可追溯锚点的城市不以0人代算。"],
-      "estimate": { "baseline": 1411778724, "optimistic": 1411778724, "conservative": 1411778724, "unit": "people" },
+      "denominator": "A0301/A0401详细表覆盖的大陆31省份人口；不含另表列示的200万现役军人、港澳台居民和外籍人员",
+      "directValue": "A0301总计行直接值为1,409,778,724人；精确换算为140,977.8724万人。七普公报含现役军人的全国总数1,411,778,724人不用于详细表份额分母。",
+      "transformation": "CENSUS_2020_MAINLAND_POPULATION_WAN=1,409,778,724÷10,000=140,977.8724万人。城市基础池（人）=2020七普目标年龄×性别人数×城市官方年末常住人口（万人）÷140,977.8724万人；2025全国人口只作宏观校准，不参与该比例。",
+      "adjustments": [
+        "多城市先按城市名去重，再对已登记的官方年末常住人口锚点求和；无可追溯锚点的城市不以0人代算。",
+        "现役军人另表虽有学历汇总，但没有18—50岁逐岁×性别×学历联合格，故不混入A0301/A0401详细表分子或分母。"
+      ],
+      "estimate": { "baseline": 1409778724, "optimistic": 1409778724, "conservative": 1409778724, "unit": "people" },
       "grade": "A",
       "limitations": [
-        "本条是2020七普初步汇总总人口，只作为同次普查年龄×性别人数的份额分母，不表示任一城市在2020年或2025年的人口。",
+        "本条是2020七普详细表31省份人口宇宙，只作为同次普查年龄×性别×学历人数的份额分母，不表示任一城市在2020年或2025年的人口。",
         "把当前城市常住人口乘以2020全国年龄×性别份额，隐含城市人口结构与2020全国相同；城市结果因此保持C级结构外推。",
         "城市0.70—1.30宽情景倍数用于披露结构不确定性，不是本条直接人口总数的统计误差或置信区间。"
       ],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "direct"
     },
     {
@@ -158,8 +161,8 @@
       "estimate": { "baseline": 0.5103, "optimistic": 0.5103, "conservative": 0.5103, "unit": "share" },
       "grade": "A",
       "limitations": ["全龄性别结构不能代替某个年龄或某个城市的性别结构。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "calibration"
     },
     {
@@ -193,8 +196,8 @@
         "estimate字段仅示例30—34岁男性未婚率；运行表粒度是性别×5岁组，不是单岁。",
         "18–19岁借用15–19岁组，50岁借用50—54岁组；启用婚史且触及边界时运行等级降为C。"
       ],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -222,8 +225,8 @@
         "公开公报给出均值但不在同一表给标准差；正态分布与标准差属于另一个证据条目/模型假设。",
         "监测样本与常住人口普查分母不同，地域差异未进入当前全国锚点。"
       ],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -248,8 +251,8 @@
       "estimate": { "baseline": 169.7, "optimistic": 169.7, "conservative": 169.7, "unit": "cm" },
       "grade": "A",
       "limitations": ["不同监测体系、抽样框和年龄加权使其与体育总局均值不可直接判为冲突。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "calibration"
     },
     {
@@ -277,8 +280,8 @@
         "标准差尚未从可公开逐项核验的同口径官方表直接提取。",
         "正态近似对极端身高尾部尤其敏感；超过约3个标准差时可信度应降级。"
       ],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -303,8 +306,8 @@
       "estimate": { "baseline": 0.164, "optimistic": 0.164, "conservative": 0.164, "unit": "share" },
       "grade": "A",
       "limitations": ["全龄、男女合计口径不能直接代表具体年龄性别。", "BMI不是人的价值或单独健康结论。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -313,27 +316,31 @@
       "dimensionName": "年龄×性别×受教育程度",
       "definition": "2020年人口普查按单岁年龄、性别和最高受教育程度汇总的3岁及以上人口。",
       "classification": "correlated_hard",
-      "applicablePopulation": "中国大陆3岁及以上人口",
+      "applicablePopulation": "中国大陆31省份3岁及以上人口；不含另表列示的现役军人",
       "geography": "中国大陆31省份",
       "ageRange": { "min": 18, "max": 50 },
       "sexBasis": "male_female_separate",
       "dataYear": "2020-11-01",
       "publisher": "国家统计局、国务院第七次全国人口普查领导小组办公室",
       "sourceTitle": "中国人口普查年鉴-2020 表4-1 全国分年龄、性别、受教育程度的3岁及以上人口",
-      "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/A0401.jpg",
-      "retrievedAt": "2026-08-13",
-      "denominator": "普查短表全部人口；按年龄和性别分层",
-      "directValue": "原表提供未上过学、小学、初中、高中、大学专科、大学本科、研究生等人数；模型参数必须从相应年龄和性别单元格计算。",
-      "transformation": "每个年龄×性别层内，学历比例=所选互斥学历人数之和÷该层总人数。专科、本科、研究生为互斥最高学历类别；“本科及以上”才可求和。",
+      "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/A0401.xls",
+      "retrievedAt": "2026-08-14",
+      "denominator": "七普A0401详细表的中国大陆31省份人口；按单岁年龄和性别分层，不含另表列示的现役军人",
+      "directValue": "原表分别提供大学专科、大学本科、硕士研究生、博士研究生的单岁×性别人数；18—50岁四类合计190,366,735人，其中专科95,537,698、本科84,811,166、硕士8,876,188、博士1,141,683。",
+      "transformation": "education-by-age.json保存权威全量表；generate-education-runtime.ts生成同值紧凑投影，validate:model逐格拒绝陈旧投影。运行逐岁读取education-runtime.json，在每个年龄×性别层内计算所选互斥最高受教育程度人数之和÷该层总人数；空选不筛选。产品中的“本科”是本科精确类别，不自动包含硕士、博士；如需本科及以上，必须显式多选。",
       "adjustments": [
-        "优先直接按年龄与性别分层，不再用一个全国常数乘任意年龄的cohort修正。",
+        "直接按年龄与性别分层，不再用一个全国常数乘任意年龄的cohort修正。",
         "学历与收入/职业组成经济社会簇；联合模型不得先乘学历边际率再乘无条件收入边际率。"
       ],
       "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
       "grade": "A",
-      "limitations": ["研究生未在主表拆分硕士与博士；硕士/博士必须另用教育行政数据或降级。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "limitations": [
+        "这是2020年11月1日普查时点存量，不是当前年度实时学历结构。",
+        "普查填写说明将普通高校在校、毕业、肄业或辍学按已达到层级登记；成人或在职非全日在校及肄业者按原学历登记，因此产品口径是最高受教育程度，不等同于已获学位或毕业证。",
+        "A0401已明确拆分硕士和博士；但城市缺少同口径单岁×性别×学历表，城市结果仍沿用全国结构并由地域组降为C级。"
+      ],
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "direct"
     },
     {
@@ -358,8 +365,8 @@
       "estimate": { "baseline": 272330000, "optimistic": 272330000, "conservative": 272330000, "unit": "people" },
       "grade": "A",
       "limitations": ["公报中的大学人口分母含各年龄；不能直接当作适婚年龄大学率。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "calibration"
     },
     {
@@ -384,8 +391,8 @@
       "estimate": { "baseline": 48725700, "optimistic": 48725700, "conservative": 48725700, "unit": "people" },
       "grade": "A",
       "limitations": ["包含成人、网络、自考等多种形式的在学规模；存在学制跨年和重复口径风险。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "calibration"
     },
     {
@@ -410,8 +417,8 @@
       "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
       "grade": "C",
       "limitations": ["985/211已不是当前建设体系的正式新招生分类。", "不能与本科率和收入率重复连乘。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "excluded"
     },
     {
@@ -443,8 +450,8 @@
         "不包括个体工商户和自由职业者，且单位类别统计口径2023年起调整。",
         "该条虽为A级官方均值，仍不支持产品的个人收入阈值概率；A级来源不自动产生A级转换。"
       ],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -469,8 +476,8 @@
       "estimate": { "baseline": 36231, "optimistic": 43377, "conservative": 36231, "unit": "cny_per_year" },
       "grade": "A",
       "limitations": ["个人劳动税前年收入、家庭人均可支配收入、单位平均工资是三种不同概念。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "calibration"
     },
     {
@@ -495,8 +502,8 @@
       "estimate": { "baseline": 60900, "optimistic": 69288, "conservative": 52512, "unit": "cny_per_year" },
       "grade": "B",
       "limitations": ["月均收入按从业时间计算，年化隐含全年从业12个月；农民工不是全部灵活就业者。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "calibration"
     },
     {
@@ -528,8 +535,8 @@
         "2019以后房价、金融资产和负债变化较大；不代表2026当前资产。",
         "当前URL是二次发布页而非人民银行持久原文，来源链不满足生产级量化要求。"
       ],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -554,8 +561,8 @@
       "estimate": { "baseline": 0.563, "optimistic": 0.7, "conservative": 0.45, "unit": "log_scale_sd" },
       "grade": "C",
       "limitations": ["该数是对数资产尺度的标准差情景，不是人口比例。", "极富家庭抽样不足会显著影响高门槛。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -583,8 +590,8 @@
       "estimate": { "baseline": 0.96, "optimistic": 0.96, "conservative": 0.96, "unit": "share" },
       "grade": "A",
       "limitations": ["不支持旧模型的‘城镇青年本地有房55%’；55%至多是待替换的C级假设。", "家庭住房可能属于父母或位于异地。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "calibration"
     },
     {
@@ -609,8 +616,8 @@
       "estimate": { "baseline": 0.45, "optimistic": 0.6, "conservative": 0.3, "unit": "share" },
       "grade": "C",
       "limitations": ["全国不同城市差异巨大。", "个人产权、家庭可用住房、本地住房语义需在UI明确。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -635,8 +642,8 @@
       "estimate": { "baseline": 52.9, "optimistic": 52.9, "conservative": 52.9, "unit": "vehicles_per_100_households" },
       "grade": "A",
       "limitations": ["辆/百户不等于拥有汽车的家庭比例，更不是个人本人名下有车率。", "不能支持旧模型CAR_RATE=42%的个人拥有率。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "calibration"
     },
     {
@@ -661,8 +668,8 @@
       "estimate": { "baseline": 0.35, "optimistic": 0.48, "conservative": 0.24, "unit": "share" },
       "grade": "C",
       "limitations": ["一户多车、家庭共用、未登记实际使用者都会造成换算偏差。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -687,8 +694,8 @@
       "estimate": { "baseline": 0.561, "optimistic": 0.561, "conservative": 0.561, "unit": "share" },
       "grade": "B",
       "limitations": ["estimate仅示例男性不吸烟率。", "全龄率不含年龄细分；电子烟定义需核对报告。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "direct"
     },
     {
@@ -713,8 +720,8 @@
       "estimate": { "baseline": 0.203, "optimistic": 0.222, "conservative": 0.184, "unit": "share" },
       "grade": "C",
       "limitations": ["公开年龄组不与产品18—50边界完全一致，不能作为逐单岁直接率。", "公开结果没有年龄×性别联合单元格；运行时raking近似不能显示为B级直接率。", "自报饮酒存在回忆与社会期许偏差；过去30天、过去12个月、重度间歇饮酒是不同指标。", "旧模型男性58.4%、女性18.7%及规律饮酒参数已被更近期同口径来源替换，不得继续混用。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -739,8 +746,8 @@
       "estimate": { "baseline": 0.372, "optimistic": 0.372, "conservative": 0.372, "unit": "share" },
       "grade": "A",
       "limitations": ["该发布会未在摘要中列年龄、性别和地区细分。", "2025年官方报道为7岁及以上38.52%，口径与成年人筛选仍需核对后再替换。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -765,8 +772,8 @@
       "estimate": { "baseline": 0.232, "optimistic": 0.232, "conservative": 0.232, "unit": "share" },
       "grade": "A",
       "limitations": ["旧模型单岁无慢性病曲线并非论文直接给出。", "诊断阈值变化会改变流行率。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "calibration"
     },
     {
@@ -791,8 +798,8 @@
       "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
       "grade": "C",
       "limitations": ["病种集合不清会造成严重语义误导。", "健康属于敏感信息，默认不分享。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "excluded"
     },
     {
@@ -817,8 +824,8 @@
       "estimate": { "baseline": 0.81, "optimistic": 0.842, "conservative": 0.772, "unit": "share" },
       "grade": "B",
       "limitations": ["异质性高；不同量表和阈值并不完全等价。", "不能把失眠诊断、失眠症状和睡眠质量差混成同一指标。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -843,8 +850,8 @@
       "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
       "grade": "C",
       "limitations": ["明显cohort、城乡、教育和诊断方法差异。", "应优先作为软偏好，或要求用户定义是否包括矫正后视力。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "excluded"
     },
     {
@@ -869,8 +876,8 @@
       "estimate": { "baseline": 0.867, "optimistic": 0.867, "conservative": 0.867, "unit": "share" },
       "grade": "B",
       "limitations": ["六城市并非全国概率样本。", "estimate示例为30—39岁男性无AGA比例。", "外貌/身体条件文案不得羞辱。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -895,8 +902,8 @@
       "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
       "grade": "D",
       "limitations": ["主观、文化依赖，且容易与AGA重复。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "excluded"
     },
     {
@@ -921,8 +928,8 @@
       "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
       "grade": "D",
       "limitations": ["年龄和染发行为会使定义不可观测。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "excluded"
     },
     {
@@ -947,8 +954,8 @@
       "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
       "grade": "C",
       "limitations": ["目标年龄不符。", "迁出可信人口估算，保留为软偏好。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "excluded"
     },
     {
@@ -973,8 +980,8 @@
       "estimate": { "baseline": 0.747, "optimistic": 0.747, "conservative": 0.747, "unit": "share" },
       "grade": "B",
       "limitations": ["敏感健康信息；默认不持久化、不分享。", "estimate示例为30—39岁无ED补集，不适用于女性。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "excluded"
     },
     {
@@ -999,8 +1006,8 @@
       "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
       "grade": "D",
       "limitations": ["产品文案不是医学诊断。", "默认折叠且不分享。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "excluded"
     },
     {
@@ -1025,8 +1032,8 @@
       "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
       "grade": "D",
       "limitations": ["当前关系状态变化快，调查定义不统一。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "excluded"
     },
     {
@@ -1051,8 +1058,8 @@
       "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
       "grade": "D",
       "limitations": ["高度敏感；禁止羞辱和强迫二元分类。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "excluded"
     },
     {
@@ -1077,8 +1084,8 @@
       "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
       "grade": "D",
       "limitations": ["技能、频率和意愿是不同问题。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "excluded"
     },
     {
@@ -1103,8 +1110,8 @@
       "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
       "grade": "D",
       "limitations": ["涉及家庭敏感经济信息，默认不分享。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "excluded"
     },
     {
@@ -1129,8 +1136,8 @@
       "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
       "grade": "D",
       "limitations": ["18岁与50岁经历完全不同的生育政策cohort。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "excluded"
     },
     {
@@ -1155,8 +1162,8 @@
       "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
       "grade": "C",
       "limitations": ["‘体制内’不是标准统计分类，国企是否计入也常有歧义。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "excluded"
     },
     {
@@ -1181,8 +1188,8 @@
       "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
       "grade": "D",
       "limitations": ["可见/不可见、面积和文化场景使定义不统一。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "excluded"
     },
     {
@@ -1207,8 +1214,8 @@
       "estimate": { "baseline": null, "optimistic": null, "conservative": null, "unit": "share" },
       "grade": "D",
       "limitations": ["自我报告、测量稳定性和样本选择偏差。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "excluded"
     },
     {
@@ -1233,8 +1240,8 @@
       "estimate": { "baseline": 0.083333, "optimistic": 0.083333, "conservative": 0.083333, "unit": "share" },
       "grade": "D",
       "limitations": ["出生季节不均匀；星座无择偶成功预测含义。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "excluded"
     },
     {
@@ -1254,13 +1261,13 @@
       "retrievedAt": "2026-08-14",
       "denominator": "南京市行政区域年末常住人口",
       "directValue": "2025年末常住人口963.85万人，其中城镇人口843.37万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×963.85万人÷141,177.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,411,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×963.85万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
       "adjustments": ["城市年龄性别结构没有逐岁直表，采用0.70—1.30宽情景倍数；该范围不是统计置信区间。"],
       "estimate": { "baseline": 963.85, "optimistic": 963.85, "conservative": 963.85, "unit": "wan" },
       "grade": "A",
       "limitations": ["官方公报网页正文以DOCX附件发布；登记值已从官方附件复核。", "全国年龄性别份额不能反映南京高校人口和迁移结构。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -1280,13 +1287,13 @@
       "retrievedAt": "2026-08-14",
       "denominator": "西安市行政区域年末常住人口",
       "directValue": "2025年末常住人口1323.63万人，其中城镇常住人口1072.27万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1323.63万人÷141,177.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,411,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1323.63万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
       "adjustments": ["城市年龄性别结构采用0.70—1.30宽情景倍数；不是统计置信区间。"],
       "estimate": { "baseline": 1323.63, "optimistic": 1323.63, "conservative": 1323.63, "unit": "wan" },
       "grade": "A",
       "limitations": ["公报未给18—50岁逐岁×性别结构。", "行政区常住人口不等于中心城区或都市圈人口。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -1306,13 +1313,13 @@
       "retrievedAt": "2026-08-14",
       "denominator": "重庆市行政区域年末常住人口",
       "directValue": "2025年末常住人口3187.26万人，其中城镇常住人口2327.34万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×3187.26万人÷141,177.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,411,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×3187.26万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
       "adjustments": ["城市年龄性别结构采用0.70—1.30宽情景倍数；不是统计置信区间。"],
       "estimate": { "baseline": 3187.26, "optimistic": 3187.26, "conservative": 3187.26, "unit": "wan" },
       "grade": "A",
       "limitations": ["重庆行政范围广、城乡差异显著，全国年龄结构外推误差可能高于一般中心城市。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -1332,13 +1339,13 @@
       "retrievedAt": "2026-08-14",
       "denominator": "天津市行政区域年末常住人口",
       "directValue": "2025年末常住人口1363万人，其中城镇常住人口1175万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1363万人÷141,177.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,411,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1363万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
       "adjustments": ["城市年龄性别结构采用0.70—1.30宽情景倍数；不是统计置信区间。"],
       "estimate": { "baseline": 1363, "optimistic": 1363, "conservative": 1363, "unit": "wan" },
       "grade": "A",
       "limitations": ["公报未给18—50岁逐岁×性别结构。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -1358,13 +1365,13 @@
       "retrievedAt": "2026-08-14",
       "denominator": "郑州市行政区域年末常住人口",
       "directValue": "2025年末常住人口1313.8万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1313.8万人÷141,177.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,411,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1313.8万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
       "adjustments": ["城市年龄性别结构采用0.70—1.30宽情景倍数；不是统计置信区间。"],
       "estimate": { "baseline": 1313.8, "optimistic": 1313.8, "conservative": 1313.8, "unit": "wan" },
       "grade": "A",
       "limitations": ["专题发布给出16—59岁总量，但未给18—50岁逐岁×性别结构。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -1384,13 +1391,13 @@
       "retrievedAt": "2026-08-14",
       "denominator": "东莞市行政区域年末常住人口",
       "directValue": "2025年末常住人口1080.04万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1080.04万人÷141,177.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,411,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1080.04万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
       "adjustments": ["城市年龄性别结构采用0.70—1.30宽情景倍数；不是统计置信区间。"],
       "estimate": { "baseline": 1080.04, "optimistic": 1080.04, "conservative": 1080.04, "unit": "wan" },
       "grade": "A",
       "limitations": ["东莞迁移人口多，全国年龄性别结构可能产生系统性偏差。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -1410,13 +1417,13 @@
       "retrievedAt": "2026-08-14",
       "denominator": "佛山市行政区域年末常住人口",
       "directValue": "2024年末常住人口969.89万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×969.89万人÷141,177.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,411,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×969.89万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
       "adjustments": ["总量比2025锚点旧一年；城市结构采用0.70—1.30宽情景倍数。"],
       "estimate": { "baseline": 969.89, "optimistic": 969.89, "conservative": 969.89, "unit": "wan" },
       "grade": "A",
       "limitations": ["2024与全国2025尺度有一年时点差。", "公报未给18—50岁逐岁×性别结构。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -1436,13 +1443,13 @@
       "retrievedAt": "2026-08-14",
       "denominator": "济南市行政区域年末常住人口",
       "directValue": "2025年末常住人口961.6万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×961.6万人÷141,177.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,411,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×961.6万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
       "adjustments": ["城市年龄性别结构采用0.70—1.30宽情景倍数；不是统计置信区间。"],
       "estimate": { "baseline": 961.6, "optimistic": 961.6, "conservative": 961.6, "unit": "wan" },
       "grade": "A",
       "limitations": ["公报未给18—50岁逐岁×性别结构。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -1462,13 +1469,13 @@
       "retrievedAt": "2026-08-14",
       "denominator": "沈阳市行政区域年末常住人口",
       "directValue": "2024年末常住人口924.3万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×924.3万人÷141,177.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,411,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×924.3万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
       "adjustments": ["总量比2025锚点旧一年；城市结构采用0.70—1.30宽情景倍数。"],
       "estimate": { "baseline": 924.3, "optimistic": 924.3, "conservative": 924.3, "unit": "wan" },
       "grade": "A",
       "limitations": ["2024与全国2025尺度有一年时点差。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -1488,13 +1495,13 @@
       "retrievedAt": "2026-08-14",
       "denominator": "福州市行政区域年末常住人口",
       "directValue": "2025年末常住人口852.1万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×852.1万人÷141,177.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,411,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×852.1万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
       "adjustments": ["城市年龄性别结构采用0.70—1.30宽情景倍数；不是统计置信区间。"],
       "estimate": { "baseline": 852.1, "optimistic": 852.1, "conservative": 852.1, "unit": "wan" },
       "grade": "A",
       "limitations": ["公报未给18—50岁逐岁×性别结构。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -1514,13 +1521,13 @@
       "retrievedAt": "2026-08-14",
       "denominator": "常州市行政区域年末常住人口",
       "directValue": "2025年末常住人口541.54万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×541.54万人÷141,177.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,411,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×541.54万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
       "adjustments": ["城市年龄性别结构采用0.70—1.30宽情景倍数；不是统计置信区间。"],
       "estimate": { "baseline": 541.54, "optimistic": 541.54, "conservative": 541.54, "unit": "wan" },
       "grade": "A",
       "limitations": ["公报未给18—50岁逐岁×性别结构。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -1540,13 +1547,13 @@
       "retrievedAt": "2026-08-14",
       "denominator": "南通市行政区域年末常住人口",
       "directValue": "2024年末常住人口775.0万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×775.0万人÷141,177.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,411,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×775.0万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
       "adjustments": ["总量比2025锚点旧一年；城市结构采用0.70—1.30宽情景倍数。"],
       "estimate": { "baseline": 775, "optimistic": 775, "conservative": 775, "unit": "wan" },
       "grade": "A",
       "limitations": ["2024与全国2025尺度有一年时点差。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -1566,13 +1573,13 @@
       "retrievedAt": "2026-08-14",
       "denominator": "烟台市行政区域年末常住人口",
       "directValue": "2025年末常住人口700.05万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×700.05万人÷141,177.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,411,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×700.05万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
       "adjustments": ["城市年龄性别结构采用0.70—1.30宽情景倍数；不是统计置信区间。"],
       "estimate": { "baseline": 700.05, "optimistic": 700.05, "conservative": 700.05, "unit": "wan" },
       "grade": "A",
       "limitations": ["公报未给18—50岁逐岁×性别结构。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -1592,13 +1599,13 @@
       "retrievedAt": "2026-08-14",
       "denominator": "石家庄市行政区域年末常住人口",
       "directValue": "2025年末常住人口1124.69万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1124.69万人÷141,177.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,411,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1124.69万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例。",
       "adjustments": ["城市年龄性别结构采用0.70—1.30宽情景倍数；不是统计置信区间。"],
       "estimate": { "baseline": 1124.69, "optimistic": 1124.69, "conservative": 1124.69, "unit": "wan" },
       "grade": "A",
       "limitations": ["公报未给18—50岁逐岁×性别结构。", "行政口径须随未来区划或统计范围变化复核。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -1618,13 +1625,13 @@
       "retrievedAt": "2026-08-13",
       "denominator": "北京市行政区域常住人口",
       "directValue": "2025年末常住人口2,180.0万人；其中城镇人口1,924.9万人，城镇化率88.3%。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×2,180.0万人÷141,177.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,411,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×2,180.0万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘全国城镇化率。",
       "adjustments": [],
       "estimate": { "baseline": 2180, "optimistic": 2180, "conservative": 2180, "unit": "wan" },
       "grade": "A",
       "limitations": ["城市公报未直接提供18—50岁逐岁结构；应用全国单岁结构属于后续模型假设。", "与其他城市并集时必须先按行政区域去重。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -1644,13 +1651,13 @@
       "retrievedAt": "2026-08-13",
       "denominator": "上海市行政区域常住人口",
       "directValue": "2025年末常住人口2,485.41万人；其中户籍常住人口1,510.91万人、外来常住人口974.50万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×2,485.41万人÷141,177.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,411,778,724人）。2025全国人口只作宏观校准，不参与该比例；不得只用户籍人口。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×2,485.41万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不得只用户籍人口。",
       "adjustments": [],
       "estimate": { "baseline": 2485.41, "optimistic": 2485.41, "conservative": 2485.41, "unit": "wan" },
       "grade": "A",
       "limitations": ["城市公报未直接提供18—50岁逐岁结构；应用全国单岁结构属于后续模型假设。", "常住、户籍与外来常住人口是不同口径，不得重复相加。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -1670,13 +1677,13 @@
       "retrievedAt": "2026-08-13",
       "denominator": "深圳市行政区域常住人口",
       "directValue": "2025年末常住人口1,824.85万人；其中城镇常住人口1,820.96万人，城镇化率99.79%。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1,824.85万人÷141,177.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,411,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘城镇化率。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1,824.85万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘城镇化率。",
       "adjustments": [],
       "estimate": { "baseline": 1824.85, "optimistic": 1824.85, "conservative": 1824.85, "unit": "wan" },
       "grade": "A",
       "limitations": ["城市公报未直接提供18—50岁逐岁结构；深圳年龄结构与全国结构可能显著不同。", "行政区常住人口不等于都市圈人口。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -1696,13 +1703,13 @@
       "retrievedAt": "2026-08-13",
       "denominator": "广州市行政区域常住人口",
       "directValue": "2025年末常住人口1,910.10万人，城镇化率87.56%；户籍人口1,091.14万人。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1,910.10万人÷141,177.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,411,778,724人）。2025全国人口只作宏观校准，不参与该比例；不得以户籍人口替代常住人口。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1,910.10万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不得以户籍人口替代常住人口。",
       "adjustments": [],
       "estimate": { "baseline": 1910.1, "optimistic": 1910.1, "conservative": 1910.1, "unit": "wan" },
       "grade": "A",
       "limitations": ["城市公报未直接提供18—50岁逐岁结构；应用全国单岁结构属于后续模型假设。", "行政区常住人口不等于广佛都市圈人口。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -1722,13 +1729,13 @@
       "retrievedAt": "2026-08-13",
       "denominator": "苏州市行政区域常住人口",
       "directValue": "2025年末常住人口1,304.77万人，常住人口城镇化率82.9%。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1,304.77万人÷141,177.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,411,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘城镇化率。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1,304.77万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘城镇化率。",
       "adjustments": [],
       "estimate": { "baseline": 1304.77, "optimistic": 1304.77, "conservative": 1304.77, "unit": "wan" },
       "grade": "A",
       "limitations": ["城市公报未直接提供18—50岁逐岁结构；应用全国单岁结构属于后续模型假设。", "苏州市行政区域包含县级市，不等同中心城区。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     },
     {
@@ -1748,13 +1755,13 @@
       "retrievedAt": "2026-08-13",
       "denominator": "武汉市行政区域常住人口",
       "directValue": "2025年末常住人口1,386.19万人，城镇化率85.22%。",
-      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1,386.19万人÷141,177.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,411,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘城镇化率。",
+      "transformation": "城市18—50岁基础池（人）=2020七普目标年龄×性别人数×1,386.19万人÷140,977.8724万人；即城市官方年末常住人口×（2020七普目标年龄×性别人数÷1,409,778,724人）。2025全国人口只作宏观校准，不参与该比例；不再额外乘城镇化率。",
       "adjustments": [],
       "estimate": { "baseline": 1386.19, "optimistic": 1386.19, "conservative": 1386.19, "unit": "wan" },
       "grade": "A",
       "limitations": ["城市公报未直接提供18—50岁逐岁结构；应用全国单岁结构属于后续模型假设。", "网页正文数字排版有空格，登记值按公报的1,386.19万人规范化。"],
-      "modelVersion": "3.0.0",
-      "dataVersion": "2026.08.14",
+      "modelVersion": "3.1.0",
+      "dataVersion": "2026.08.14.1",
       "modelUse": "anchor"
     }
   ]

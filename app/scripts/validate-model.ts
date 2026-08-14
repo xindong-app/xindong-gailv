@@ -16,6 +16,7 @@ import {
 } from '../src/data/population-policy'
 import { GOLDEN_SCENARIOS } from '../tests/model/scenarios'
 import { validateRelationshipData } from '../src/data/relationship'
+import { validateEducationTable } from '../src/data/education-validation'
 
 const buildDate = process.env.BUILD_DATE ?? new Intl.DateTimeFormat('en-CA', {
   timeZone: 'Asia/Shanghai',
@@ -75,6 +76,21 @@ if (!population.valid) {
   console.log(`Population table: ${population.rowCount} direct single-age rows; total=${population.totals.total.toLocaleString('en-US')}; male+female conserved`)
 }
 
+const education = validateEducationTable()
+if (!education.valid) {
+  console.error('Education table validation failed', education)
+  process.exitCode = 1
+} else {
+  console.log([
+    `Education table: ${education.rowCount} direct single-age rows`,
+    `${education.fiveYearChecks} complete five-year checks`,
+    `junior college=${education.totals.junior_college.total.toLocaleString('en-US')}`,
+    `bachelor=${education.totals.bachelor.total.toLocaleString('en-US')}`,
+    `master=${education.totals.master.total.toLocaleString('en-US')}`,
+    `doctorate=${education.totals.doctorate.total.toLocaleString('en-US')}`,
+  ].join('; '))
+}
+
 const dimensionIds = DIMENSION_REGISTRY.map((dimension) => dimension.id)
 if (new Set(dimensionIds).size !== dimensionIds.length) {
   console.error('Dimension registry contains duplicate ids')
@@ -89,6 +105,7 @@ const expectedScenarioMethods: Readonly<Record<string, string>> = {
   'base.region': 'city_structure_multiplier',
   'base.marital': 'five_year_group_mapping',
   'appearance.height': 'height_parameter_endpoints',
+  'education.level': 'education_age_sex_direct',
   'lifestyle.smoking': 'all_age_to_target_age_multiplier',
   'lifestyle.drinking': 'drinking_raking_endpoints',
 }
@@ -165,8 +182,8 @@ const national2025CalibrationAligned =
   national2025CalibrationEvidence.transformation.includes('不以本条为分母')
 const cityTransformationsAligned = supportedCityEvidence.every(({ evidence: cityEvidence }) =>
   cityEvidence?.modelUse === 'anchor' &&
-  cityEvidence.transformation.includes('141,177.8724万人') &&
-  cityEvidence.transformation.includes('1,411,778,724人') &&
+  cityEvidence.transformation.includes('140,977.8724万人') &&
+  cityEvidence.transformation.includes('1,409,778,724人') &&
   cityEvidence.transformation.includes('2025全国人口只作宏观校准') &&
   cityEvidence.transformation.includes('不参与该比例'),
 )
@@ -176,8 +193,8 @@ if (!censusDenominatorAligned || !national2025CalibrationAligned || !cityTransfo
     national2025CalibrationAligned,
     invalidCityTransformations: supportedCityEvidence
       .filter(({ evidence: cityEvidence }) => cityEvidence == null ||
-        !cityEvidence.transformation.includes('141,177.8724万人') ||
-        !cityEvidence.transformation.includes('1,411,778,724人') ||
+        !cityEvidence.transformation.includes('140,977.8724万人') ||
+        !cityEvidence.transformation.includes('1,409,778,724人') ||
         !cityEvidence.transformation.includes('2025全国人口只作宏观校准') ||
         !cityEvidence.transformation.includes('不参与该比例'))
       .map(({ city }) => city.name),

@@ -146,11 +146,11 @@ const correlatedEntries: DimensionRegistryEntry[] = [
   {
     id: 'education.level', label: '学历', category: 'education', classification: 'correlated_hard',
     inputType: 'multi', options: [option(EDUCATION_LEVELS[0], '大专'), option(EDUCATION_LEVELS[1], '本科'), option(EDUCATION_LEVELS[2], '硕士'), option(EDUCATION_LEVELS[3], '博士')],
-    applicableTo: everyone, evidenceId: 'evidence.education.level.census-2020', evidenceGrade: 'C', sensitive: false,
-    population: false, populationUse: 'unquantified', match: false, entertainment: false, shareDefault: true,
-    description: '可作为硬条件记录；官方年龄×性别表尚未完成机器化验收前，不使用常量近似削减主人数。',
-    semantics: { within: 'or', cross: 'excluded', empty: 'ignore' }, binding: 'correlated.educationLevels',
-    correlationGroup: null, order: 70,
+    applicableTo: everyone, evidenceId: 'evidence.education.level.census-2020', evidenceGrade: 'A', sensitive: false,
+    population: true, populationUse: 'included', match: false, entertainment: false, shareDefault: true,
+    description: '七普表4-1直接按单岁和性别统计最高受教育程度；多选为互斥类别并集，进入主人口估算。',
+    semantics: { within: 'or', cross: 'grouped', empty: 'ignore' }, binding: 'correlated.educationLevels',
+    correlationGroup: 'socioeconomic', order: 70,
   },
   {
     id: 'education.school', label: '院校层级偏好', category: 'education', classification: 'soft_preference',

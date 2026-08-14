@@ -5,6 +5,7 @@ import {
   heightDist,
   nonSmokerRate,
 } from '../data/model'
+import { educationShareAtAge } from '../data/education'
 import {
   CENSUS_2020_MAINLAND_POPULATION_WAN,
   MAX_MODEL_AGE,
@@ -331,6 +332,17 @@ function lifestyleProbabilitiesAtAge(selection: ModelSelection, age: number): Ar
   return probabilities
 }
 
+function educationProbabilityAtAge(selection: ModelSelection, age: number): ProbabilityScenario | null {
+  if (selection.correlated.educationLevels.length === 0) return null
+  requireScenarioMethod('education.level', 'education_age_sex_direct')
+  const point = educationShareAtAge(
+    age,
+    selection.target.gender,
+    selection.correlated.educationLevels,
+  )
+  return { conservative: point, baseline: point, optimistic: point }
+}
+
 function intersectionBounds(probabilities: readonly ProbabilityScenario[]): ProbabilityScenario {
   if (probabilities.length === 0) return { conservative: 1, baseline: 1, optimistic: 1 }
   const conservative = probabilities.map((scenario) => clampProbability(scenario.conservative))
@@ -430,6 +442,7 @@ function calculatePopulation(selection: ModelSelection): RawPopulationResult {
   const activeDimensions: string[] = []
   const heightActive = selection.target.heightCm != null &&
     (selection.target.heightCm.min != null || selection.target.heightCm.max != null)
+  const educationActive = selection.correlated.educationLevels.length > 0
   const lifestyleDimensions = [...new Set(
     strata.flatMap((stratum) => lifestyleProbabilitiesAtAge(selection, stratum.age).map((item) => item.dimensionId)),
   )]
@@ -438,6 +451,7 @@ function calculatePopulation(selection: ModelSelection): RawPopulationResult {
   let conservative = 0
   let optimistic = 0
   let afterHeight = 0
+  let afterEducation = 0
   for (const stratum of strata) {
     const maritalProbability = maritalShareScenarioAtAge(selection, stratum.age)
     const heightProbability = heightProbabilityAtAge(selection, stratum.age) ?? {
@@ -446,14 +460,21 @@ function calculatePopulation(selection: ModelSelection): RawPopulationResult {
       optimistic: 1,
     }
     const lifestyleProbabilities = lifestyleProbabilitiesAtAge(selection, stratum.age).map((item) => item.probability)
+    const educationProbability = educationProbabilityAtAge(selection, stratum.age) ?? {
+      conservative: 1,
+      baseline: 1,
+      optimistic: 1,
+    }
     const allActiveProbabilities = [
       ...(maritalActive ? [maritalProbability] : []),
       ...(heightActive ? [heightProbability] : []),
+      ...(educationActive ? [educationProbability] : []),
       ...lifestyleProbabilities,
     ]
     const combinedBounds = intersectionBounds(allActiveProbabilities)
     const heightPeople = stratum.residents.baseline * maritalProbability.baseline * heightProbability.baseline
     afterHeight += heightPeople
+    afterEducation += heightPeople * educationProbability.baseline
     baseline += stratum.residents.baseline * combinedBounds.baseline
     conservative += stratum.residents.conservative * combinedBounds.conservative
     optimistic += stratum.residents.optimistic * combinedBounds.optimistic
@@ -469,8 +490,19 @@ function calculatePopulation(selection: ModelSelection): RawPopulationResult {
     })
   }
 
-  if (lifestyleDimensions.length > 0) {
+  if (educationActive) {
     const before = heightActive ? afterHeight : base
+    const factor = before > 0 ? clampProbability(afterEducation / before) : 0
+    activeDimensions.push('education.level')
+    groups.push({
+      id: 'socioeconomic', label: '最高受教育程度', classification: 'correlated_hard', dimensions: ['education.level'],
+      factor, before, after: afterEducation, method: '七普表4-1逐岁×性别直接人数；多选互斥类别按并集相加', evidenceGrade: 'A',
+      note: '学历边际为官方直接表；与婚史、身高、烟酒同时筛选时，基准值使用透明独立情景，范围使用 Fréchet 联合界。',
+    })
+  }
+
+  if (lifestyleDimensions.length > 0) {
+    const before = educationActive ? afterEducation : heightActive ? afterHeight : base
     const factor = before > 0 ? clampProbability(baseline / before) : 0
     activeDimensions.push(...lifestyleDimensions)
     groups.push({
@@ -646,7 +678,7 @@ function confidence(raw: RawPopulationResult): ModelResult['confidence'] {
     return { grade: 'NA', score: 0, reasons: [...raw.confidenceReasons] }
   }
   let score = 0.9
-  if (raw.groups.some((group) => group.id === 'socioeconomic')) score -= 0.12
+  if (raw.groups.some((group) => group.id === 'socioeconomic' && group.evidenceGrade !== 'A')) score -= 0.12
   if (raw.groups.some((group) => group.id === 'health_body' && group.dimensions.length > 1)) score -= 0.1
   if (raw.confidenceReasons.some((reason) => reason.includes('城市'))) score -= 0.08
   score = Math.min(0.95, Math.max(0.35, score))
