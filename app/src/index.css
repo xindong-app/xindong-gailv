@@ -3135,9 +3135,18 @@ input[aria-invalid="true"] {
    只加表现层(字体/质感/微交互), 不动布局结构与算法
    ============================================================ */
 
+/* 自托管展示字体: 站酷快乐体(OFL) 界面实显字符子集, 128KB, 本地加载零第三方请求 */
+@font-face {
+  font-family: "KuaiLe Display";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./assets/fonts/ZCOOLKuaiLe-Regular.subset.woff2") format("woff2");
+}
+
 :root {
-  /* 系统字体栈: 不请求第三方字体(隐私承诺), 中文用系统黑体加粗撑起展示感 */
-  --font-display: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Source Han Sans SC", sans-serif;
+  /* 自托管可爱展示体 + 系统中文黑体兜底 */
+  --font-display: "KuaiLe Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Source Han Sans SC", sans-serif;
   --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --spring-soft: cubic-bezier(0.22, 1.2, 0.36, 1);
 }
@@ -4527,6 +4536,227 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .welcome-cta:hover {
+    animation: none !important;
+  }
+}
+
+/* ============================================================
+   🎬 A 阶段 · 封面化开场 (2026-08-14)
+   海报式欢迎页 + 循环小剧场(小人排队跳进爱心)
+   ============================================================ */
+
+/* 封面版式: 单栏海报, 视觉层变叠加层 */
+.welcome-cover {
+  position: relative;
+  display: block;
+  min-height: 0; /* 内容刚好一屏, 剧场不被底部舞台吃掉 */
+}
+
+.welcome-cover .welcome-visual {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  pointer-events: none;
+}
+
+.welcome-cover .formula-note {
+  position: absolute;
+  top: 6%;
+  right: 5%;
+  bottom: auto;
+}
+
+.cover-whisper {
+  margin: 10px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+.cover-fineprint {
+  margin: 16px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.76rem;
+}
+
+.cover-links {
+  display: flex;
+  margin-top: 6px;
+  gap: 4px;
+}
+
+.cover-links button {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 0.76rem;
+  font-weight: 720;
+}
+
+.cover-links button:hover {
+  background: var(--paper-deep);
+  color: var(--ink);
+}
+
+/* ---------- 循环小剧场 ---------- */
+.cover-show {
+  position: relative;
+  height: 152px;
+  margin-top: 14px;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(ellipse 55% 85% at 76% 34%, color-mix(in srgb, var(--rose) 62%, transparent), transparent),
+    color-mix(in srgb, var(--sky) 24%, var(--surface-strong));
+}
+
+.cover-heart {
+  position: absolute;
+  right: 9%;
+  bottom: 16px;
+  color: #e2547a;
+  font-size: 4.4rem;
+  line-height: 1;
+  text-shadow: 3px 4px 0 rgba(59, 48, 80, 0.18);
+  animation: cover-heart-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes cover-heart-pulse {
+  0%, 100% { scale: 1; }
+  50% { scale: 1.07; }
+}
+
+.cover-walker {
+  position: absolute;
+  bottom: 18px;
+  left: 2%;
+  opacity: 0;
+  animation: cover-walk 7.5s linear infinite;
+  animation-delay: var(--walk-delay);
+}
+
+.cover-walker svg {
+  display: block;
+  animation: cover-hop 420ms ease-in-out infinite;
+}
+
+@keyframes cover-walk {
+  0% { left: 2%; opacity: 0; }
+  5% { opacity: 1; }
+  72% { left: 68%; opacity: 1; }
+  80% { left: 76%; opacity: 0; transform: translateY(10px) rotate(-24deg) scale(0.72); }
+  100% { left: 76%; opacity: 0; }
+}
+
+@keyframes cover-hop {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+.cover-floor {
+  position: absolute;
+  right: 4%;
+  bottom: 12px;
+  left: 4%;
+  border-top: 2px dashed color-mix(in srgb, var(--ink) 26%, transparent);
+}
+
+/* 手机端: 剧场压低, 爱心收小; 公式贴纸收起(信息在玩前须知) */
+@media (max-width: 640px) {
+  .welcome-cover .formula-note {
+    display: none;
+  }
+
+  .cover-show {
+    height: 132px;
+    margin-top: 10px;
+  }
+
+  .cover-heart {
+    font-size: 3.4rem;
+  }
+}
+
+/* 减少动态: 静帧 —— 小人排队站好, 不走了 */
+@media (prefers-reduced-motion: reduce) {
+  .cover-heart,
+  .cover-walker,
+  .cover-walker svg {
+    animation: none !important;
+  }
+
+  .cover-walker {
+    left: var(--static-x);
+    opacity: 1;
+  }
+}
+
+/* ---------- 懒人模板: 全端一排小横按钮(U6) ---------- */
+.preset-bar {
+  display: flex;
+  padding: 13px 16px;
+  align-items: center;
+  gap: 14px;
+}
+
+.preset-bar > div:first-child {
+  flex: 0 0 auto;
+}
+
+.preset-bar h2 {
+  font-size: 0.86rem;
+  white-space: nowrap;
+}
+
+.preset-list {
+  display: flex;
+  min-width: 0;
+  margin-top: 0;
+  flex: 1;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 8px;
+  scrollbar-width: none;
+}
+
+.preset-list::-webkit-scrollbar {
+  display: none;
+}
+
+.preset-list button {
+  display: flex;
+  min-width: max-content;
+  min-height: 40px;
+  padding: 7px 14px;
+  align-items: center;
+}
+
+.preset-list button b {
+  font-size: 0.8rem;
+}
+
+.preset-list button span {
+  display: none;
+}
+
+/* ---------- "就差一点"舞台字幕(#19) ---------- */
+.stage-tip {
+  display: inline-block;
+  margin-top: 6px;
+  color: #ffe9a8;
+  font-size: 0.78rem;
+  font-weight: 720;
+  animation: tip-fade 480ms ease-out;
+}
+
+@keyframes tip-fade {
+  from { opacity: 0; translate: 0 5px; }
+  to { opacity: 1; translate: 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage-tip {
     animation: none !important;
   }
 }

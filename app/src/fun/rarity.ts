@@ -36,6 +36,7 @@ export function fmtRarity(p: number): string {
 // 收入/资产/房车/体型/疾病等不砍人数的维度, 不做"淘汰最多"的玩笑。
 const VERDICT_JOKES: Record<string, string> = {
   'appearance.height': '海拔这关, 刻度说了算',
+  'education.level': '知识确实改变…池子大小',
   'lifestyle.smoking': '一根烟烧掉一大片缘分',
   'lifestyle.drinking': '感情深一口闷, 缘分浅全筛完',
 }

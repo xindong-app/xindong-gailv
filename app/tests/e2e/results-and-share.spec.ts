@@ -53,7 +53,7 @@ test('12 反向偏好：双向条件命中示意明确不是爱情预测', async
   await selectDimension(page, '冲突', '冲突')
   await goToStep(page, 5, '敏感与娱乐')
   await page.getByRole('button', { name: /敏感人口条件与偏好/ }).click()
-  await page.getByRole('button', { name: '慢性病信息偏好（软）', exact: true }).click()
+  await page.getByRole('button', { name: '无慢性病', exact: true }).click()
   await goToStep(page, 6, '结果解释')
 
   const reciprocal = page.locator('.reciprocal-card').getByRole('button', { name: /冲突/ })

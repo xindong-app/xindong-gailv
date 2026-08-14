@@ -16,6 +16,7 @@ const PALETTE = ['#ffd9e2', '#ffd9b8', '#cdeafa', '#e6dbf7', '#ddefd3', '#ffeeb0
 // 不拿收入、身体、疾病、婚史开玩笑。
 const LAST_WORDS: Record<string, string[]> = {
   'appearance.height': ['就差 2cm 啊!!', '我去踩个高跷', '尺子今天也很严格'],
+  'education.level': ['当年该考研的', '书到用时方恨少', '学历这关, 我认栽'],
   'lifestyle.smoking': ['戒烟第一天打卡', '电子烟算烟吗'],
   'lifestyle.drinking': ['先戒为敬', '只喝亿点点'],
 }

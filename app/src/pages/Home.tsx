@@ -133,6 +133,7 @@ export default function Home() {
   const [pendingPreset, setPendingPreset] = useState<Preset | null>(null)
   const [methodOpen, setMethodOpen] = useState(false)
   const [privacyOpen, setPrivacyOpen] = useState(false)
+  const [rulesOpen, setRulesOpen] = useState(false)
   const [mobileResultOpen, setMobileResultOpen] = useState(false)
   const [shareOpen, setShareOpen] = useState(false)
   // 幕布开场: 每会话只播一次, 减少动态用户直接跳过
@@ -268,7 +269,11 @@ export default function Home() {
             />
           )}
 
-          {currentStep === 0 && <WelcomeStep onStart={() => navigate(1)} />}
+          {currentStep === 0 && <WelcomeStep onStart={() => navigate(1)} onOpenInfo={(which) => {
+            if (which === 'method') setMethodOpen(true)
+            else if (which === 'privacy') setPrivacyOpen(true)
+            else setRulesOpen(true)
+          }} />}
           {currentStep === 1 && <PopulationStep selection={selection} onChange={updateSelection} onNext={() => navigate(2)} />}
           {currentStep === 2 && <CoreCriteriaStep selection={selection} onChange={updateSelection} onNext={() => navigate(3)} />}
           {currentStep === 3 && <DimensionLibraryStep selection={selection} onChange={updateSelection} onNext={() => navigate(4)} />}
@@ -353,6 +358,15 @@ export default function Home() {
           <section><h3>会话草稿</h3><p>仅在当前标签页保存非敏感草稿；关闭标签页结束，敏感项不会写入。</p></section>
           <section><h3>分享</h3><p>先生成白名单预览；敏感字段默认关闭，且必须二次确认。</p></section>
           <section><h3>清除</h3><p>可在第 7 步立即清除本次会话草稿，不影响当前内存画面。</p></section>
+        </div>
+      </Dialog>
+
+      <Dialog open={rulesOpen} title="玩前须知" description="三条规矩，看完再玩。" onClose={() => setRulesOpen(false)}>
+        <div className="privacy-dialog-grid">
+          <section><h3>你的条件只住在这台设备里</h3><p>筛选只在浏览器内存和本次会话中计算，不上传、无账号、无埋点。</p></section>
+          <section><h3>算不准就老实说算不准</h3><p>估算给保守、基准、乐观三档；低到模型分辨率以下，它会直接说"数不出来"，不编数字哄你。</p></section>
+          <section><h3>四种条件，四种待遇</h3><p>硬条件砍人；软偏好只算契合；敏感项你主动拉开才生效；星座 MBTI 只负责出梗。</p></section>
+          <section><h3>不当月老</h3><p>不撮合、不拉郎配、不评价谁高谁低，也不预测真实爱情结果。它只回答一个问题：池子多大。</p></section>
         </div>
       </Dialog>
 

@@ -80,7 +80,7 @@ export function CoreCriteriaStep({ selection, onChange, onNext }: {
       <div className="step-heading">
         <span className="eyebrow">第二关 · 硬核条件</span>
         <h2 id="core-title" tabIndex={-1}>把最在意的硬门槛放这里</h2>
-        <p>真砍人的是身高：逐岁按官方均值估算。学历、收入、资产证据不足——选中后主数字标为「上限」并逐项列明，绝不编造比例乱砍。体型、烟酒、健康与房车等敏感项放在下一步主动展开。</p>
+        <p>真砍人的是身高和学历（官方口径逐岁计入）；收入、资产证据不足——选中后主数字标为「上限」并逐项列明，绝不编造比例乱砍。体型、烟酒、健康与房车等敏感项放在下一步主动展开。</p>
       </div>
       <div className="criteria-grid">
         <article className="criteria-card has-sticker" data-kind="hard">
@@ -95,10 +95,10 @@ export function CoreCriteriaStep({ selection, onChange, onNext }: {
 
         <article className="criteria-card criteria-wide has-sticker" data-kind="correlated">
           <DimensionSticker dimensionId="education.level" />
-          <div className="criteria-card-head"><div><span className="class-badge">硬边界 · 暂不砍人</span><h3>学历与院校偏好{educationActive && <span aria-hidden="true" className="equipped-stamp equipped-inline">已装备</span>}</h3></div><EvidenceBadge grade="C" /></div>
+          <div className="criteria-card-head"><div><span className="class-badge">硬筛选 ＋ 软偏好</span><h3>学历与院校偏好{educationActive && <span aria-hidden="true" className="equipped-stamp equipped-inline">已装备</span>}</h3></div><EvidenceBadge grade="A" /></div>
           <div className="chip-row">{EDUCATION_OPTIONS.map((option) => <Chip key={option.id} active={selection.correlated.educationLevels.includes(option.id)} tone="sun" onClick={() => update((draft) => { draft.correlated.educationLevels = toggleArrayValue(draft.correlated.educationLevels, option.id) })}>{option.label}</Chip>)}</div>
           <div className="chip-row nested-row"><span>院校层级</span>{SCHOOL_OPTIONS.map((option) => <Chip key={option.id} active={selection.correlated.schoolTier === option.id} tone="sun" onClick={() => update((draft) => { draft.correlated.schoolTier = draft.correlated.schoolTier === option.id ? null : option.id })}>{option.label}</Chip>)}</div>
-          <FieldHelp>学历逐岁×性别机器表整理完成前不砍人口；选中即把主数字标为上限，揭榜页逐项列明。院校层级仅作软偏好。清北 ⊂ C9 ⊂ 985 ⊂ 211。</FieldHelp>
+          <FieldHelp>学历按七普表 4-1 逐岁×性别直接计入人数，多选按并集；院校层级仅作软偏好，不再砍人口。清北 ⊂ C9 ⊂ 985 ⊂ 211。</FieldHelp>
         </article>
 
         <article className="criteria-card has-sticker" data-kind="correlated">

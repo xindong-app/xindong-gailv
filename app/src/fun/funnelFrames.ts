@@ -53,6 +53,11 @@ const FRAME_RULES: readonly FrameRule[] = [
     enable: (draft, full) => { draft.target.heightCm = full.target.heightCm == null ? null : { ...full.target.heightCm } },
   },
   {
+    dimensionId: 'education.level',
+    isActive: (s) => s.correlated.educationLevels.length > 0,
+    enable: (draft, full) => { draft.correlated.educationLevels = [...full.correlated.educationLevels] },
+  },
+  {
     dimensionId: 'lifestyle.smoking',
     isActive: (s) => s.correlated.smoking !== 'any',
     enable: (draft, full) => { draft.correlated.smoking = full.correlated.smoking },

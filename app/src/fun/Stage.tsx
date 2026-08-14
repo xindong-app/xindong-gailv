@@ -1,7 +1,8 @@
 // 常驻舞台带 —— 全站唯一的小人剧场(深色天鹅绒 + 脚灯 + 聚光灯)
 // 桌面端固定于视口底部, 可折叠成字幕条; 手机端仍走底部字幕条+弹层(见 Home)
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { ModelResult } from '../engine/modelEngine'
+import { formatCount } from '../engine/modelEngine'
 import { FunFunnel } from './FunFunnel'
 import { buildFunnelFrames } from './funnelFrames'
 import { rarityTier } from './rarity'
@@ -16,6 +17,15 @@ export function Stage({ result }: { result: ModelResult }) {
   const tier = rarityTier(probability * 10_000)
   const cities = result.input.target.cities
   const scope = `${cities.includes('全国') ? '全国' : cities.join('、')} · ${result.input.target.age.min}–${result.input.target.age.max} 岁 · ${result.input.target.gender === 'male' ? '男生' : '女生'}`
+  // "就差一点"字幕: 轮播引擎的放宽建议(前 3 条), 播报即链路反馈
+  const tips = result.population.numericStatus === 'available' ? result.relaxations.slice(0, 3) : []
+  const [tipIndex, setTipIndex] = useState(0)
+  useEffect(() => {
+    if (tips.length < 2) return undefined
+    const id = window.setInterval(() => setTipIndex((index) => (index + 1) % tips.length), 3400)
+    return () => window.clearInterval(id)
+  }, [tips.length])
+  const currentTip = tips[tipIndex % Math.max(1, tips.length)]
 
   return (
     <section aria-label="小人剧场" className={`stage${collapsed ? ' stage--collapsed' : ''}`} data-tier={available ? tier.key : 'NA'}>
@@ -30,6 +40,11 @@ export function Stage({ result }: { result: ModelResult }) {
           </span>
           <SlotNumber text={result.population.displayShort} ariaLabel={result.population.display} />
           <span className="stage-scope">{scope}</span>
+          {!collapsed && currentTip && (
+            <span key={currentTip.dimensionId} className="stage-tip">
+              就差一点：{currentTip.label}，池子多约 {formatCount(currentTip.gain)}
+            </span>
+          )}
           <button
             aria-expanded={!collapsed}
             className="stage-toggle"
