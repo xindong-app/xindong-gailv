@@ -7,6 +7,8 @@ const projectRoot = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
   plugins: [react()],
+  // GitHub Pages 项目页在子路径下; 本地开发/预览保持根路径
+  base: process.env.VITE_BASE ?? '/',
   server: {
     port: 3000,
     strictPort: true,

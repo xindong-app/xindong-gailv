@@ -13,9 +13,9 @@ const WALKERS: readonly WalkerSpec[] = PALETTE.map((color, index) => ({
   staticX: 8 + index * 13,
 }))
 
-function MiniPerson({ color, glow }: { color: string; glow?: boolean }) {
+function MiniPerson({ color }: { color: string }) {
   return (
-    <svg width="34" height="47" viewBox="0 0 34 46" aria-hidden="true" className={glow ? 'walker-glow' : undefined}>
+    <svg width="34" height="47" viewBox="0 0 34 46" aria-hidden="true">
       <path d="M5 44 Q5 24 17 24 Q29 24 29 44 Z" fill={color} stroke={INK} strokeWidth="1.7" />
       <circle cx="17" cy="13" r="7.5" fill={color} stroke={INK} strokeWidth="1.7" />
       <circle cx="14" cy="12" r="1" fill={INK} />
@@ -53,7 +53,7 @@ export function CoverShow() {
             ['--static-x' as string]: `${walker.staticX}%`,
           }}
         >
-          <MiniPerson color={walker.color} glow={walker.passes} />
+          <MiniPerson color={walker.color} />
         </div>
       ))}
       <div className="cover-floor" />

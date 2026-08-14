@@ -1,3 +1,4 @@
+import { CHALLENGE_URL } from './challenge'
 import type { ShareDto } from './types'
 
 export function buildTextFallback(dto: ShareDto): string {
@@ -31,7 +32,7 @@ export function buildTextFallback(dto: ShareDto): string {
   }
   lines.push(`模型 ${dto.versions.modelVersion} · 数据 ${dto.versions.dataVersion} · 模型可信度 ${dto.confidenceGrade}`)
   lines.push(dto.notice)
-  lines.push('自己算一卦 → https://xindong-gailv.vercel.app')
+  lines.push(`自己算一卦 → ${CHALLENGE_URL}`)
   // 片尾彩蛋: 字幕滚完还有一行
   if (dto.fun) {
     lines.push(`P.S. 本战报由 80 个小人倾情出演，${dto.fun.survivors} 个活到了片尾字幕。`)

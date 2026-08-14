@@ -5081,10 +5081,6 @@ body {
   90%, 100% { left: 90%; opacity: 0; }
 }
 
-.walker-glow {
-  /* 通关小人常驻微光 */
-}
-
 /* CTA 压住场景下沿中央, 像"开场"按钮浮在舞台上 */
 .cover-cta {
   position: relative;
