@@ -1,0 +1,657 @@
+{
+  "dataVersion": "2026.08.14",
+  "modelVersion": "3.0.0",
+  "retrievedAt": "2026-08-14",
+  "entries": [
+    {
+      "id": "evidence.base.age.census-2020-single-year",
+      "dimensionId": "base.age",
+      "grade": "A",
+      "modelUse": "direct",
+      "sourceTitle": "中国人口普查年鉴-2020 表3-1 全国分年龄、性别的人口",
+      "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/A0301.jpg",
+      "publisher": "国家统计局、国务院第七次全国人口普查领导小组办公室",
+      "dataYear": "2020-11-01"
+    },
+    {
+      "id": "evidence.base.age.population-sample-2025",
+      "dimensionId": "base.age",
+      "grade": "A",
+      "modelUse": "calibration",
+      "sourceTitle": "2025年全国1%人口抽样调查主要数据公报",
+      "sourceUrl": "https://www.stats.gov.cn/zwfwck/sjfb/202605/t20260522_1963788.html",
+      "publisher": "国家统计局",
+      "dataYear": "2025-11-01"
+    },
+    {
+      "id": "evidence.base.region.population-2025",
+      "dimensionId": "base.region",
+      "grade": "A",
+      "modelUse": "calibration",
+      "sourceTitle": "中华人民共和国2025年国民经济和社会发展统计公报",
+      "sourceUrl": "https://www.stats.gov.cn/xxgk/sjfb/tjgb2020/202602/t20260228_1962662.html",
+      "publisher": "国家统计局",
+      "dataYear": "2025-12-31"
+    },
+    {
+      "id": "evidence.base.region.census-mainland-total-2020",
+      "dimensionId": "base.region",
+      "grade": "A",
+      "modelUse": "direct",
+      "sourceTitle": "第七次全国人口普查公报（第二号）——全国人口情况",
+      "sourceUrl": "https://www.stats.gov.cn/sj/tjgb/rkpcgb/qgrkpcgb/202302/t20230206_1902002.html",
+      "publisher": "国家统计局、国务院第七次全国人口普查领导小组办公室",
+      "dataYear": "2020-11-01"
+    },
+    {
+      "id": "evidence.base.gender.sample-2025",
+      "dimensionId": "base.gender",
+      "grade": "A",
+      "modelUse": "calibration",
+      "sourceTitle": "2025年全国1%人口抽样调查主要数据公报",
+      "sourceUrl": "https://www.stats.gov.cn/zwfwck/sjfb/202605/t20260522_1963788.html",
+      "publisher": "国家统计局",
+      "dataYear": "2025-11-01"
+    },
+    {
+      "id": "evidence.base.marital.census-2020",
+      "dimensionId": "base.marital",
+      "grade": "B",
+      "modelUse": "anchor",
+      "sourceTitle": "中国人口普查年鉴-2020 表5-3 全国分年龄、性别、受教育程度、婚姻状况的人口",
+      "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/B0503.jpg",
+      "publisher": "国家统计局、国务院第七次全国人口普查领导小组办公室",
+      "dataYear": "2020-11-01"
+    },
+    {
+      "id": "evidence.appearance.height.sport-monitoring-2020",
+      "dimensionId": "appearance.height",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "第五次国民体质监测公报",
+      "sourceUrl": "https://www.sport.gov.cn/kys/n11029/c24335066/content.html",
+      "publisher": "国家体育总局体育科学研究所、国家国民体质监测中心",
+      "dataYear": "2020"
+    },
+    {
+      "id": "evidence.appearance.height.nhc-2020",
+      "dimensionId": "appearance.height",
+      "grade": "A",
+      "modelUse": "calibration",
+      "sourceTitle": "《中国居民营养与慢性病状况报告（2020年）》新闻发布会文字实录",
+      "sourceUrl": "https://www.nhc.gov.cn/xcs/c100122/202012/175301a949ce481a9c1a9a2b393c8e49.shtml",
+      "publisher": "国家卫生健康委员会、国务院新闻办公室",
+      "dataYear": "2015—2019监测，2020发布"
+    },
+    {
+      "id": "evidence.appearance.height.distribution-assumption",
+      "dimensionId": "appearance.height",
+      "grade": "C",
+      "modelUse": "anchor",
+      "sourceTitle": "基于官方年龄别均值的可替换正态近似",
+      "sourceUrl": "https://openstd.samr.gov.cn/bzgk/gb/newGbInfo?hcno=80D4B3287E95D708171C64A442925FAA",
+      "publisher": "心动概率局模型组",
+      "dataYear": "model-2026"
+    },
+    {
+      "id": "evidence.appearance.bmi.nhc-2018",
+      "dimensionId": "appearance.bmi",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "体重管理指导原则（2024年版）",
+      "sourceUrl": "https://www.nhc.gov.cn/wjw/c100378/202412/f3f58b54fbeb4c87b14164fac898bf08/files/1736390749000_59785.pdf",
+      "publisher": "国家卫生健康委员会",
+      "dataYear": "2018"
+    },
+    {
+      "id": "evidence.education.level.census-2020",
+      "dimensionId": "education.level",
+      "grade": "A",
+      "modelUse": "direct",
+      "sourceTitle": "中国人口普查年鉴-2020 表4-1 全国分年龄、性别、受教育程度的3岁及以上人口",
+      "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/A0401.jpg",
+      "publisher": "国家统计局、国务院第七次全国人口普查领导小组办公室",
+      "dataYear": "2020-11-01"
+    },
+    {
+      "id": "evidence.education.level.sample-2025",
+      "dimensionId": "education.level",
+      "grade": "A",
+      "modelUse": "calibration",
+      "sourceTitle": "2025年全国1%人口抽样调查主要数据公报",
+      "sourceUrl": "https://www.stats.gov.cn/zwfwck/sjfb/202605/t20260522_1963788.html",
+      "publisher": "国家统计局",
+      "dataYear": "2025-11-01"
+    },
+    {
+      "id": "evidence.education.level.moe-2025-flow",
+      "dimensionId": "education.level",
+      "grade": "A",
+      "modelUse": "calibration",
+      "sourceTitle": "2025年全国教育事业发展统计公报",
+      "sourceUrl": "https://www.moe.gov.cn/jyb_sjzl/sjzl_fztjgb/202607/t20260706_1442870.html",
+      "publisher": "教育部",
+      "dataYear": "2025"
+    },
+    {
+      "id": "evidence.education.school.elite-assumption",
+      "dimensionId": "education.school",
+      "grade": "C",
+      "modelUse": "excluded",
+      "sourceTitle": "院校层级参数待专项行政数据重建",
+      "sourceUrl": "https://www.moe.gov.cn/jyb_sjzl/sjzl_fztjgb/202607/t20260706_1442870.html",
+      "publisher": "心动概率局模型组",
+      "dataYear": "model-2026"
+    },
+    {
+      "id": "evidence.economy.income.wages-2025",
+      "dimensionId": "economy.income",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "2025年城镇单位就业人员年平均工资情况",
+      "sourceUrl": "https://www.stats.gov.cn/sj/zxfbhjd/202605/t20260515_1963707.html",
+      "publisher": "国家统计局",
+      "dataYear": "2025"
+    },
+    {
+      "id": "evidence.economy.income.household-2025",
+      "dimensionId": "economy.income",
+      "grade": "A",
+      "modelUse": "calibration",
+      "sourceTitle": "2025年居民收入和消费支出情况/全年经济运行解读",
+      "sourceUrl": "https://www.stats.gov.cn/zt_18555/zthd/lhfw/2026lhzt/2026hgjj/202602/t20260202_1962431.html",
+      "publisher": "国家统计局",
+      "dataYear": "2025"
+    },
+    {
+      "id": "evidence.economy.income.migrant-workers-2025",
+      "dimensionId": "economy.income",
+      "grade": "B",
+      "modelUse": "calibration",
+      "sourceTitle": "2025年农民工监测调查报告",
+      "sourceUrl": "https://www.stats.gov.cn/sj/zxfb/202604/t20260430_1963472.html",
+      "publisher": "国家统计局",
+      "dataYear": "2025"
+    },
+    {
+      "id": "evidence.economy.wealth.pbc-2019",
+      "dimensionId": "economy.wealth",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "2019年中国城镇居民家庭资产负债情况调查",
+      "sourceUrl": "https://finance.sina.com.cn/roll/2020-04-24/doc-iirczymi8106383.shtml",
+      "publisher": "中国人民银行调查统计司城镇居民家庭资产负债调查课题组",
+      "dataYear": "2019-10"
+    },
+    {
+      "id": "evidence.economy.wealth.distribution-assumption",
+      "dimensionId": "economy.wealth",
+      "grade": "C",
+      "modelUse": "anchor",
+      "sourceTitle": "基于央行家庭资产中位数的可替换分布假设",
+      "sourceUrl": "https://finance.sina.com.cn/roll/2020-04-24/doc-iirczymi8106383.shtml",
+      "publisher": "心动概率局模型组",
+      "dataYear": "model-2026"
+    },
+    {
+      "id": "evidence.economy.house.pbc-2019",
+      "dimensionId": "economy.house",
+      "grade": "A",
+      "modelUse": "calibration",
+      "sourceTitle": "2019年中国城镇居民家庭资产负债情况调查",
+      "sourceUrl": "https://finance.sina.com.cn/roll/2020-04-24/doc-iirczymi8106383.shtml",
+      "publisher": "中国人民银行调查统计司城镇居民家庭资产负债调查课题组",
+      "dataYear": "2019"
+    },
+    {
+      "id": "evidence.economy.house.local-young-assumption",
+      "dimensionId": "economy.house",
+      "grade": "C",
+      "modelUse": "anchor",
+      "sourceTitle": "旧模型HOUSE_LOCAL_RATE审计",
+      "sourceUrl": "https://www.stats.gov.cn/zs/flfg/zdgqglpctl/202411/t20241111_1957365.html",
+      "publisher": "心动概率局模型组",
+      "dataYear": "model-2026"
+    },
+    {
+      "id": "evidence.economy.car.household-2025",
+      "dimensionId": "economy.car",
+      "grade": "A",
+      "modelUse": "calibration",
+      "sourceTitle": "居民收支稳步增长 人民生活持续改善——“十四五”经济社会发展成就系列报告之十五",
+      "sourceUrl": "https://www.stats.gov.cn/sj/sjjd/202606/t20260604_1963891.html",
+      "publisher": "国家统计局",
+      "dataYear": "2025"
+    },
+    {
+      "id": "evidence.economy.car.personal-assumption",
+      "dimensionId": "economy.car",
+      "grade": "C",
+      "modelUse": "anchor",
+      "sourceTitle": "由家庭车辆拥有量到个人有车的待校准转换",
+      "sourceUrl": "https://www.stats.gov.cn/hd/lyzx/zxgk/202402/t20240201_1947105.html",
+      "publisher": "心动概率局模型组",
+      "dataYear": "model-2026"
+    },
+    {
+      "id": "evidence.lifestyle.smoking.cdc-2024",
+      "dimensionId": "lifestyle.smoking",
+      "grade": "B",
+      "modelUse": "direct",
+      "sourceTitle": "2024中国成人烟草调查主要结果和发现",
+      "sourceUrl": "https://www.chinacdc.cn/jksj/jksj04/202506/P020250616403576918910.pdf",
+      "publisher": "中国疾病预防控制中心",
+      "dataYear": "2024"
+    },
+    {
+      "id": "evidence.lifestyle.drinking.cdc-2024",
+      "dimensionId": "lifestyle.drinking",
+      "grade": "C",
+      "modelUse": "anchor",
+      "sourceTitle": "Alcohol Use Prevalence Among Chinese People Aged 15 Years and Above — China, 2024",
+      "sourceUrl": "https://weekly.chinacdc.cn/en/article/doi/10.46234/ccdcw2026.006",
+      "publisher": "中国疾病预防控制中心慢性非传染性疾病预防控制中心等",
+      "dataYear": "2024"
+    },
+    {
+      "id": "evidence.health.exercise.sport-2020",
+      "dimensionId": "health.exercise",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "国家卫生健康委员会2022年7月5日新闻发布会文字实录",
+      "sourceUrl": "https://www.nhc.gov.cn/xcs/c100122/202207/6d599a8446334eb982dd055982cff360.shtml",
+      "publisher": "国家体育总局、国家卫生健康委员会新闻发布平台",
+      "dataYear": "2020"
+    },
+    {
+      "id": "evidence.health.chronic.hypertension-2012-2015",
+      "dimensionId": "health.chronic",
+      "grade": "A",
+      "modelUse": "calibration",
+      "sourceTitle": "Status of Hypertension in China: Results From the China Hypertension Survey, 2012-2015",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/29449338/",
+      "publisher": "国家心血管病中心等",
+      "dataYear": "2012—2015"
+    },
+    {
+      "id": "evidence.health.chronic.no-major-disease-assumption",
+      "dimensionId": "health.chronic",
+      "grade": "C",
+      "modelUse": "excluded",
+      "sourceTitle": "由高血压、糖尿病等锚点合成的范围",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/29449338/",
+      "publisher": "心动概率局模型组",
+      "dataYear": "model-2026"
+    },
+    {
+      "id": "evidence.health.sleep.meta-analysis-2023",
+      "dimensionId": "health.sleep",
+      "grade": "B",
+      "modelUse": "anchor",
+      "sourceTitle": "The prevalence of poor sleep quality in the general population in China: a meta-analysis of epidemiological studies",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/38429554/",
+      "publisher": "同行评议系统综述与Meta分析",
+      "dataYear": "文献检索截至2023-11-23"
+    },
+    {
+      "id": "evidence.health.myopia.adult-evidence-gap",
+      "dimensionId": "health.myopia",
+      "grade": "C",
+      "modelUse": "excluded",
+      "sourceTitle": "成年人近视参数证据缺口",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/19744728/",
+      "publisher": "心动概率局模型组",
+      "dataYear": "model-2026"
+    },
+    {
+      "id": "evidence.appearance.hair_full.community-study",
+      "dimensionId": "appearance.hair_full",
+      "grade": "B",
+      "modelUse": "anchor",
+      "sourceTitle": "Prevalence of androgenetic alopecia in China: a community-based study in six cities",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/20105167/",
+      "publisher": "同行评议社区研究",
+      "dataYear": "研究发表于2010"
+    },
+    {
+      "id": "evidence.appearance.hairline.assumption",
+      "dimensionId": "appearance.hairline",
+      "grade": "D",
+      "modelUse": "excluded",
+      "sourceTitle": "无统一客观定义或全国流行率",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/20105167/",
+      "publisher": "心动概率局娱乐设定",
+      "dataYear": "model-2026"
+    },
+    {
+      "id": "evidence.appearance.gray_hair.assumption",
+      "dimensionId": "appearance.gray_hair",
+      "grade": "D",
+      "modelUse": "excluded",
+      "sourceTitle": "无全国同口径流行率",
+      "sourceUrl": "https://www.nhc.gov.cn/",
+      "publisher": "心动概率局娱乐设定",
+      "dataYear": "model-2026"
+    },
+    {
+      "id": "evidence.health.teeth.malocclusion-review",
+      "dimensionId": "health.teeth",
+      "grade": "C",
+      "modelUse": "excluded",
+      "sourceTitle": "Prevalence of malocclusion in Chinese schoolchildren from 1991 to 2018",
+      "sourceUrl": "https://onlinelibrary.wiley.com/doi/10.1111/ipd.12591",
+      "publisher": "同行评议系统综述与Meta分析",
+      "dataYear": "研究1991—2018，2020发表"
+    },
+    {
+      "id": "evidence.soft.intimacy_health.ed-meta-analysis",
+      "dimensionId": "soft.intimacy_health",
+      "grade": "B",
+      "modelUse": "excluded",
+      "sourceTitle": "Meta-Analysis of Prevalence of Erectile Dysfunction in Mainland China",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/28024996/",
+      "publisher": "同行评议Meta分析",
+      "dataYear": "检索截至2015，2017发表"
+    },
+    {
+      "id": "evidence.soft.stamina.assumption",
+      "dimensionId": "soft.stamina",
+      "grade": "D",
+      "modelUse": "excluded",
+      "sourceTitle": "不同临床定义不能直接转为择偶命中概率",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/28024996/",
+      "publisher": "心动概率局产品定义",
+      "dataYear": "model-2026"
+    },
+    {
+      "id": "evidence.soft.currently_single.assumption",
+      "dimensionId": "soft.currently_single",
+      "grade": "D",
+      "modelUse": "excluded",
+      "sourceTitle": "当前关系状态证据缺口",
+      "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/B0503.jpg",
+      "publisher": "心动概率局模型组",
+      "dataYear": "model-2026"
+    },
+    {
+      "id": "evidence.soft.orientation.assumption",
+      "dimensionId": "soft.orientation",
+      "grade": "D",
+      "modelUse": "excluded",
+      "sourceTitle": "取向比例不进入人口价值判断",
+      "sourceUrl": "https://www.who.int/health-topics/gender",
+      "publisher": "心动概率局隐私与尊重原则",
+      "dataYear": "model-2026"
+    },
+    {
+      "id": "evidence.soft.cooking.assumption",
+      "dimensionId": "soft.cooking",
+      "grade": "D",
+      "modelUse": "excluded",
+      "sourceTitle": "无统一技能阈值的软偏好",
+      "sourceUrl": "https://www.stats.gov.cn/zt_18555/zthd/sjtjr/d12kf/202507/t20250730_1960619.html",
+      "publisher": "心动概率局产品定义",
+      "dataYear": "model-2026"
+    },
+    {
+      "id": "evidence.soft.family_pension.assumption",
+      "dimensionId": "soft.family_pension",
+      "grade": "D",
+      "modelUse": "excluded",
+      "sourceTitle": "养老保险参保人数不能直接换算父母退休金命中率",
+      "sourceUrl": "https://www.stats.gov.cn/xxgk/sjfb/tjgb2020/202602/t20260228_1962662.html",
+      "publisher": "心动概率局模型组",
+      "dataYear": "model-2026"
+    },
+    {
+      "id": "evidence.soft.only_child.assumption",
+      "dimensionId": "soft.only_child",
+      "grade": "D",
+      "modelUse": "excluded",
+      "sourceTitle": "独生子女cohort与城乡差异证据缺口",
+      "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/left.htm",
+      "publisher": "心动概率局模型组",
+      "dataYear": "model-2026"
+    },
+    {
+      "id": "evidence.soft.in_system.census-employment",
+      "dimensionId": "soft.in_system",
+      "grade": "C",
+      "modelUse": "excluded",
+      "sourceTitle": "就业行业/职业表不能直接等同单位所有制",
+      "sourceUrl": "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/B0403.jpg",
+      "publisher": "心动概率局模型组",
+      "dataYear": "model-2026"
+    },
+    {
+      "id": "evidence.soft.tattoo_free.assumption",
+      "dimensionId": "soft.tattoo_free",
+      "grade": "D",
+      "modelUse": "excluded",
+      "sourceTitle": "无全国相同口径流行率",
+      "sourceUrl": "https://www.stats.gov.cn/",
+      "publisher": "心动概率局产品定义",
+      "dataYear": "model-2026"
+    },
+    {
+      "id": "evidence.soft.mbti.entertainment",
+      "dimensionId": "soft.mbti",
+      "grade": "D",
+      "modelUse": "excluded",
+      "sourceTitle": "MBTI不进入人口估算",
+      "sourceUrl": "https://www.myersbriggs.org/",
+      "publisher": "心动概率局娱乐设定",
+      "dataYear": "model-2026"
+    },
+    {
+      "id": "evidence.entertainment.zodiac.uniform",
+      "dimensionId": "entertainment.zodiac",
+      "grade": "D",
+      "modelUse": "excluded",
+      "sourceTitle": "十二等分娱乐假设",
+      "sourceUrl": "https://www.stats.gov.cn/",
+      "publisher": "心动概率局娱乐设定",
+      "dataYear": "model-2026"
+    },
+    {
+      "id": "evidence.base.region.nanjing-2025",
+      "dimensionId": "base.region",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "南京市2025年国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.nanjing.gov.cn/bmfw/njsj/202604/t20260403_5818444.html",
+      "publisher": "南京市统计局",
+      "dataYear": "2025-year-end"
+    },
+    {
+      "id": "evidence.base.region.xian-2025",
+      "dimensionId": "base.region",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "西安市2025年国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.xa.gov.cn/web_files/tjj/file/2026/05/15/202605151000219859531.pdf",
+      "publisher": "西安市统计局、国家统计局西安调查队",
+      "dataYear": "2025-year-end"
+    },
+    {
+      "id": "evidence.base.region.chongqing-2025",
+      "dimensionId": "base.region",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "2025年重庆市国民经济和社会发展统计公报",
+      "sourceUrl": "https://www.cq.gov.cn/zwgk/zfxxgkml/sjfb_120853/tjgb/202603/t20260326_15568523.html",
+      "publisher": "重庆市统计局、国家统计局重庆调查总队",
+      "dataYear": "2025-year-end"
+    },
+    {
+      "id": "evidence.base.region.tianjin-2025",
+      "dimensionId": "base.region",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "2025年天津市国民经济和社会发展统计公报",
+      "sourceUrl": "https://www.tj.gov.cn/sq/tjgb/202603/t20260327_7271193.html",
+      "publisher": "天津市统计局、国家统计局天津调查总队",
+      "dataYear": "2025-year-end"
+    },
+    {
+      "id": "evidence.base.region.zhengzhou-2025",
+      "dimensionId": "base.region",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "2025年郑州常住人口总量1313.8万人 人口高质量发展持续推进",
+      "sourceUrl": "https://tjj.zhengzhou.gov.cn/fxtj/10069073.jhtml",
+      "publisher": "郑州市统计局",
+      "dataYear": "2025-year-end"
+    },
+    {
+      "id": "evidence.base.region.dongguan-2025",
+      "dimensionId": "base.region",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "2025年东莞市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.dg.gov.cn/tjzl/tjgb/content/post_4537415.html",
+      "publisher": "东莞市统计局、国家统计局东莞调查队",
+      "dataYear": "2025-year-end"
+    },
+    {
+      "id": "evidence.base.region.foshan-2024",
+      "dimensionId": "base.region",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "2024年佛山市国民经济和社会发展统计公报",
+      "sourceUrl": "https://www.foshan.gov.cn/attachment/0/537/537176/6564843.pdf",
+      "publisher": "佛山市统计局、国家统计局佛山调查队",
+      "dataYear": "2024-year-end"
+    },
+    {
+      "id": "evidence.base.region.jinan-2025",
+      "dimensionId": "base.region",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "2025年济南市国民经济和社会发展统计公报",
+      "sourceUrl": "https://jntj.jinan.gov.cn/col/col18254/art/2026/art_7dc3135bb2209f961b3c65baa8ab3d2d.html",
+      "publisher": "济南市统计局、国家统计局济南调查队",
+      "dataYear": "2025-year-end"
+    },
+    {
+      "id": "evidence.base.region.shenyang-2024",
+      "dimensionId": "base.region",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "2024年沈阳市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.shenyang.gov.cn/sjfb/tjgb/202504/P020250423354552607711.pdf",
+      "publisher": "沈阳市统计局、国家统计局沈阳调查队",
+      "dataYear": "2024-year-end"
+    },
+    {
+      "id": "evidence.base.region.fuzhou-2025",
+      "dimensionId": "base.region",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "2025年福州市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.fuzhou.gov.cn/zwgk/tjzl/ndbg/202604/t20260414_5308173.htm",
+      "publisher": "福州市统计局、国家统计局福州调查队",
+      "dataYear": "2025-year-end"
+    },
+    {
+      "id": "evidence.base.region.changzhou-2025",
+      "dimensionId": "base.region",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "2025年常州市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.changzhou.gov.cn/content/suitable/show?catid=24519&id=29035",
+      "publisher": "常州市统计局、国家统计局常州调查队",
+      "dataYear": "2025-year-end"
+    },
+    {
+      "id": "evidence.base.region.nantong-2024",
+      "dimensionId": "base.region",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "2024年南通市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.nantong.gov.cn/ntstj/2025tjnj/zk/html/gb.pdf",
+      "publisher": "南通市统计局、国家统计局南通调查队",
+      "dataYear": "2024-year-end"
+    },
+    {
+      "id": "evidence.base.region.yantai-2025",
+      "dimensionId": "base.region",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "2025年烟台市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.yantai.gov.cn/col/col117/art/2026/art_61a619eacfd44e5bbf80e45bf2cdd6d0.html",
+      "publisher": "烟台市统计局、国家统计局烟台调查队",
+      "dataYear": "2025-year-end"
+    },
+    {
+      "id": "evidence.base.region.shijiazhuang-2025",
+      "dimensionId": "base.region",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "石家庄市2025年国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.sjz.gov.cn/columns/940d701f-5e56-4f5d-9ece-7968f6354993/202605/26/f062dca8-ce95-46f8-b1c9-33f507db5a29.html",
+      "publisher": "石家庄市统计局、国家统计局石家庄调查队",
+      "dataYear": "2025-year-end"
+    },
+    {
+      "id": "evidence.base.region.beijing-2025",
+      "dimensionId": "base.region",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "北京市2025年国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.beijing.gov.cn/tjsj_31433/tjgb_31445/ndgb_31446/202603/t20260326_4566469.html",
+      "publisher": "北京市统计局、国家统计局北京调查总队",
+      "dataYear": "2025-year-end"
+    },
+    {
+      "id": "evidence.base.region.shanghai-2025",
+      "dimensionId": "base.region",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "2025年上海市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.sh.gov.cn/tjgb/20260330/e0772941e8e041eaaad2df850b44ef98.html",
+      "publisher": "上海市统计局、国家统计局上海调查总队",
+      "dataYear": "2025-year-end"
+    },
+    {
+      "id": "evidence.base.region.shenzhen-2025",
+      "dimensionId": "base.region",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "深圳市2025年国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.sz.gov.cn/zwgk/zfxxgkml/tjsj/tjgb/content/post_12803919.html",
+      "publisher": "深圳市统计局、国家统计局深圳调查队",
+      "dataYear": "2025-year-end"
+    },
+    {
+      "id": "evidence.base.region.guangzhou-2025",
+      "dimensionId": "base.region",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "2025年广州市人口规模及分布情况",
+      "sourceUrl": "https://tjj.gz.gov.cn/zzfwzq/tjgb/content/post_10804088.html",
+      "publisher": "广州市统计局",
+      "dataYear": "2025-year-end"
+    },
+    {
+      "id": "evidence.base.region.suzhou-2025",
+      "dimensionId": "base.region",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "2025年苏州市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.suzhou.gov.cn/sztjj/tjgb/202604/3dc4b574cabd4e86b36ec5d3280e927c.shtml",
+      "publisher": "苏州市统计局",
+      "dataYear": "2025-year-end"
+    },
+    {
+      "id": "evidence.base.region.wuhan-2025",
+      "dimensionId": "base.region",
+      "grade": "A",
+      "modelUse": "anchor",
+      "sourceTitle": "2025年武汉市国民经济和社会发展统计公报",
+      "sourceUrl": "https://tjj.wuhan.gov.cn/tjfw/tjgb/202604/t20260408_2750693.shtml",
+      "publisher": "武汉市统计局、国家统计局武汉调查队",
+      "dataYear": "2025-year-end"
+    }
+  ]
+}

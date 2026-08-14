@@ -20,6 +20,7 @@
     "test:model": "vitest run tests/model tests/data tests/performance",
     "test:e2e": "playwright test",
     "validate:model": "tsx scripts/validate-model.ts",
+    "generate:evidence-runtime": "tsx scripts/generate-evidence-runtime.ts",
     "audit:prod": "npm audit --omit=dev --audit-level=high --registry=https://registry.npmjs.org",
     "scan:secrets": "tsx scripts/scan-secrets.ts",
     "scan:dist": "tsx scripts/scan-dist.ts",

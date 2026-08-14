@@ -20,10 +20,15 @@ export const POPULATION_BY_AGE: readonly PopulationByAgeRow[] = populationByAgeJ
 const populationByAge = new Map(POPULATION_BY_AGE.map((row) => [row.age, row]))
 
 // 2025 year-end mainland population (evidence.base.region.population-2025).
-// It is used only as the same-denominator divisor for selected city resident
-// population. The census single-age shape remains 2020 and is not silently
-// inflated to 2025 without a published 2025 single-age table.
+// It is a disclosed macro reference only. It must not be used as the divisor
+// for a 2020 single-age numerator because that silently mixes denominators.
 export const NATIONAL_POPULATION_WAN = 140_489
+
+// Seventh Census mainland total. A supported city's current resident anchor
+// is multiplied by the 2020 target age/sex/marital share of this total. This
+// still assumes the city has the national demographic shape, so city results
+// remain C-grade sensitivity estimates rather than direct city counts.
+export const CENSUS_2020_MAINLAND_POPULATION_WAN = 141_177.8724
 
 export function populationWanAtAge(age: number): number {
   if (!Number.isInteger(age) || age < MIN_MODEL_AGE || age > MAX_MODEL_AGE) return 0
@@ -157,7 +162,7 @@ export function cityPopulationScale(cities: readonly string[]): number {
     (sum, city) => sum + (uniqueCities.has(city.name) ? city.pop : 0),
     0,
   )
-  return Math.min(1, selectedPopulationWan / NATIONAL_POPULATION_WAN)
+  return Math.min(1, selectedPopulationWan / CENSUS_2020_MAINLAND_POPULATION_WAN)
 }
 
 export function cityWageScale(cities: readonly string[]): number {

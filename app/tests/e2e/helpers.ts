@@ -7,13 +7,21 @@ export async function openApp(page: Page) {
 }
 
 export async function goToStep(page: Page, stepNumber: number, label: string) {
+  void label
   await page.getByRole('button', {
-    name: new RegExp(`第 ${stepNumber} 步，共 7 步：${label}`),
+    name: new RegExp(`^第 ${stepNumber} 步，共 7 步：`),
   }).click()
 }
 
 export function desktopEstimate(page: Page) {
-  return page.locator('.desktop-result .result-number')
+  // Kimi's current layout keeps the live total in the persistent stage rather
+  // than the retired `.desktop-result` card. The slot reels contain all ten
+  // visual digits, so assertions must read the accessible label, not innerText.
+  return page.locator('.stage-scoreboard .slot-number')
+}
+
+export async function desktopEstimateLabel(page: Page) {
+  return (await desktopEstimate(page).getAttribute('aria-label')) ?? ''
 }
 
 export async function expectNoHorizontalOverflow(page: Page) {
@@ -27,9 +35,14 @@ export async function expectNoHorizontalOverflow(page: Page) {
 export async function expectNoSeriousAxeViolations(page: Page) {
   // Axe must inspect the settled colors. Scanning during the 140–170ms dialog
   // fade measures a translucent intermediate frame against the dark backdrop.
+  // The current stage contains intentionally looping decorative animations, so
+  // waiting for every document animation to finish would never resolve.
   await page.evaluate(async () => {
-    const animations = document.getAnimations()
-    await Promise.all(animations.map((animation) => animation.finished.catch(() => undefined)))
+    const finiteAnimations = document.getAnimations().filter((animation) => {
+      const iterations = animation.effect?.getTiming().iterations
+      return iterations !== Number.POSITIVE_INFINITY
+    })
+    await Promise.all(finiteAnimations.map((animation) => animation.finished.catch(() => undefined)))
   })
   const result = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])

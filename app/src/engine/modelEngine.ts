@@ -1,38 +1,30 @@
-import { z } from 'zod'
+import { array, object, string, type z } from 'zod/v4'
 import {
-  CAR_RATE,
-  EDU,
-  EDU_INCOME_PREMIUM,
-  ECON_RHO,
-  HOUSE_LOCAL_RATE,
-  INCOME_MEDIAN_WAN,
-  INCOME_SIGMA,
-  WEALTH_MEDIAN_WAN,
-  WEALTH_SIGMA,
-  bmiDist,
-  drinkingRate,
-  eduAgeFactor,
-  fullHairRate,
+  drinkingRateScenario,
+  HEIGHT_SD_SCENARIOS,
   heightDist,
-  incomeAgeFactor,
   nonSmokerRate,
-  wealthAgeFactor,
 } from '../data/model'
 import {
+  CENSUS_2020_MAINLAND_POPULATION_WAN,
   MAX_MODEL_AGE,
   MIN_MODEL_AGE,
   cityPopulationScale,
-  cityWageScale,
   maleShareAtAge,
   maritalShareAtAge,
   populationWanAtAge,
 } from '../data/population'
+import {
+  populationPolicyForDimension,
+  type PopulationScenarioMethod,
+  unsupportedSelectedCities,
+} from '../data/population-policy'
 import { DIMENSION_BY_ID, type DimensionClass, type EvidenceGrade } from '../model/dimensions'
+import { activeConditions } from '../model/selectionUtils'
 import { DATA_VERSION, MODEL_VERSION } from '../model/versions'
 import {
   parseSelection,
   selectionSchema,
-  type EducationId,
   type ModelSelection,
   type SoftPreferenceId,
 } from '../model/schema'
@@ -87,12 +79,28 @@ export interface ModelResult {
   input: ModelSelection
   population: {
     base: number
+    /** Full resident-population ceiling for the selected geography. */
+    scopeCeiling: number
     estimate: number
     range: PopulationRange
+    status: 'estimated' | 'upper_bound' | 'unavailable'
+    interpretation: 'all_selected_hard_conditions' | 'quantified_conditions_only' | 'not_available'
+    numericStatus: 'available' | 'unavailable'
+    zeroMeaning: 'not_zero' | 'positive_below_resolution' | 'model_underflow' | 'logical_zero' | 'unavailable'
     resolutionFloor: number
     resolutionExceeded: boolean
     display: string
     displayShort: string
+  }
+  coverage: {
+    includedHardConditions: string[]
+    unquantifiedHardConditions: Array<{
+      dimensionId: string
+      label: string
+      sensitive: boolean
+      reason: string
+    }>
+    unsupportedCities: string[]
   }
   scores: {
     softMatch: number
@@ -129,11 +137,51 @@ export class ModelInputError extends Error {
 
 interface RawPopulationResult {
   base: number
+  scopeCeiling: number
   estimate: number
   groups: GroupResult[]
   activeDimensions: string[]
-  uncertaintyContributions: number[]
   confidenceReasons: string[]
+  availability: 'available' | 'unavailable'
+  unsupportedCities: string[]
+  structuralRange: PopulationRange
+}
+
+export interface ModelComputationOptions {
+  /**
+   * Selected soft/sensitive dimensions that the user explicitly declares as
+   * hard requirements. They remain unquantified unless the population policy
+   * has a reliable compatible denominator; no guessed prevalence is applied.
+   */
+  hardRequirementIds?: readonly string[]
+}
+
+const modelComputationOptionsSchema = object({
+  hardRequirementIds: array(string().min(1))
+    .max(DIMENSION_BY_ID.size)
+    .refine((ids) => new Set(ids).size === ids.length, { message: '硬条件 ID 不能重复' })
+    .refine((ids) => ids.every((id) => DIMENSION_BY_ID.has(id)), { message: '包含未登记的硬条件 ID' })
+    .optional(),
+}).strict()
+
+export class ModelOptionsError extends Error {
+  readonly issues: z.core.$ZodIssue[]
+
+  constructor(error: z.ZodError) {
+    super('模型计算选项未通过运行时校验')
+    this.name = 'ModelOptionsError'
+    this.issues = error.issues
+  }
+}
+
+export class ModelRequirementError extends Error {
+  readonly invalidDimensionIds: string[]
+
+  constructor(invalidDimensionIds: string[]) {
+    super(`硬条件必须是已选择且已登记的维度：${invalidDimensionIds.join('、')}`)
+    this.name = 'ModelRequirementError'
+    this.invalidDimensionIds = invalidDimensionIds
+  }
 }
 
 function normalCdf(z: number): number {
@@ -145,277 +193,227 @@ function normalCdf(z: number): number {
   return clampProbability(z > 0 ? 1 - probability : probability)
 }
 
-function normalInverse(probability: number): number {
-  const a = [-39.69683028665376, 220.9460984245205, -275.9285104469687, 138.357751867269, -30.66479806614716, 2.506628277459239]
-  const b = [-54.47609879822406, 161.5858368580409, -155.6989798598866, 66.80131188771972, -13.28068155288572]
-  const c = [-0.007784894002430293, -0.3223964580411365, -2.400758277161838, -2.549732539343734, 4.374664141464968, 2.938163982698783]
-  const d = [0.007784695709041462, 0.3224671290700398, 2.445134137142996, 3.754408661907416]
-  const lower = 0.02425
-  const p = Math.min(1 - 1e-12, Math.max(1e-12, probability))
-  if (p < lower) {
-    const q = Math.sqrt(-2 * Math.log(p))
-    return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
-      ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1)
-  }
-  if (p > 1 - lower) return -normalInverse(1 - p)
-  const q = p - 0.5
-  const r = q * q
-  return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q /
-    (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1)
-}
-
-/** P(Z1 > z1, Z2 > z2) for a Gaussian copula, by deterministic quadrature. */
-function gaussianCopulaJointTail(p1: number, p2: number, rho: number): number {
-  if (p1 >= 1) return p2
-  if (p2 >= 1) return p1
-  if (p1 <= 0 || p2 <= 0) return 0
-  const z1 = normalInverse(1 - p1)
-  const z2 = normalInverse(1 - p2)
-  const segments = 120
-  const from = z1
-  const to = z1 + 8
-  const width = (to - from) / segments
-  let sum = 0
-  for (let index = 0; index <= segments; index += 1) {
-    const z = from + index * width
-    const density = Math.exp((-z * z) / 2) / Math.sqrt(2 * Math.PI)
-    const conditional = 1 - normalCdf((z2 - rho * z) / Math.sqrt(1 - rho * rho))
-    sum += (index === 0 || index === segments ? 0.5 : 1) * density * conditional
-  }
-  return clampProbability(Math.min(p1, p2, sum * width))
-}
-
 function probabilityInNormalRange(minimum: number, maximum: number, mean: number, standardDeviation: number): number {
   return clampProbability(
     normalCdf((maximum - mean) / standardDeviation) - normalCdf((minimum - mean) / standardDeviation),
   )
 }
 
-function basePopulation(selection: ModelSelection): number {
-  const scale = cityPopulationScale(selection.target.cities)
-  let people = 0
+interface PopulationStratum {
+  age: number
+  /** Age×sex residents after the region scenario, before marital/other filters. */
+  residents: ProbabilityScenario
+}
+
+function requireScenarioMethod(
+  dimensionId: string,
+  expectedMethod: PopulationScenarioMethod,
+) {
+  const policy = populationPolicyForDimension(dimensionId)
+  if (policy.scenarioMethod !== expectedMethod) {
+    throw new Error(`Population scenario policy is not runtime-aligned: ${dimensionId}`)
+  }
+  return policy
+}
+
+function multiplierScenarioFor(
+  dimensionId: string,
+  expectedMethod: PopulationScenarioMethod,
+  baseline: number,
+): ProbabilityScenario {
+  const policy = requireScenarioMethod(dimensionId, expectedMethod)
+  const range = policy.scenarioRange
+  if (range == null) {
+    throw new Error(`Population scenario policy is not runtime-aligned: ${dimensionId}`)
+  }
+  return {
+    conservative: clampProbability(baseline * range.conservativeMultiplier),
+    baseline,
+    optimistic: clampProbability(baseline * range.optimisticMultiplier),
+  }
+}
+
+function maritalShareScenarioAtAge(selection: ModelSelection, age: number): ProbabilityScenario {
+  requireScenarioMethod('base.marital', 'five_year_group_mapping')
+  const baseline = maritalShareAtAge(age, selection.target.gender, selection.target.maritalStatuses)
+  if (selection.target.maritalStatuses.length === 0) {
+    return { conservative: 1, baseline: 1, optimistic: 1 }
+  }
+  // These are declared sensitivity scenarios for mapping five-year official
+  // rates to single ages. Boundary borrowing is deliberately wider. They are
+  // not sampling confidence intervals.
+  const relativeSpread = age < 20 || age > 49 ? 0.16 : 0.08
+  return {
+    conservative: clampProbability(baseline * (1 - relativeSpread)),
+    baseline,
+    optimistic: clampProbability(baseline * (1 + relativeSpread)),
+  }
+}
+
+function populationStrata(selection: ModelSelection): PopulationStratum[] {
+  const baselineScale = cityPopulationScale(selection.target.cities)
+  const regionScale: ProbabilityScenario = isNationwideSelection(selection)
+    ? { conservative: 1, baseline: 1, optimistic: 1 }
+    : multiplierScenarioFor('base.region', 'city_structure_multiplier', baselineScale)
+  const strata: PopulationStratum[] = []
   for (let age = selection.target.age.min; age <= selection.target.age.max; age += 1) {
     const totalAtAge = populationWanAtAge(age) * 10_000
     const genderShare = selection.target.gender === 'male' ? maleShareAtAge(age) : 1 - maleShareAtAge(age)
-    const maritalShare = maritalShareAtAge(age, selection.target.gender, selection.target.maritalStatuses)
-    people += totalAtAge * scale * genderShare * maritalShare
+    const ageSexPeople = totalAtAge * genderShare
+    strata.push({
+      age,
+      residents: {
+        conservative: ageSexPeople * regionScale.conservative,
+        baseline: ageSexPeople * regionScale.baseline,
+        optimistic: ageSexPeople * regionScale.optimistic,
+      },
+    })
   }
-  return Math.max(0, people)
+  return strata
 }
 
-function heightFactor(selection: ModelSelection): number {
+function isNationwideSelection(selection: ModelSelection): boolean {
+  return selection.target.cities.length === 0 || selection.target.cities.includes('全国')
+}
+
+interface ProbabilityScenario {
+  conservative: number
+  baseline: number
+  optimistic: number
+}
+
+function heightProbabilityAtAge(selection: ModelSelection, age: number): ProbabilityScenario | null {
   const range = selection.target.heightCm
-  if (range == null || (range.min == null && range.max == null)) return 1
-  const minimum = range.min ?? 130
-  const maximum = range.max ?? 220
-  let denominator = 0
-  let numerator = 0
-  for (let age = selection.target.age.min; age <= selection.target.age.max; age += 1) {
-    const totalAtAge = populationWanAtAge(age)
-    const genderShare = selection.target.gender === 'male' ? maleShareAtAge(age) : 1 - maleShareAtAge(age)
-    const maritalShare = maritalShareAtAge(age, selection.target.gender, selection.target.maritalStatuses)
-    const weight = totalAtAge * genderShare * maritalShare
-    const distribution = heightDist(age, selection.target.gender)
-    denominator += weight
-    numerator += weight * probabilityInNormalRange(minimum, maximum, distribution.mean, distribution.sd)
-  }
-  return denominator > 0 ? clampProbability(numerator / denominator) : 0
-}
-
-function demographicWeightedProbability(
-  selection: ModelSelection,
-  probabilityAtAge: (age: number) => number,
-): number {
-  let denominator = 0
-  let numerator = 0
-  for (let age = selection.target.age.min; age <= selection.target.age.max; age += 1) {
-    const totalAtAge = populationWanAtAge(age)
-    const genderShare = selection.target.gender === 'male' ? maleShareAtAge(age) : 1 - maleShareAtAge(age)
-    const maritalShare = maritalShareAtAge(age, selection.target.gender, selection.target.maritalStatuses)
-    const weight = totalAtAge * genderShare * maritalShare
-    denominator += weight
-    numerator += weight * probabilityAtAge(age)
-  }
-  return denominator > 0 ? clampProbability(numerator / denominator) : 0
-}
-
-const BODY_RANGES: Record<ModelSelection['correlated']['bodyTypes'][number], readonly [number, number]> = {
-  underweight: [0, 17], slim: [17, 18.5], balanced: [18.5, 21.5], standard: [21.5, 24],
-  soft: [24, 26], full: [26, 28], round: [28, 99],
-}
-
-function bodyTypeProbability(selection: ModelSelection, age: number): number | null {
-  if (selection.correlated.bodyTypes.length === 0) return null
-  const { mean, sd } = bmiDist(age, selection.target.gender)
-  const probability = selection.correlated.bodyTypes.reduce((sum, bodyType) => {
-    const [minimum, maximum] = BODY_RANGES[bodyType]
-    return sum + probabilityInNormalRange(minimum, maximum, mean, sd)
-  }, 0)
-  return clampProbability(probability)
-}
-
-const EDUCATION_BANDS: Record<EducationId, (age: number) => number> = {
-  junior_college: (age) => Math.max(0, EDU.juniorPlus * eduAgeFactor(age) - EDU.bachelorPlus * eduAgeFactor(age)),
-  bachelor: (age) => Math.max(0, EDU.bachelorPlus * eduAgeFactor(age) - EDU.masterPlus * eduAgeFactor(age)),
-  master: (age) => Math.max(0, EDU.masterPlus * eduAgeFactor(age) - EDU.phd * eduAgeFactor(age)),
-  doctorate: (age) => Math.max(0, EDU.phd * eduAgeFactor(age)),
-}
-
-function educationProbability(selection: ModelSelection, age: number): number {
-  const selectedLevels = selection.correlated.educationLevels
-  return clampProbability(selectedLevels.length === 0
-    ? 1
-    : selectedLevels.reduce((sum, level) => sum + EDUCATION_BANDS[level](age), 0))
-}
-
-function educationIncomePremium(selection: ModelSelection): number {
-  if (selection.correlated.educationLevels.length === 0) return 1
-  const premiumByLevel: Record<EducationId, number> = {
-    junior_college: EDU_INCOME_PREMIUM.大专,
-    bachelor: EDU_INCOME_PREMIUM.本科,
-    master: EDU_INCOME_PREMIUM.硕士,
-    doctorate: EDU_INCOME_PREMIUM.博士,
-  }
-  let totalWeight = 0
-  let totalPremium = 0
-  for (const level of selection.correlated.educationLevels) {
-    const weight = EDUCATION_BANDS[level]((selection.target.age.min + selection.target.age.max) / 2)
-    totalWeight += weight
-    totalPremium += weight * premiumByLevel[level]
-  }
-  return totalWeight > 0 ? totalPremium / totalWeight : 1
-}
-
-function incomeTail(xWan: number): number {
-  if (xWan <= 0) return 1
-  return clampProbability(1 - normalCdf(Math.log(xWan / INCOME_MEDIAN_WAN) / INCOME_SIGMA))
-}
-
-function wealthTail(xWan: number): number {
-  if (xWan <= 0) return 1
-  return clampProbability(1 - normalCdf(Math.log(xWan / WEALTH_MEDIAN_WAN) / WEALTH_SIGMA))
-}
-
-function socioeconomicFactor(selection: ModelSelection): { factor: number; dimensions: string[]; note: string } {
-  const midpoint = (selection.target.age.min + selection.target.age.max) / 2
-  const dimensions: string[] = []
-  const education = educationProbability(selection, midpoint)
-  if (selection.correlated.educationLevels.length > 0) dimensions.push('education.level')
-
-  let income = 1
-  if (selection.correlated.minAnnualIncomeWan != null) {
-    dimensions.push('economy.income')
-    const scale = cityWageScale(selection.target.cities) * incomeAgeFactor(midpoint)
-    income = incomeTail(selection.correlated.minAnnualIncomeWan / Math.max(0.1, scale * educationIncomePremium(selection)))
-  }
-
-  let wealth = 1
-  if (selection.correlated.minHouseholdWealthWan != null) {
-    dimensions.push('economy.wealth')
-    const cityWealthScale = Math.pow(cityWageScale(selection.target.cities), 1.35)
-    wealth = wealthTail(selection.correlated.minHouseholdWealthWan / Math.max(0.1, wealthAgeFactor(midpoint) * cityWealthScale))
-  }
-  const economy = income < 1 && wealth < 1
-    ? gaussianCopulaJointTail(income, wealth, ECON_RHO)
-    : Math.min(income, wealth)
-
-  const housing = selection.correlated.housing
-  const hasHousingCondition = housing.required || housing.location != null || housing.minAreaSqm != null || housing.type != null
-  let house = 1
-  if (hasHousingCondition) {
-    dimensions.push('economy.house')
-    let ownership = HOUSE_LOCAL_RATE
-    if (selection.correlated.minHouseholdWealthWan != null) ownership += 0.2
-    else if (selection.correlated.minAnnualIncomeWan != null) ownership += 0.1
-    ownership = Math.min(0.94, ownership)
-    const locationProbability = housing.location == null ? 1 : ({ core: 0.15, urban: 0.5, suburban: 0.9 } as const)[housing.location]
-    const areaProbability = housing.minAreaSqm == null
-      ? 1
-      : housing.minAreaSqm <= 90 ? 0.55 : housing.minAreaSqm <= 120 ? 0.28 : housing.minAreaSqm <= 144 ? 0.12 : housing.minAreaSqm <= 200 ? 0.045 : 0.015
-    const typeProbability = housing.type == null || housing.type === 'apartment'
-      ? 1
-      : ({ large_flat: 0.02, villa: 0.006, courtyard: 0.0002 } as const)[housing.type]
-    // Type implies a size class, so it and area are nested rather than multiplied.
-    house = ownership * locationProbability * Math.min(areaProbability, typeProbability)
-  }
-
-  const vehicle = selection.correlated.vehicle
-  let car = 1
-  if (vehicle.required || vehicle.priceBands.length > 0) {
-    dimensions.push('economy.vehicle')
-    const conditionalOwnership = Math.min(0.78, CAR_RATE + (income < 1 || wealth < 1 ? 0.13 : 0))
-    const bandShare = vehicle.priceBands.length === 0
-      ? 1
-      : vehicle.priceBands.reduce((sum, band) => sum + ({
-          under_10: 0.35, '10_20': 0.35, '20_50': 0.22, '50_100': 0.06, over_100: 0.02,
-        } as const)[band], 0)
-    car = conditionalOwnership * clampProbability(bandShare)
-  }
-
-  // This multiplication is a documented conditional chain:
-  // P(education) × P(income,wealth | education,age,region)
-  // × P(house | economy) × P(vehicle | economy), not independent marginals.
-  const factor = clampProbability(education * economy * house * car)
+  if (range == null || (range.min == null && range.max == null)) return null
+  requireScenarioMethod('appearance.height', 'height_parameter_endpoints')
+  // Integer UI values denote inclusive one-centimetre bins. Without the
+  // half-centimetre continuity correction, 180–180 cm was an empty interval.
+  const minimum = range.min == null ? 130 : range.min - 0.5
+  const maximum = range.max == null ? 220 : range.max + 0.5
+  const distribution = heightDist(age, selection.target.gender)
+  const sdScenarios = HEIGHT_SD_SCENARIOS[selection.target.gender]
+  const probabilities = [
+    probabilityInNormalRange(minimum, maximum, distribution.mean, sdScenarios.conservative),
+    probabilityInNormalRange(minimum, maximum, distribution.mean, sdScenarios.baseline),
+    probabilityInNormalRange(minimum, maximum, distribution.mean, sdScenarios.optimistic),
+  ]
   return {
-    factor,
-    dimensions,
-    note: income < 1 && wealth < 1
-      ? '学历→收入、收入×资产 Gaussian copula、住房/车辆条件概率链'
-      : '学历、经济与资产条件通过条件概率链合并',
+    conservative: Math.min(...probabilities),
+    baseline: probabilityInNormalRange(minimum, maximum, distribution.mean, distribution.sd),
+    optimistic: Math.max(...probabilities),
   }
 }
 
-/**
- * Positive-correlation conjunction. It interpolates on log scale between the
- * independent product and the tightest marginal. Thus it can never exceed any
- * individual condition, but avoids treating overlapping health traits as
- * fully independent repeated deductions.
- */
-function correlatedConjunction(probabilities: readonly number[], correlation: number): number {
-  if (probabilities.length === 0) return 1
-  if (probabilities.length === 1) return clampProbability(probabilities[0])
-  const positive = probabilities.map((probability) => Math.max(1e-12, clampProbability(probability)))
-  const independent = positive.reduce((product, probability) => product * probability, 1)
-  const upperBound = Math.min(...positive)
-  return clampProbability(Math.pow(independent, 1 - correlation) * Math.pow(upperBound, correlation))
-}
-
-function healthBodyFactor(selection: ModelSelection): { factor: number; dimensions: string[]; note: string } {
-  const midpoint = (selection.target.age.min + selection.target.age.max) / 2
-  const probabilities: number[] = []
-  const dimensions: string[] = []
-  const body = bodyTypeProbability(selection, midpoint)
-  if (body != null) { probabilities.push(body); dimensions.push('appearance.body_type') }
+function lifestyleProbabilitiesAtAge(selection: ModelSelection, age: number): Array<{
+  dimensionId: string
+  probability: ProbabilityScenario
+}> {
+  const probabilities: Array<{ dimensionId: string; probability: ProbabilityScenario }> = []
   if (selection.correlated.smoking === 'non_smoker') {
-    probabilities.push(nonSmokerRate(selection.target.gender)); dimensions.push('lifestyle.smoking')
+    const point = nonSmokerRate(selection.target.gender)
+    probabilities.push({
+      dimensionId: 'lifestyle.smoking',
+      probability: multiplierScenarioFor(
+        'lifestyle.smoking',
+        'all_age_to_target_age_multiplier',
+        point,
+      ),
+    })
   }
   if (selection.correlated.drinking !== 'any') {
+    requireScenarioMethod('lifestyle.drinking', 'drinking_raking_endpoints')
     const level = selection.correlated.drinking === 'not_regular' ? 'notRegular' : 'none'
-    probabilities.push(demographicWeightedProbability(
-      selection,
-      (age) => drinkingRate(selection.target.gender, level, age),
-    )); dimensions.push('lifestyle.drinking')
+    probabilities.push({
+      dimensionId: 'lifestyle.drinking',
+      probability: drinkingRateScenario(selection.target.gender, level, age),
+    })
   }
-  // `no_major_chronic` is retained in the schema for saved selections, but the
-  // registry marks its composite prevalence as excluded. It is scored as a soft
-  // preference below and must never enter this population factor.
-  if (selection.correlated.hairCriteria.includes('full_hair')) {
-    probabilities.push(fullHairRate(midpoint, selection.target.gender)); dimensions.push('appearance.hair_full')
-  }
+  return probabilities
+}
+
+function intersectionBounds(probabilities: readonly ProbabilityScenario[]): ProbabilityScenario {
+  if (probabilities.length === 0) return { conservative: 1, baseline: 1, optimistic: 1 }
+  const conservative = probabilities.map((scenario) => clampProbability(scenario.conservative))
+  const baseline = probabilities.map((scenario) => clampProbability(scenario.baseline))
+  const optimistic = probabilities.map((scenario) => clampProbability(scenario.optimistic))
   return {
-    factor: correlatedConjunction(probabilities, 0.3),
-    dimensions,
-    note: probabilities.length > 1
-      ? '健康/体型/生活方式使用正相关交集近似（独立乘积与最小边际之间）'
-      : '单一健康或生活方式边际概率',
+    // Fréchet bounds require no unobserved correlation parameter. The central
+    // value is the transparent conditional-independence scenario, not a fact.
+    conservative: clampProbability(
+      conservative.reduce((sum, probability) => sum + probability, 0) - (conservative.length - 1),
+    ),
+    baseline: baseline.reduce((product, probability) => product * probability, 1),
+    optimistic: Math.min(...optimistic),
   }
+}
+
+function selectedUnquantifiedHardConditions(
+  selection: ModelSelection,
+  hardRequirementIds: readonly string[],
+): ModelResult['coverage']['unquantifiedHardConditions'] {
+  const active = activeConditions(selection)
+  const activeIds = new Set(active.map((condition) => condition.dimensionId))
+  const invalidDimensionIds = [...new Set(hardRequirementIds)].filter((dimensionId) => {
+    const dimension = DIMENSION_BY_ID.get(dimensionId)
+    return dimension == null || dimension.classification === 'entertainment' || !activeIds.has(dimensionId)
+  })
+  if (invalidDimensionIds.length > 0) throw new ModelRequirementError(invalidDimensionIds)
+
+  const selected = active.filter((condition) => {
+    const policy = populationPolicyForDimension(condition.dimensionId)
+    const isPopulationHard = condition.classification === 'hard_filter' || condition.classification === 'correlated_hard'
+    return (isPopulationHard || hardRequirementIds.includes(condition.dimensionId)) && policy.mainEstimateEffect === 'do_not_apply'
+  }).map((condition) => condition.dimensionId)
+
+  return [...new Set(selected)].map((dimensionId) => {
+    const dimension = DIMENSION_BY_ID.get(dimensionId)
+    const policy = populationPolicyForDimension(dimensionId)
+    return {
+      dimensionId,
+      label: dimension?.label ?? dimensionId,
+      sensitive: dimension?.sensitive ?? true,
+      reason: policy.reason,
+    }
+  })
 }
 
 function calculatePopulation(selection: ModelSelection): RawPopulationResult {
-  const base = basePopulation(selection)
+  const unsupportedCities = unsupportedSelectedCities(selection.target.cities)
+  if (unsupportedCities.length > 0) {
+    return {
+      base: 0,
+      estimate: 0,
+      groups: [{
+        id: 'demographic',
+        label: '基础人口范围',
+        classification: 'hard_filter',
+        dimensions: ['base.age', 'base.region', 'base.gender'],
+        factor: 0,
+        before: 0,
+        after: 0,
+        method: '未计算：缺少已登记的一手常住人口锚点',
+        evidenceGrade: 'NA',
+        note: `${unsupportedCities.join('、')}当前不可可靠量化；0 是数值占位，不表示当地无人。`,
+      }],
+      activeDimensions: [],
+      scopeCeiling: 0,
+      confidenceReasons: [`${unsupportedCities.join('、')}缺少本数据版本可复核的官方常住人口锚点，主人口结果不可用。`],
+      availability: 'unavailable',
+      unsupportedCities,
+      structuralRange: { conservative: 0, baseline: 0, optimistic: 0 },
+    }
+  }
+
+  const strata = populationStrata(selection)
+  const maritalActive = selection.target.maritalStatuses.length > 0
+  const base = strata.reduce((sum, stratum) => {
+    const marital = maritalShareScenarioAtAge(selection, stratum.age)
+    return sum + stratum.residents.baseline * marital.baseline
+  }, 0)
+  const scopeCeiling = CENSUS_2020_MAINLAND_POPULATION_WAN * 10_000 * cityPopulationScale(selection.target.cities)
   const hasMaritalBoundaryApproximation = selection.target.maritalStatuses.length > 0 &&
     (selection.target.age.min < 20 || selection.target.age.max > 49)
-  const demographicEvidenceGrade: EvidenceGrade = !selection.target.cities.includes('全国') || hasMaritalBoundaryApproximation
+  const demographicEvidenceGrade: EvidenceGrade = !isNationwideSelection(selection) || hasMaritalBoundaryApproximation
     ? 'C'
     : selection.target.maritalStatuses.length > 0 ? 'B' : 'A'
   const groups: GroupResult[] = [{
@@ -430,66 +428,82 @@ function calculatePopulation(selection: ModelSelection): RawPopulationResult {
         : '婚史互斥类别按官方五岁组直接率取并集。',
   }]
   const activeDimensions: string[] = []
-  let estimate = base
+  const heightActive = selection.target.heightCm != null &&
+    (selection.target.heightCm.min != null || selection.target.heightCm.max != null)
+  const lifestyleDimensions = [...new Set(
+    strata.flatMap((stratum) => lifestyleProbabilitiesAtAge(selection, stratum.age).map((item) => item.dimensionId)),
+  )]
 
-  const height = heightFactor(selection)
-  if (selection.target.heightCm != null && (selection.target.heightCm.min != null || selection.target.heightCm.max != null)) {
-    const before = estimate
-    estimate *= height
+  let baseline = 0
+  let conservative = 0
+  let optimistic = 0
+  let afterHeight = 0
+  for (const stratum of strata) {
+    const maritalProbability = maritalShareScenarioAtAge(selection, stratum.age)
+    const heightProbability = heightProbabilityAtAge(selection, stratum.age) ?? {
+      conservative: 1,
+      baseline: 1,
+      optimistic: 1,
+    }
+    const lifestyleProbabilities = lifestyleProbabilitiesAtAge(selection, stratum.age).map((item) => item.probability)
+    const allActiveProbabilities = [
+      ...(maritalActive ? [maritalProbability] : []),
+      ...(heightActive ? [heightProbability] : []),
+      ...lifestyleProbabilities,
+    ]
+    const combinedBounds = intersectionBounds(allActiveProbabilities)
+    const heightPeople = stratum.residents.baseline * maritalProbability.baseline * heightProbability.baseline
+    afterHeight += heightPeople
+    baseline += stratum.residents.baseline * combinedBounds.baseline
+    conservative += stratum.residents.conservative * combinedBounds.conservative
+    optimistic += stratum.residents.optimistic * combinedBounds.optimistic
+  }
+
+  if (heightActive) {
+    const heightFactor = base > 0 ? clampProbability(afterHeight / base) : 0
     activeDimensions.push('appearance.height')
     groups.push({
       id: 'anthropometric', label: '明确身高范围', classification: 'hard_filter', dimensions: ['appearance.height'],
-      factor: height, before, after: estimate, method: '官方年龄/性别均值 + C级正态离散度区间概率', evidenceGrade: 'C',
-      note: '上下限按同一分布计算，不重复扣减。',
+      factor: heightFactor, before: base, after: afterHeight, method: '逐岁加权：官方年龄/性别均值 + C级正态离散度区间概率', evidenceGrade: 'C',
+      note: '每个单岁人口分别计算上下限的同一分布区间，再求和；不使用年龄中点。',
     })
   }
 
-  const socioeconomic = socioeconomicFactor(selection)
-  if (socioeconomic.dimensions.length > 0) {
-    const before = estimate
-    estimate *= socioeconomic.factor
-    activeDimensions.push(...socioeconomic.dimensions)
+  if (lifestyleDimensions.length > 0) {
+    const before = heightActive ? afterHeight : base
+    const factor = before > 0 ? clampProbability(baseline / before) : 0
+    activeDimensions.push(...lifestyleDimensions)
     groups.push({
-      id: 'socioeconomic', label: '社会经济相关组', classification: 'correlated_hard', dimensions: socioeconomic.dimensions,
-      factor: socioeconomic.factor, before, after: estimate, method: '条件概率链 + 收入资产 copula + 嵌套关系', evidenceGrade: 'C',
-      note: socioeconomic.note,
-    })
-  }
-
-  const healthBody = healthBodyFactor(selection)
-  if (healthBody.dimensions.length > 0) {
-    const before = estimate
-    estimate *= healthBody.factor
-    activeDimensions.push(...healthBody.dimensions)
-    groups.push({
-      id: 'health_body', label: '健康与生活相关组', classification: 'correlated_hard', dimensions: healthBody.dimensions,
-      factor: healthBody.factor, before, after: estimate, method: '相关交集（有界对数插值）', evidenceGrade: 'C',
-      note: healthBody.note,
+      id: 'health_body', label: '生活方式相关组', classification: 'correlated_hard', dimensions: lifestyleDimensions,
+      factor, before, after: baseline, method: '逐岁边际；多条件基准为条件独立情景，范围使用 Fréchet 联合概率界', evidenceGrade: 'C',
+      note: lifestyleDimensions.length > 1
+        ? '公开数据没有年龄×性别×烟酒联合微观表；基准值是透明情景，不宣称独立性为事实。'
+        : '单一生活方式条件按公开年龄/性别边际逐岁加权。',
     })
   }
 
   return {
     base,
-    estimate: Math.max(0, Number.isFinite(estimate) ? estimate : 0),
+    scopeCeiling,
+    estimate: Math.max(0, Number.isFinite(baseline) ? baseline : 0),
     groups,
     activeDimensions,
-    uncertaintyContributions: [
-      selection.target.cities.includes('全国') ? 0.12 : 0.2,
-      ...(selection.target.maritalStatuses.length > 0 ? [hasMaritalBoundaryApproximation ? 0.16 : 0.08] : []),
-      ...(height < 1 ? [0.18] : []),
-      ...(socioeconomic.dimensions.length > 0 ? [0.4] : []),
-      ...(healthBody.dimensions.length > 0 ? [0.3] : []),
-    ],
     confidenceReasons: [
       '人口按 2020 普查单岁表加总；婚史使用官方性别×五岁组率并在组内保持常数，2025 总量只做宏观校准。',
       ...(selection.target.maritalStatuses.length > 0 && !hasMaritalBoundaryApproximation
         ? ['婚史是官方五岁组率的透明组内应用，运行等级为 B，并加入 8% 组粒度敏感性。']
         : []),
       ...(hasMaritalBoundaryApproximation ? ['18–19/50 岁婚史分别借用 15–19/50–54 岁组，已降级并扩大范围。'] : []),
-      ...(selection.target.cities.includes('全国') ? [] : ['已登记城市使用 2025 常住人口锚点；其他城市仍是历史口径，且都假设年龄结构与全国相同。']),
-      ...(socioeconomic.dimensions.length > 0 ? ['收入、资产、住房与车辆分布包含 C 级模型参数，敏感性范围已扩大。'] : []),
-      ...(healthBody.dimensions.length > 1 ? ['健康相关组使用透明相关性修正，相关参数仍需未来微观数据校准。'] : []),
+      ...(isNationwideSelection(selection) ? [] : ['已登记城市使用官方常住人口锚点，并套用 2020 全国年龄/性别份额；城市人口结构差异未直接观测，按 C 级宽情景处理。']),
+      ...(lifestyleDimensions.length > 1 ? ['烟酒联合缺少同分母微观表；基准采用独立情景，范围采用不依赖相关假设的 Fréchet 界。'] : []),
     ],
+    availability: 'available',
+    unsupportedCities: [],
+    structuralRange: {
+      conservative: Math.min(baseline, conservative),
+      baseline,
+      optimistic: Math.max(baseline, optimistic),
+    },
   }
 }
 
@@ -541,7 +555,7 @@ function removeDimension(selection: ModelSelection, dimensionId: string): ModelS
 function impactCandidates(selection: ModelSelection, raw: RawPopulationResult): string[] {
   const candidates = [...raw.activeDimensions]
   if (selection.target.age.min !== MIN_MODEL_AGE || selection.target.age.max !== MAX_MODEL_AGE) candidates.push('base.age')
-  if (!selection.target.cities.includes('全国')) candidates.push('base.region')
+  if (!isNationwideSelection(selection)) candidates.push('base.region')
   if (selection.target.maritalStatuses.length > 0) candidates.push('base.marital')
   return [...new Set(candidates)]
 }
@@ -575,7 +589,12 @@ function buildImpacts(selection: ModelSelection, raw: RawPopulationResult): Cond
 }
 
 function buildRelaxations(impacts: readonly ConditionImpact[]): RelaxationSuggestion[] {
-  return impacts.filter((impact) => impact.marginalLoss > 0).slice(0, 5).map((impact) => ({
+  // Neighbor scenarios are shown only for non-sensitive boundaries. Sensitive
+  // boundaries remain user-controlled and are never proactively suggested for
+  // relaxation by the engine.
+  return impacts.filter((impact) =>
+    impact.marginalLoss > 0 && !DIMENSION_BY_ID.get(impact.dimensionId)?.sensitive,
+  ).slice(0, 5).map((impact) => ({
     dimensionId: impact.dimensionId,
     label: `放宽${impact.label}`,
     currentEstimate: impact.after,
@@ -623,6 +642,9 @@ function softScores(selection: ModelSelection): ModelResult['scores'] & ModelRes
 }
 
 function confidence(raw: RawPopulationResult): ModelResult['confidence'] {
+  if (raw.availability === 'unavailable') {
+    return { grade: 'NA', score: 0, reasons: [...raw.confidenceReasons] }
+  }
   let score = 0.9
   if (raw.groups.some((group) => group.id === 'socioeconomic')) score -= 0.12
   if (raw.groups.some((group) => group.id === 'health_body' && group.dimensions.length > 1)) score -= 0.1
@@ -643,15 +665,16 @@ function confidence(raw: RawPopulationResult): ModelResult['confidence'] {
 }
 
 function sensitivityRange(raw: RawPopulationResult): PopulationRange {
-  const logUncertainty = Math.sqrt(raw.uncertaintyContributions.reduce(
-    (sum, contribution) => sum + Math.log1p(contribution) ** 2,
-    0,
-  ))
-  const factor = Math.exp(logUncertainty)
+  if (raw.availability === 'unavailable') {
+    return { conservative: 0, baseline: 0, optimistic: 0 }
+  }
+  // Every range component was already propagated stratum by stratum from its
+  // registered scenario endpoints. Do not widen again by condition count or
+  // an unrelated root-sum-square factor.
   return {
-    conservative: Math.max(0, raw.estimate / factor),
+    conservative: Math.max(0, Math.min(raw.estimate, raw.structuralRange.conservative)),
     baseline: raw.estimate,
-    optimistic: Math.min(raw.base, raw.estimate * factor),
+    optimistic: Math.min(raw.scopeCeiling, Math.max(raw.estimate, raw.structuralRange.optimistic)),
   }
 }
 
@@ -669,29 +692,67 @@ export function formatCountShort(value: number): string {
   return formatted === '期望值低于 1 人' ? '< 1 人' : formatted.replace(/^约\s*/, '')
 }
 
-export function computeModel(input: unknown): ModelResult {
+export function computeModel(input: unknown, options: unknown = {}): ModelResult {
   const parsed = selectionSchema.safeParse(input)
   if (!parsed.success) throw new ModelInputError(parsed.error)
+  const parsedOptions = modelComputationOptionsSchema.safeParse(options)
+  if (!parsedOptions.success) throw new ModelOptionsError(parsedOptions.error)
   const selection = parsed.data
   const raw = calculatePopulation(selection)
   const range = sensitivityRange(raw)
-  const resolutionFloor = Math.max(1, raw.base / 1_000_000)
-  const resolutionExceeded = raw.estimate < resolutionFloor
-  const impacts = buildImpacts(selection, raw)
+  const isUnavailable = raw.availability === 'unavailable'
+  const resolutionFloor = isUnavailable ? 0 : Math.max(1, raw.base / 1_000_000)
+  const resolutionExceeded = !isUnavailable && raw.estimate < resolutionFloor
+  const impacts = isUnavailable ? [] : buildImpacts(selection, raw)
   const scores = softScores(selection)
+  const unquantifiedHardConditions = selectedUnquantifiedHardConditions(
+    selection,
+    parsedOptions.data.hardRequirementIds ?? [],
+  )
+  const isUpperBound = !isUnavailable && unquantifiedHardConditions.length > 0
+  const includedHardConditions = isUnavailable
+    ? []
+    : [...new Set(raw.groups.flatMap((group) => group.dimensions))]
+  const zeroMeaning: ModelResult['population']['zeroMeaning'] = isUnavailable
+    ? 'unavailable'
+    : raw.estimate === 0
+      ? 'model_underflow'
+      : resolutionExceeded
+        ? 'positive_below_resolution'
+        : 'not_zero'
   return {
     versions: { modelVersion: MODEL_VERSION, dataVersion: DATA_VERSION },
     input: selection,
     population: {
       base: raw.base,
+      scopeCeiling: raw.scopeCeiling,
       estimate: raw.estimate,
       range,
+      status: isUnavailable ? 'unavailable' : isUpperBound ? 'upper_bound' : 'estimated',
+      interpretation: isUnavailable ? 'not_available' : isUpperBound ? 'quantified_conditions_only' : 'all_selected_hard_conditions',
+      numericStatus: isUnavailable ? 'unavailable' : 'available',
+      zeroMeaning,
       resolutionFloor,
       resolutionExceeded,
-      display: resolutionExceeded
-        ? `模型期望值为 ${formatCount(raw.estimate)}，已低于当前数据约 ${formatCount(resolutionFloor)} 的可靠分辨能力；不代表现实中绝对不存在。`
+      display: isUnavailable
+        ? `当前无法可靠估算：${raw.unsupportedCities.join('、')}尚无本数据版本已登记的一手常住人口锚点；这不表示当地无人。`
+        : isUpperBound
+        ? `${formatCount(raw.estimate)}（仅满足已计入条件的人数上限；${unquantifiedHardConditions.length} 项硬条件因证据不足未计入）`
+        : raw.estimate === 0
+        ? '模型数值已下溢到 0，低于当前数据分辨能力；不能解释为现实中恰好 0 人。'
+        : resolutionExceeded
+        ? `${formatCount(raw.estimate)}，已低于当前数据 ${formatCount(resolutionFloor)} 的可靠分辨能力；不代表现实中绝对不存在。`
         : formatCount(raw.estimate),
-      displayShort: resolutionExceeded ? '低于模型分辨率' : formatCountShort(raw.estimate),
+      displayShort: isUnavailable
+        ? '无法可靠估算'
+        : isUpperBound
+        ? `≤ ${formatCountShort(raw.estimate)}`
+        : resolutionExceeded ? '低于模型分辨率' : formatCountShort(raw.estimate),
+    },
+    coverage: {
+      includedHardConditions,
+      unquantifiedHardConditions,
+      unsupportedCities: raw.unsupportedCities,
     },
     scores: {
       softMatch: scores.softMatch,
@@ -707,24 +768,32 @@ export function computeModel(input: unknown): ModelResult {
     },
     confidence: confidence(raw),
     impacts,
-    relaxations: buildRelaxations(impacts),
+    relaxations: isUnavailable ? [] : buildRelaxations(impacts),
     groups: raw.groups,
     explanation: [
-      '硬条件用于人口范围；相关硬条件只在所属相关组内通过条件概率或相关交集计算。',
+      isUnavailable
+        ? '所选城市缺少已登记的一手常住人口锚点，本版本不会用历史约数或 0 冒充估算。'
+        : isUpperBound
+        ? `主人数只计算有可复核人口参数的条件；${unquantifiedHardConditions.map((item) => item.label).join('、')}保留为硬边界但未用猜测比例扣减，因此该数是上限。`
+        : '主人数只计算有可复核人口参数的硬条件。',
       '软偏好和娱乐条件不会减少满足硬条件的估算人数。',
-      '乐观/基准/保守是按启用模型组的预设不确定度传播的敏感度范围，不是经过抽样校准的置信区间。',
+      '乐观/基准/保守是敏感度范围：烟酒联合采用 Fréchet 界，城市结构、身高分布、婚史组粒度再按已登记宽情景传播；不是抽样置信区间。',
       ...(resolutionExceeded ? ['当前结果低于模型分辨率，只能解释为期望值极小，不能解释为现实中不存在。'] : []),
     ],
   }
 }
 
-export function tryComputeModel(input: unknown):
+export function tryComputeModel(input: unknown, options: unknown = {}):
   | { success: true; data: ModelResult }
-  | { success: false; error: ModelInputError } {
+  | { success: false; error: ModelInputError | ModelOptionsError | ModelRequirementError } {
   try {
-    return { success: true, data: computeModel(input) }
+    return { success: true, data: computeModel(input, options) }
   } catch (error) {
-    if (error instanceof ModelInputError) return { success: false, error }
+    if (
+      error instanceof ModelInputError ||
+      error instanceof ModelOptionsError ||
+      error instanceof ModelRequirementError
+    ) return { success: false, error }
     throw error
   }
 }

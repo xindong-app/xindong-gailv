@@ -13,7 +13,7 @@ test('15 键盘：跳转、步骤、表单、对话框均可完成', async ({ pa
   await page.keyboard.press('Enter')
   await expect(page.locator('#main-content')).toBeInViewport()
 
-  await page.getByRole('button', { name: '开始设置范围' }).focus()
+  await page.getByRole('button', { name: /开筛/ }).focus()
   await page.keyboard.press('Enter')
   await expect(page.getByRole('heading', { name: /先圈出/ })).toBeFocused()
 
@@ -50,7 +50,7 @@ test('17 离线：不依赖外部字体和 API，计算与解释仍可用', asyn
   await goToStep(page, 5, '敏感与娱乐')
   await page.getByRole('button', { name: /敏感人口条件与偏好/ }).click()
   await page.getByRole('button', { name: '当前不吸烟', exact: true }).click()
-  await expect(page.locator('.desktop-result .result-number')).not.toBeEmpty()
+  await expect(page.locator('.stage-scoreboard .slot-number')).not.toHaveAttribute('aria-label', '')
   const externalResources = await page.evaluate(() => performance.getEntriesByType('resource')
     .map((entry) => entry.name)
     .filter((url) => /^https?:/.test(url) && !url.startsWith(location.origin)))
@@ -69,7 +69,7 @@ test('18 手机与桌面关键流程：结果入口语义正确', async ({ page 
 
   await page.getByRole('button', { name: '关闭对话框' }).click()
   await page.setViewportSize({ width: 1440, height: 900 })
-  await expect(page.getByRole('complementary', { name: '实时结果' })).toBeVisible()
+  await expect(page.getByRole('region', { name: '小人剧场' })).toBeVisible()
   await expectNoHorizontalOverflow(page)
 })
 
@@ -97,7 +97,7 @@ test('reduced-motion：步骤切换不触发脚本平滑滚动', async ({ page }
     }
   })
   await page.goto('/')
-  await page.getByRole('button', { name: '开始设置范围' }).click()
+  await page.getByRole('button', { name: /开筛/ }).click()
   const options = await page.evaluate(() => (window as Window & { __scrollOptions?: ScrollToOptions[] }).__scrollOptions ?? [])
   expect(options.at(-1)?.behavior).toBe('auto')
 })
@@ -150,7 +150,7 @@ test('console 与生产网络：关键流程无错误且无第三方业务请求
   await page.getByRole('button', { name: /敏感人口条件与偏好/ }).click()
   await page.getByRole('button', { name: '当前不吸烟', exact: true }).click()
   await goToStep(page, 6, '结果解释')
-  await expect(page.getByRole('heading', { name: '先看范围，再看为什么' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '先看战况，再看谁是守门员' })).toBeVisible()
 
   expect(errors).toEqual([])
   expect(external).toEqual([])

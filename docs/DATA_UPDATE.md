@@ -1,9 +1,31 @@
 # 数据更新流程
 
-> 当前 `dataVersion`：`2026.08.13`
-> 当前 `modelVersion`：`2.1.0`
+> 当前 `dataVersion`：`2026.08.14`
+> 当前 `modelVersion`：`3.0.0`
 
-本流程用于更新 [`app/src/data/evidence-registry.json`](../app/src/data/evidence-registry.json)、[`app/src/data/population-by-age.json`](../app/src/data/population-by-age.json) 及模型参数。目标不是“换个年份”，而是保证来源、分母、转换、相关性、测试和页面说明一起更新。
+本流程用于更新 [`app/src/data/evidence-registry.json`](../app/src/data/evidence-registry.json)、[`app/src/data/population-by-age.json`](../app/src/data/population-by-age.json)、[`app/src/data/cities.ts`](../app/src/data/cities.ts)、[`app/src/data/population-policy.ts`](../app/src/data/population-policy.ts)、[`app/src/data/relationship.ts`](../app/src/data/relationship.ts) 及模型参数。目标不是“换个年份”，而是保证来源、分母、转换、量化准入、相关性、测试和页面说明一起更新。
+
+## 0. 先过人口量化准入门槛
+
+证据登记与主人口准入是两层检查：
+
+1. `evidence-registry.json` 记录来源到底观察了什么、分母是什么、可作直接值/锚点/校准还是必须排除。
+2. `population-policy.ts` 决定该产品维度能否真正削减主人口。只有 `included_estimate + apply` 可以进入；`unquantified` 输出上界；`research_only` 只能进入另行标注的研究情景。
+3. 未登记的维度ID必须 fail closed 为 `unquantified`，禁止凭常量或旧代码自动进入连乘。
+4. 收入、资产、住房、车辆在取得同口径的18—50岁个人联合分布前，固定为 `research_only/do_not_apply`。
+5. `scenarioMethod` 必须描述引擎实际消费的范围传播方法；只有倍数法才允许登记 `scenarioRange`。身高参数端点、饮酒 raking 端点不得伪装成通用 0.70—1.30 倍数。
+
+完整证据与浏览器展示数据分离：`evidence-registry.json` 是唯一权威全量登记，`evidence-validation.ts` 只供脚本/测试做严格校验；浏览器只加载由其生成的 `evidence-runtime.json` 可追溯投影。每次修改全量登记后必须运行 `npm run generate:evidence-runtime`，随后 `npm run validate:model` 会逐字段比对并拒绝陈旧投影。这样不会为了前端徽章把全部方法正文和 Zod 校验器打入生产包。
+
+关系情境层使用独立的低可信来源登记与版本，因为它不属于主人口证据、也不能回写主人口。修改 `relationship.ts` 时必须同步关系情境版本、数据版本、检索日、默认三点范围和方法文档。`validate:model` 同一发布入口会检查：研究来源 HTTPS、分析者情境仓库相对路径、未来日期、来源 ID 引用、默认范围有序且位于 0—1，以及输出版本是否与登记一致。
+
+### 城市新增/更新规则
+
+- 只接受统计局、国家统计局调查队或政府门户承载的一手原始公报/人口发布页；搜索摘要、媒体报道、地产报告和百科不能落主估算。
+- 必须同时登记：`populationStatus`、`mainEstimateStatus`、口径、年份、值、来源URL、证据ID、检索日和局限。
+- 城市公报没有18—50岁逐岁×性别结构时，基础池只可用“城市常住人口×2020全国相应年龄性别份额”，并使用0.70—1.30宽情景倍数；明确这不是置信区间。
+- 缺少一手锚点的城市保持 `unsupported/unquantified`；`pop=0` 只是禁用哨兵，结果层不得解释成0人。
+- 混选支持与不支持城市时，不能只计算支持城市后冒充全部所选城市；应返回不支持城市清单并把总结果标为不可量化/部分上界。
 
 ## 1. 更新频率与触发条件
 
@@ -47,6 +69,14 @@
 - 记录旧 `dataVersion`、`modelVersion` 和Git提交。
 - 运行黄金场景并保存结果，包括基础池、逐因子变化、情景范围和置信等级。
 - 不直接覆盖旧结果后再尝试回忆差异。
+
+### 步骤1.1：同步浏览器证据投影
+
+```bash
+npm run generate:evidence-runtime
+```
+
+生成文件不得人工维护；`validate:model` 必须证明它与全量登记逐项一致。
 
 ### 步骤2：下载或定位原始表
 
@@ -209,7 +239,7 @@ evidence.<dimensionId>.<short-source>
 - 硬/相关硬维度至少一条非D证据；否则构建失败或自动降级为软。
 - UI显示的来源ID都存在；没有悬空引用。
 
-当前注册表为了与初始loader枚举兼容，个别单位（如辆/百户、对数标准差）暂使用近似unit并在 `limitations` 明确。下一次schema小版本应补充 `vehicles_per_100_households` 和 `log_scale_sd`，随后收紧验证。
+非比例参数必须使用专用unit。当前已支持 `vehicles_per_100_households` 和 `log_scale_sd`；不允许为绕过 `share` 的 `[0,1]` 门禁而把它们标成比例。
 
 ## 7. URL与版权维护
 
@@ -222,11 +252,11 @@ evidence.<dimensionId>.<short-source>
 ## 8. 当前下一轮优先队列
 
 1. 2025年1%人口抽样调查详细年鉴发布后，替换2020单岁/婚姻/学历分层并做影响报告。
-2. 在已登记北京、上海、深圳、广州、苏州、武汉2025年锚点的基础上，为 `cities.ts` 其余城市补齐官方常住人口、工资年份和持久URL；统一到可比较年份。
+2. 当前20城有官方常住人口锚点、26城为 `unsupported`。按上述城市规则逐个补齐；工资继续保持研究情景，不以“补齐工资”作为主人口发布门槛。
 3. 用公开可核验的GB/T 10000-2023分位表替换身高标准差临时假设。
 4. 获取年龄×性别×就业状态和收入分布微观/官方表，重建收入尾部。
 5. 获取近期家庭资产联合分布，替换对数正态σ与固定copula相关系数。
-6. 若无法获得青年个人本地住房/本人有车数据，继续保留C级宽范围或迁为偏好，不能升级徽章。
+6. 若无法获得青年个人本地住房/本人有车数据，继续保持 `research_only/do_not_apply`；研究沙盒可以展示C级情景，但不得改变主人口或升级徽章。
 7. 饮酒已换为2024年中国疾控全国调查；下一轮补齐更细的18—50逐岁/窄年龄组，并确认UI采用过去30天、过去12个月还是重度间歇饮酒定义。
 8. 删除任何仍以“官方数据”统称A/B/C/D混合结果的页面文案。
 
@@ -244,9 +274,11 @@ evidence.<dimensionId>.<short-source>
 - [ ] 分享图显示数据/模型版本，默认排除收入、资产、健康、亲密、取向等敏感字段。
 - [ ] URL检查、schema检查、模型验证和完整测试均通过。
 
-### 2026-08-13 终态签核记录
+### 2026-08-13 历史终态签核记录
 
 签核对象：应用 `1.0.0`、模型 `2.1.0`、数据 `2026.08.13`。
+
+> 这是上一数据版本的历史记录，不代表 `2026.08.14` 当前工作树已通过完整发布门禁；当前版本的实际验证应另行追加，禁止复制旧通过结论。
 
 - 从 `npm.cmd ci --registry=https://registry.npmjs.org` 重建锁定依赖后，完整 `npm.cmd run check` 通过；typecheck、lint 均为 0 错误，Vitest 18 个文件、106 项测试全部通过。最终暂存前密钥扫描覆盖 105 个 Git 已跟踪或未忽略候选文件，且未读取真实 `.env*` 内容。
 - 模型验证：50 条证据（A=23、B=6、C=10、D=11，17 条 excluded）、33 个单岁人口行、651,601,516 总人口守恒、69 个唯一维度及 15 个代表场景全部通过；干净安装后计算 p95 为 2.101ms。
@@ -256,3 +288,14 @@ evidence.<dimensionId>.<short-source>
 - Playwright HTML 报告位于 `app/output/playwright/report/index.html`，测试结果位于 `app/output/playwright/test-results/`；两者均被 Git 忽略。
 
 上述记录签核的是仓库内可自动验证项目。外部来源 URL 的定期存活检查、候选 HTTPS 地址上的真实响应头/缓存/SPA 回退以及线上 Lighthouse/真实用户性能，仍须在拥有部署地址后按发布手册执行，不能由本地门禁冒充已完成。
+
+### 2026-08-14 模型 v3 算法与数据终态签核
+
+签核对象：模型 `3.0.0`、数据 `2026.08.14`、关系情境 `1.1.0`。这是**算法与数据签核**，不是整机发布签核；完整产品仍被前端集成与隐私问题阻断，详见 [终态复核](./audit/ALGORITHM_DATA_RELEASE_REVIEW_2026-08-14.md)。
+
+- `npm.cmd run check:fast`：通过；Vitest 22 个文件、177 项测试全部通过，typecheck、ESLint、构建和产物扫描均通过。
+- `validate:model`：65 条证据（A38/B6/C10/D11，17 条 excluded）、33 个单岁人口行、19 项人口政策、20 个官方城市锚点、4 个关系来源、6 个关系情境全部通过；终态复跑的15个代表场景 p95=`2.453 ms`（本机计时随负载轻微波动）。
+- 生产包：Vite JS gzip `141.22 kB`；产物扫描口径 JS `137.0 KiB`、CSS `13.2 KiB`，无源码路径、调试标记、source map 或体积违规。
+- `npm.cmd run audit:prod`：官方 npm registry 返回 0 vulnerabilities。
+- 浏览器验收按文件单 worker 运行，23/28 通过；五项失败属于已登记的前端字体、1024 px 溢出、v3 状态展示和一键放宽接线问题，因此没有把 `npm.cmd run check` 伪报为通过。
+- 本轮没有修改 Kimi 的产品前端组件、页面、样式、分享、趣味层或 `index.html`。

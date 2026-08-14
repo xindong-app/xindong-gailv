@@ -139,8 +139,9 @@ describe('population semantics', () => {
     expect(values.every((value) => Number.isFinite(value) && value >= 0)).toBe(true)
     expect(result.population.range.conservative).toBeLessThanOrEqual(result.population.range.baseline)
     expect(result.population.range.baseline).toBeLessThanOrEqual(result.population.range.optimistic)
-    expect(result.population.resolutionExceeded).toBe(true)
-    expect(result.population.display).toContain('不代表现实中绝对不存在')
+    expect(result.population.status).toBe('upper_bound')
+    expect(result.coverage.unquantifiedHardConditions.length).toBeGreaterThan(0)
+    expect(result.population.display).toContain('未计入')
   })
 })
 
@@ -179,18 +180,31 @@ describe('four dimension classes remain separated', () => {
 
   it('routes structured school, vision, and composite chronic-health selections into soft scoring, never population', () => {
     const base = computeModel(DEFAULT_SELECTION)
-    const result = computeModel(selection({
+    const input = selection({
       correlated: {
         ...DEFAULT_SELECTION.correlated,
         schoolTier: '985',
         healthCriteria: ['no_myopia', 'no_major_chronic'],
       },
       selfPreferenceIds: ['education.school', 'health.myopia', 'health.chronic'],
-    }))
-    expect(result.population).toEqual(base.population)
+    })
+    const result = computeModel(input)
+    expect(result.population.estimate).toBe(base.population.estimate)
+    expect(result.population.status).toBe('estimated')
     expect(result.scoreDetails.selectedSoftPreferences).toBe(3)
     expect(result.scoreDetails.overlappingPreferences).toBe(3)
     expect(result.scores.softMatch).toBe(100)
+
+    const asHardRequirements = computeModel(input, {
+      hardRequirementIds: ['education.school', 'health.myopia', 'health.chronic'],
+    })
+    expect(asHardRequirements.population.estimate).toBe(base.population.estimate)
+    expect(asHardRequirements.population.status).toBe('upper_bound')
+    expect(asHardRequirements.coverage.unquantifiedHardConditions.map((item) => item.dimensionId)).toEqual([
+      'education.school',
+      'health.chronic',
+      'health.myopia',
+    ])
   })
 })
 
@@ -206,39 +220,41 @@ describe('correlation groups and explanations', () => {
       correlated: { ...DEFAULT_SELECTION.correlated, smoking: 'non_smoker' },
     }))
 
-    for (const result of [heightOnly, bodyOnly, smokingOnly]) {
-      expect(result.confidence.grade).toBe('C')
-      expect(result.confidence.reasons.at(-1)).toContain('模型可信度不会高于')
-    }
+    expect(heightOnly.confidence.grade).toBe('C')
+    expect(smokingOnly.confidence.grade).toBe('C')
+    expect(bodyOnly.confidence.grade).toBe('A')
+    expect(bodyOnly.population.status).toBe('upper_bound')
     expect(heightOnly.confidence.score).toBe(0.9)
-    expect(heightOnly.explanation.join(' ')).toContain('预设不确定度')
+    expect(heightOnly.explanation.join(' ')).toContain('敏感度范围')
+    expect(heightOnly.explanation.join(' ')).toContain('不是抽样置信区间')
   })
 
-  it('uses a joint economic group whose factor stays between independence and each marginal', () => {
+  it('keeps economic hard requirements explicit but out of the main estimate', () => {
     const income = computeModel(selection({ correlated: { ...DEFAULT_SELECTION.correlated, minAnnualIncomeWan: 50 } }))
     const wealth = computeModel(selection({ correlated: { ...DEFAULT_SELECTION.correlated, minHouseholdWealthWan: 600 } }))
     const both = computeModel(selection({ correlated: {
       ...DEFAULT_SELECTION.correlated, minAnnualIncomeWan: 50, minHouseholdWealthWan: 600,
     } }))
-    const incomeFactor = income.groups.find((group) => group.id === 'socioeconomic')!.factor
-    const wealthFactor = wealth.groups.find((group) => group.id === 'socioeconomic')!.factor
-    const jointFactor = both.groups.find((group) => group.id === 'socioeconomic')!.factor
-    expect(jointFactor).toBeLessThanOrEqual(Math.min(incomeFactor, wealthFactor))
-    expect(jointFactor).toBeGreaterThanOrEqual(incomeFactor * wealthFactor * 0.98)
-    expect(both.groups.find((group) => group.id === 'socioeconomic')!.method).toContain('copula')
+    expect(income.population.estimate).toBe(income.population.base)
+    expect(wealth.population.estimate).toBe(wealth.population.base)
+    expect(both.population.estimate).toBe(both.population.base)
+    expect(both.population.status).toBe('upper_bound')
+    expect(both.coverage.unquantifiedHardConditions.map((item) => item.dimensionId))
+      .toEqual(expect.arrayContaining(['economy.income', 'economy.wealth']))
   })
 
-  it('uses bounded positive-correlation correction in the health/body group', () => {
+  it('does not mix an unquantified hair boundary into the quantified smoking result', () => {
     const smoke = computeModel(selection({ correlated: { ...DEFAULT_SELECTION.correlated, smoking: 'non_smoker' } }))
     const hair = computeModel(selection({ correlated: { ...DEFAULT_SELECTION.correlated, hairCriteria: ['full_hair'] } }))
     const both = computeModel(selection({ correlated: {
       ...DEFAULT_SELECTION.correlated, smoking: 'non_smoker', hairCriteria: ['full_hair'],
     } }))
     const pSmoke = smoke.groups.find((group) => group.id === 'health_body')!.factor
-    const pHair = hair.groups.find((group) => group.id === 'health_body')!.factor
     const pBoth = both.groups.find((group) => group.id === 'health_body')!.factor
-    expect(pBoth).toBeGreaterThan(pSmoke * pHair)
-    expect(pBoth).toBeLessThanOrEqual(Math.min(pSmoke, pHair))
+    expect(hair.population.estimate).toBe(hair.population.base)
+    expect(hair.population.status).toBe('upper_bound')
+    expect(pBoth).toBe(pSmoke)
+    expect(both.coverage.unquantifiedHardConditions.map((item) => item.dimensionId)).toContain('appearance.hair_full')
   })
 
   it('weights drinking age bands over the selected single-age population', () => {
@@ -272,8 +288,8 @@ describe('correlation groups and explanations', () => {
         housing: { required: true, location: null, minAreaSqm: null, type: null },
       },
     }))
-    expect(result.impacts.length).toBeGreaterThanOrEqual(3)
+    expect(result.impacts.length).toBeGreaterThanOrEqual(1)
     expect(result.impacts[0].marginalLoss).toBeGreaterThanOrEqual(result.impacts.at(-1)!.marginalLoss)
-    expect(result.relaxations[0].relaxedEstimate).toBeGreaterThan(result.relaxations[0].currentEstimate)
+    expect(result.relaxations.every((item) => !['base.marital', 'appearance.body_type', 'economy.income', 'economy.house'].includes(item.dimensionId))).toBe(true)
   })
 })

@@ -1,4 +1,14 @@
-import { z } from 'zod'
+import {
+  array,
+  boolean,
+  enum as enumSchema,
+  number,
+  object,
+  preprocess,
+  string,
+  type infer as Infer,
+  type ZodType,
+} from 'zod/v4'
 import { CITIES } from '../data/cities'
 import { MAX_MODEL_AGE, MIN_MODEL_AGE } from '../data/population'
 
@@ -82,19 +92,19 @@ export const SOFT_PREFERENCE_IDS = [
   'interest.shared_activities',
 ] as const
 
-const uniqueArray = <T extends z.ZodTypeAny>(item: T, maximum: number) =>
-  z.array(item).max(maximum).refine((values) => new Set(values).size === values.length, {
+const uniqueArray = <T extends ZodType>(item: T, maximum: number) =>
+  array(item).max(maximum).refine((values) => new Set(values).size === values.length, {
     message: '不能包含重复值',
   })
 
 const cityNames = new Set(['全国', ...CITIES.map((city) => city.name)])
-const citySchema = z.string().refine((city) => cityNames.has(city), { message: '不支持的城市' })
+const citySchema = string().refine((city) => cityNames.has(city), { message: '不支持的城市' })
 
-const targetSchema = z.object({
-  gender: z.enum(GENDERS),
-  age: z.object({
-    min: z.number().int().min(MIN_MODEL_AGE).max(MAX_MODEL_AGE),
-    max: z.number().int().min(MIN_MODEL_AGE).max(MAX_MODEL_AGE),
+const targetSchema = object({
+  gender: enumSchema(GENDERS),
+  age: object({
+    min: number().int().min(MIN_MODEL_AGE).max(MAX_MODEL_AGE),
+    max: number().int().min(MIN_MODEL_AGE).max(MAX_MODEL_AGE),
   }).refine((age) => age.min <= age.max, {
     message: '最小年龄不能大于最大年龄',
     path: ['max'],
@@ -103,41 +113,41 @@ const targetSchema = z.object({
     (cities) => !cities.includes('全国') || cities.length === 1,
     { message: '选择全国时不能同时选择城市' },
   ),
-  maritalStatuses: uniqueArray(z.enum(MARITAL_STATUSES), MARITAL_STATUSES.length),
-  heightCm: z.object({
-    min: z.number().int().min(130).max(220).nullable(),
-    max: z.number().int().min(130).max(220).nullable(),
+  maritalStatuses: uniqueArray(enumSchema(MARITAL_STATUSES), MARITAL_STATUSES.length),
+  heightCm: object({
+    min: number().int().min(130).max(220).nullable(),
+    max: number().int().min(130).max(220).nullable(),
   }).refine(
     (height) => height.min == null || height.max == null || height.min <= height.max,
     { message: '最低身高不能大于最高身高', path: ['max'] },
   ).nullable(),
 }).strict()
 
-const correlatedSchema = z.object({
-  bodyTypes: uniqueArray(z.enum(BODY_TYPES), BODY_TYPES.length),
-  minAnnualIncomeWan: z.number().min(0).max(10_000).nullable(),
-  minHouseholdWealthWan: z.number().min(0).max(1_000_000).nullable(),
-  educationLevels: uniqueArray(z.enum(EDUCATION_LEVELS), EDUCATION_LEVELS.length),
-  schoolTier: z.enum(SCHOOL_TIERS).nullable(),
-  housing: z.object({
-    required: z.boolean(),
-    location: z.enum(HOUSE_LOCATIONS).nullable(),
-    minAreaSqm: z.number().int().min(1).max(2_000).nullable(),
-    type: z.enum(HOUSE_TYPES).nullable(),
+const correlatedSchema = object({
+  bodyTypes: uniqueArray(enumSchema(BODY_TYPES), BODY_TYPES.length),
+  minAnnualIncomeWan: number().min(0).max(10_000).nullable(),
+  minHouseholdWealthWan: number().min(0).max(1_000_000).nullable(),
+  educationLevels: uniqueArray(enumSchema(EDUCATION_LEVELS), EDUCATION_LEVELS.length),
+  schoolTier: enumSchema(SCHOOL_TIERS).nullable(),
+  housing: object({
+    required: boolean(),
+    location: enumSchema(HOUSE_LOCATIONS).nullable(),
+    minAreaSqm: number().int().min(1).max(2_000).nullable(),
+    type: enumSchema(HOUSE_TYPES).nullable(),
   }).strict(),
-  vehicle: z.object({
-    required: z.boolean(),
-    priceBands: uniqueArray(z.enum(CAR_PRICE_BANDS), CAR_PRICE_BANDS.length),
+  vehicle: object({
+    required: boolean(),
+    priceBands: uniqueArray(enumSchema(CAR_PRICE_BANDS), CAR_PRICE_BANDS.length),
   }).strict(),
-  smoking: z.enum(['any', 'non_smoker']),
-  drinking: z.enum(['any', 'not_regular', 'none']),
-  healthCriteria: uniqueArray(z.enum(HEALTH_CRITERIA), HEALTH_CRITERIA.length),
-  hairCriteria: uniqueArray(z.enum(HAIR_CRITERIA), HAIR_CRITERIA.length),
+  smoking: enumSchema(['any', 'non_smoker']),
+  drinking: enumSchema(['any', 'not_regular', 'none']),
+  healthCriteria: uniqueArray(enumSchema(HEALTH_CRITERIA), HEALTH_CRITERIA.length),
+  hairCriteria: uniqueArray(enumSchema(HAIR_CRITERIA), HAIR_CRITERIA.length),
 }).strict()
 
-const entertainmentSchema = z.object({
-  zodiacs: uniqueArray(z.enum(ZODIACS), ZODIACS.length),
-  mbti: uniqueArray(z.enum(MBTI_POLES), MBTI_POLES.length).refine((poles) => {
+const entertainmentSchema = object({
+  zodiacs: uniqueArray(enumSchema(ZODIACS), ZODIACS.length),
+  mbti: uniqueArray(enumSchema(MBTI_POLES), MBTI_POLES.length).refine((poles) => {
     const axes = [['E', 'I'], ['S', 'N'], ['T', 'F'], ['J', 'P']] as const
     return axes.every(([left, right]) => !(poles.includes(left) && poles.includes(right)))
   }, { message: '同一 MBTI 轴只能选择一端' }),
@@ -169,17 +179,17 @@ export function migrateLegacySelectionInput(input: unknown): unknown {
   }
 }
 
-const currentSelectionSchema = z.object({
+const currentSelectionSchema = object({
   target: targetSchema,
   correlated: correlatedSchema,
-  softPreferenceIds: uniqueArray(z.enum(SOFT_PREFERENCE_IDS), SOFT_PREFERENCE_IDS.length),
+  softPreferenceIds: uniqueArray(enumSchema(SOFT_PREFERENCE_IDS), SOFT_PREFERENCE_IDS.length),
   entertainment: entertainmentSchema,
-  selfPreferenceIds: uniqueArray(z.enum(SOFT_PREFERENCE_IDS), SOFT_PREFERENCE_IDS.length),
+  selfPreferenceIds: uniqueArray(enumSchema(SOFT_PREFERENCE_IDS), SOFT_PREFERENCE_IDS.length),
 }).strict()
 
-export const selectionSchema = z.preprocess(migrateLegacySelectionInput, currentSelectionSchema)
+export const selectionSchema = preprocess(migrateLegacySelectionInput, currentSelectionSchema)
 
-export type ModelSelection = z.infer<typeof selectionSchema>
+export type ModelSelection = Infer<typeof selectionSchema>
 export type GenderId = ModelSelection['target']['gender']
 export type MaritalStatusId = ModelSelection['target']['maritalStatuses'][number]
 export type BodyTypeId = ModelSelection['correlated']['bodyTypes'][number]

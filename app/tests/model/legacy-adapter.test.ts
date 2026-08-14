@@ -34,7 +34,8 @@ describe('legacy UI migration adapter', () => {
       mbti: ['E', 'N', 'F', 'J'],
       zodiacs: ['狮子座'],
     })
-    expect(migrated.population).toEqual(base.population)
+    expect(migrated.population.estimate).toBe(base.population.estimate)
+    expect(migrated.population.range).toEqual(base.population.range)
     expect(migrated.scoreDetails.selectedSoftPreferences).toBeGreaterThan(10)
     expect(migrated.scores.entertainment).toBeGreaterThan(0)
   })

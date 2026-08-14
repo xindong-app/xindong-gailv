@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { CITIES, NATIONAL_WAGE } from '../../src/data/cities'
-import { evidenceById } from '../../src/data/evidence'
+import { evidenceById } from '../../src/data/evidence-validation'
 import { CAR_RATE, HOUSE_LOCAL_RATE, drinkingRate, nonSmokerRate } from '../../src/data/model'
-import { NATIONAL_POPULATION_WAN } from '../../src/data/population'
+import {
+  CENSUS_2020_MAINLAND_POPULATION_WAN,
+  NATIONAL_POPULATION_WAN,
+  cityPopulationScale,
+} from '../../src/data/population'
 
 describe('runtime data anchors match declared evidence', () => {
   it('uses the registered 2025 national population and wage anchors', () => {
@@ -10,6 +14,20 @@ describe('runtime data anchors match declared evidence', () => {
     const wage = evidenceById('evidence.economy.income.wages-2025')!
     expect(NATIONAL_POPULATION_WAN * 10_000).toBe(population.estimate.baseline)
     expect(NATIONAL_WAGE).toBe(wage.estimate.baseline)
+  })
+
+  it('binds the city scaling divisor to the exact 2020 census evidence', () => {
+    const census = evidenceById('evidence.base.region.census-mainland-total-2020')!
+    const national2025 = evidenceById('evidence.base.region.population-2025')!
+    expect(CENSUS_2020_MAINLAND_POPULATION_WAN * 10_000).toBe(census.estimate.baseline)
+    expect(CENSUS_2020_MAINLAND_POPULATION_WAN).not.toBe(NATIONAL_POPULATION_WAN)
+    expect(national2025.modelUse).toBe('calibration')
+
+    const beijing = CITIES.find((city) => city.name === '北京')!
+    expect(cityPopulationScale(['北京']))
+      .toBeCloseTo(beijing.pop / (census.estimate.baseline! / 10_000), 12)
+    expect(cityPopulationScale(['北京']))
+      .not.toBeCloseTo(beijing.pop / NATIONAL_POPULATION_WAN, 12)
   })
 
   it('uses exact registered 2025 population anchors for the six updated cities', () => {

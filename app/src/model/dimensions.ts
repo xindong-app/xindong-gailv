@@ -21,6 +21,7 @@ export type DimensionCategory =
   | 'values' | 'future' | 'health' | 'interests' | 'entertainment'
 export type DimensionInputType = 'single' | 'multi' | 'toggle' | 'range' | 'number' | 'city_multi' | 'compound'
 export type EvidenceGrade = 'A' | 'B' | 'C' | 'D' | 'NA'
+export type PopulationUse = 'included' | 'unquantified'
 
 export interface DimensionOption {
   value: string
@@ -44,6 +45,8 @@ export interface DimensionRegistryEntry {
   evidenceGrade: EvidenceGrade
   sensitive: boolean
   population: boolean
+  /** `unquantified` remains a hard user boundary but must not invent a rate. */
+  populationUse: PopulationUse
   match: boolean
   entertainment: boolean
   shareDefault: boolean
@@ -85,7 +88,7 @@ const baseEntries: DimensionRegistryEntry[] = [
   {
     id: 'base.gender', label: '目标性别', category: 'demographics', classification: 'hard_filter',
     inputType: 'single', options: [option('male', '男性'), option('female', '女性')], applicableTo: everyone,
-    evidenceId: 'evidence.base.age.census-2020-single-year', evidenceGrade: 'A', sensitive: false, population: true,
+    evidenceId: 'evidence.base.age.census-2020-single-year', evidenceGrade: 'A', sensitive: false, population: true, populationUse: 'included',
     match: false, entertainment: false, shareDefault: true, description: '选择要估算的统计人群性别口径。',
     semantics: { within: 'or', cross: 'conditional', empty: 'all' }, binding: 'target.gender',
     correlationGroup: 'demographic', order: 10,
@@ -93,7 +96,7 @@ const baseEntries: DimensionRegistryEntry[] = [
   {
     id: 'base.age', label: '年龄范围', category: 'demographics', classification: 'hard_filter',
     inputType: 'range', options: [], applicableTo: everyone, evidenceId: 'evidence.base.age.census-2020-single-year', evidenceGrade: 'A',
-    sensitive: false, population: true, match: false, entertainment: false, shareDefault: true,
+    sensitive: false, population: true, populationUse: 'included', match: false, entertainment: false, shareDefault: true,
     description: '18–50 岁逐单岁有效，区间按单岁人口求和。',
     semantics: { within: 'range', cross: 'conditional', empty: 'all' }, binding: 'target.age',
     correlationGroup: 'demographic', order: 20,
@@ -101,7 +104,7 @@ const baseEntries: DimensionRegistryEntry[] = [
   {
     id: 'base.region', label: '居住地区', category: 'region', classification: 'hard_filter',
     inputType: 'city_multi', options: [], applicableTo: everyone, evidenceId: 'evidence.base.region.population-2025', evidenceGrade: 'C',
-    sensitive: false, population: true, match: false, entertainment: false, shareDefault: true,
+    sensitive: false, population: true, populationUse: 'included', match: false, entertainment: false, shareDefault: true,
     description: '多城市为并集；全国与城市互斥，未知城市不会被当成零概率。',
     semantics: { within: 'or', cross: 'conditional', empty: 'all' }, binding: 'target.cities',
     correlationGroup: 'demographic', order: 30,
@@ -112,7 +115,7 @@ const baseEntries: DimensionRegistryEntry[] = [
       option(MARITAL_STATUSES[0], '未婚'), option(MARITAL_STATUSES[1], '离婚未再婚'),
       option(MARITAL_STATUSES[2], '丧偶未再婚'),
     ], applicableTo: everyone, evidenceId: 'evidence.base.marital.census-2020', evidenceGrade: 'B', sensitive: true,
-    population: true, match: false, entertainment: false, shareDefault: false,
+    population: true, populationUse: 'included', match: false, entertainment: false, shareDefault: false,
     description: '官方性别×五岁组率在组内年龄保持常数；状态互斥，多选取并集，全部取消表示不限婚史。18–19 岁与 50 岁边界降 C。',
     semantics: { within: 'or', cross: 'conditional', empty: 'all' }, binding: 'target.maritalStatuses',
     correlationGroup: 'demographic', order: 40,
@@ -120,7 +123,7 @@ const baseEntries: DimensionRegistryEntry[] = [
   {
     id: 'appearance.height', label: '身高范围', category: 'appearance', classification: 'hard_filter',
     inputType: 'range', options: [], applicableTo: everyone, evidenceId: 'evidence.appearance.height.distribution-assumption', evidenceGrade: 'C',
-    sensitive: false, population: true, match: false, entertainment: false, shareDefault: true,
+    sensitive: false, population: true, populationUse: 'included', match: false, entertainment: false, shareDefault: true,
     description: '使用分年龄、分性别正态近似计算明确的上下限。',
     semantics: { within: 'range', cross: 'conditional', empty: 'all' }, binding: 'target.heightCm',
     correlationGroup: 'anthropometric', order: 50,
@@ -135,25 +138,25 @@ const correlatedEntries: DimensionRegistryEntry[] = [
       option(BODY_TYPES[3], '标准'), option(BODY_TYPES[4], '微胖'), option(BODY_TYPES[5], '丰腴'),
       option(BODY_TYPES[6], '圆润'),
     ], applicableTo: everyone, evidenceId: 'evidence.appearance.bmi.nhc-2018', evidenceGrade: 'C', sensitive: true,
-    population: true, match: false, entertainment: false, shareDefault: false,
-    description: '互斥体型档多选取并集，并与年龄、健康簇做相关性修正。',
-    semantics: { within: 'or', cross: 'grouped', empty: 'ignore' }, binding: 'correlated.bodyTypes',
-    correlationGroup: 'health_body', order: 60,
+    population: false, populationUse: 'unquantified', match: false, entertainment: false, shareDefault: false,
+    description: '体型标签是主观语义，无法由全国BMI超重/肥胖率可靠映射；可作为硬边界记录，但不削减主人数。',
+    semantics: { within: 'or', cross: 'excluded', empty: 'ignore' }, binding: 'correlated.bodyTypes',
+    correlationGroup: null, order: 60,
   },
   {
     id: 'education.level', label: '学历', category: 'education', classification: 'correlated_hard',
     inputType: 'multi', options: [option(EDUCATION_LEVELS[0], '大专'), option(EDUCATION_LEVELS[1], '本科'), option(EDUCATION_LEVELS[2], '硕士'), option(EDUCATION_LEVELS[3], '博士')],
     applicableTo: everyone, evidenceId: 'evidence.education.level.census-2020', evidenceGrade: 'C', sensitive: false,
-    population: true, match: false, entertainment: false, shareDefault: true,
-    description: '互斥学历档取并集，并作为收入分布的条件变量。',
-    semantics: { within: 'or', cross: 'conditional', empty: 'ignore' }, binding: 'correlated.educationLevels',
-    correlationGroup: 'socioeconomic', order: 70,
+    population: false, populationUse: 'unquantified', match: false, entertainment: false, shareDefault: true,
+    description: '可作为硬条件记录；官方年龄×性别表尚未完成机器化验收前，不使用常量近似削减主人数。',
+    semantics: { within: 'or', cross: 'excluded', empty: 'ignore' }, binding: 'correlated.educationLevels',
+    correlationGroup: null, order: 70,
   },
   {
     id: 'education.school', label: '院校层级偏好', category: 'education', classification: 'soft_preference',
     inputType: 'single', options: [option(SCHOOL_TIERS[0], '清北'), option(SCHOOL_TIERS[1], 'C9'), option(SCHOOL_TIERS[2], '985'), option(SCHOOL_TIERS[3], '211')],
     applicableTo: everyone, evidenceId: 'evidence.education.school.elite-assumption', evidenceGrade: 'C', sensitive: false,
-    population: false, match: true, entertainment: false, shareDefault: true,
+    population: false, populationUse: 'unquantified', match: true, entertainment: false, shareDefault: true,
     description: '清北 ⊂ C9 ⊂ 985 ⊂ 211；因缺少同口径年龄存量数据，迁出人口估算。',
     semantics: { within: 'nested', cross: 'excluded', empty: 'ignore' }, binding: 'correlated.schoolTier',
     correlationGroup: null, order: 80,
@@ -161,71 +164,71 @@ const correlatedEntries: DimensionRegistryEntry[] = [
   {
     id: 'economy.income', label: '最低年收入', category: 'finance', classification: 'correlated_hard',
     inputType: 'number', options: [], applicableTo: everyone, evidenceId: 'evidence.economy.income.wages-2025', evidenceGrade: 'C',
-    sensitive: true, population: true, match: false, entertainment: false, shareDefault: false,
-    description: '按年龄、地区和学历条件化的收入尾部模型。',
-    semantics: { within: 'threshold', cross: 'conditional', empty: 'ignore' }, binding: 'correlated.minAnnualIncomeWan',
-    correlationGroup: 'socioeconomic', order: 90,
+    sensitive: true, population: false, populationUse: 'unquantified', match: false, entertainment: false, shareDefault: false,
+    description: '可作为硬条件记录；公开数据的就业分母、个人税前年收入口径与尾部不足以可靠量化，因此不削减主人数，主结果标为上限。',
+    semantics: { within: 'threshold', cross: 'excluded', empty: 'ignore' }, binding: 'correlated.minAnnualIncomeWan',
+    correlationGroup: null, order: 90,
   },
   {
     id: 'economy.wealth', label: '最低家庭资产', category: 'finance', classification: 'correlated_hard',
     inputType: 'number', options: [], applicableTo: everyone, evidenceId: 'evidence.economy.wealth.distribution-assumption', evidenceGrade: 'C',
-    sensitive: true, population: true, match: false, entertainment: false, shareDefault: false,
-    description: '收入与资产使用联合分布近似，不把两个尾部概率直接相乘。',
-    semantics: { within: 'threshold', cross: 'grouped', empty: 'ignore' }, binding: 'correlated.minHouseholdWealthWan',
-    correlationGroup: 'socioeconomic', order: 100,
+    sensitive: true, population: false, populationUse: 'unquantified', match: false, entertainment: false, shareDefault: false,
+    description: '可作为硬条件记录；2019年城镇家庭锚点不能可靠映射到18–50岁个人，故不削减主人数。',
+    semantics: { within: 'threshold', cross: 'excluded', empty: 'ignore' }, binding: 'correlated.minHouseholdWealthWan',
+    correlationGroup: null, order: 100,
   },
   {
     id: 'economy.house', label: '住房条件', category: 'housing', classification: 'correlated_hard',
     inputType: 'compound', options: [option(HOUSE_LOCATIONS[0], '核心区'), option(HOUSE_LOCATIONS[1], '市区'), option(HOUSE_LOCATIONS[2], '郊区'), option(HOUSE_TYPES[1], '大平层'), option(HOUSE_TYPES[2], '别墅'), option(HOUSE_TYPES[3], '四合院')],
     applicableTo: everyone, evidenceId: 'evidence.economy.house.local-young-assumption', evidenceGrade: 'C', sensitive: true,
-    population: true, match: false, entertainment: false, shareDefault: false,
-    description: '住房拥有率条件于年龄、地区与经济状态，类型和面积使用嵌套语义。',
-    semantics: { within: 'nested', cross: 'conditional', empty: 'ignore' }, binding: 'correlated.housing',
-    correlationGroup: 'socioeconomic', order: 110,
+    population: false, populationUse: 'unquantified', match: false, entertainment: false, shareDefault: false,
+    description: '可作为硬条件记录；家庭有房不等于本人名下、本地且满足面积/类型，缺少同口径联合数据，故不削减主人数。',
+    semantics: { within: 'nested', cross: 'excluded', empty: 'ignore' }, binding: 'correlated.housing',
+    correlationGroup: null, order: 110,
   },
   {
     id: 'economy.vehicle', label: '车辆条件', category: 'housing', classification: 'correlated_hard',
     inputType: 'compound', options: [option(CAR_PRICE_BANDS[0], '10 万以下'), option(CAR_PRICE_BANDS[1], '10–20 万'), option(CAR_PRICE_BANDS[2], '20–50 万'), option(CAR_PRICE_BANDS[3], '50–100 万'), option(CAR_PRICE_BANDS[4], '100 万以上')],
     applicableTo: everyone, evidenceId: 'evidence.economy.car.personal-assumption', evidenceGrade: 'C', sensitive: true,
-    population: true, match: false, entertainment: false, shareDefault: false,
-    description: '价位档为有车人群内的并集，并对收入与资产条件化。',
-    semantics: { within: 'or', cross: 'conditional', empty: 'ignore' }, binding: 'correlated.vehicle',
-    correlationGroup: 'socioeconomic', order: 120,
+    population: false, populationUse: 'unquantified', match: false, entertainment: false, shareDefault: false,
+    description: '可作为硬条件记录；家庭车辆与目标个人持有及价位档口径不一致，缺少可靠联合分布，故不削减主人数。',
+    semantics: { within: 'or', cross: 'excluded', empty: 'ignore' }, binding: 'correlated.vehicle',
+    correlationGroup: null, order: 120,
   },
   {
     id: 'lifestyle.smoking', label: '吸烟习惯', category: 'lifestyle', classification: 'correlated_hard',
     inputType: 'single', options: [option('any', '不限'), option('non_smoker', '当前不吸烟')], applicableTo: everyone,
-    evidenceId: 'evidence.lifestyle.smoking.cdc-2024', evidenceGrade: 'B', sensitive: true, population: true,
+    evidenceId: 'evidence.lifestyle.smoking.cdc-2024', evidenceGrade: 'B', sensitive: true, population: true, populationUse: 'included',
     match: false, entertainment: false, shareDefault: false, description: '按 2024 年性别“现在吸烟率”的补集估算，不等于终身从不吸烟。',
     semantics: { within: 'or', cross: 'grouped', empty: 'ignore' }, binding: 'correlated.smoking', correlationGroup: 'health_body', order: 130,
   },
   {
     id: 'lifestyle.drinking', label: '饮酒习惯', category: 'lifestyle', classification: 'correlated_hard',
     inputType: 'single', options: [option('any', '不限'), option('not_regular', '过去30天未饮酒'), option('none', '过去12个月未饮酒')], applicableTo: everyone,
-    evidenceId: 'evidence.lifestyle.drinking.cdc-2024', evidenceGrade: 'C', sensitive: true, population: true,
+    evidenceId: 'evidence.lifestyle.drinking.cdc-2024', evidenceGrade: 'C', sensitive: true, population: true, populationUse: 'included',
     match: false, entertainment: false, shareDefault: false, description: '使用 2024 年调查的回溯期口径；“过去12个月未饮酒”是更窄集合，不声称终身不饮酒。',
     semantics: { within: 'nested', cross: 'grouped', empty: 'ignore' }, binding: 'correlated.drinking', correlationGroup: 'health_body', order: 140,
   },
   {
     id: 'health.chronic', label: '慢性病信息偏好', category: 'health', classification: 'soft_preference',
     inputType: 'toggle', options: [option(HEALTH_CRITERIA[0], '健康状况符合期待')], applicableTo: everyone,
-    evidenceId: 'evidence.health.chronic.no-major-disease-assumption', evidenceGrade: 'C', sensitive: true, population: false, match: true,
+    evidenceId: 'evidence.health.chronic.no-major-disease-assumption', evidenceGrade: 'C', sensitive: true, population: false, populationUse: 'unquantified', match: true,
     entertainment: false, shareDefault: false, description: '“无重大慢性病”没有可运行的统一病种定义；登记表已将该合成曲线排除，因此只进契合度而不减少人口。',
     semantics: { within: 'score', cross: 'excluded', empty: 'ignore' }, binding: 'correlated.healthCriteria', correlationGroup: null, order: 150,
   },
   {
     id: 'health.myopia', label: '视力偏好', category: 'health', classification: 'soft_preference',
     inputType: 'toggle', options: [option(HEALTH_CRITERIA[1], '不近视')], applicableTo: everyone,
-    evidenceId: 'evidence.health.myopia.adult-evidence-gap', evidenceGrade: 'C', sensitive: true, population: false, match: true,
+    evidenceId: 'evidence.health.myopia.adult-evidence-gap', evidenceGrade: 'C', sensitive: true, population: false, populationUse: 'unquantified', match: true,
     entertainment: false, shareDefault: false, description: '缺少18–50岁同口径成人分布，保留为偏好但不砍人口。',
     semantics: { within: 'and', cross: 'excluded', empty: 'ignore' }, binding: 'correlated.healthCriteria', correlationGroup: null, order: 160,
   },
   {
     id: 'appearance.hair_full', label: '无雄激素性脱发', category: 'appearance', classification: 'correlated_hard',
     inputType: 'toggle', options: [option(HAIR_CRITERIA[0], '无雄激素性脱发（AGA）')], applicableTo: everyone,
-    evidenceId: 'evidence.appearance.hair_full.community-study', evidenceGrade: 'C', sensitive: true, population: true,
-    match: false, entertainment: false, shareDefault: false, description: '仅按六城社区研究的 AGA 年龄组口径估算；女性缺少同粒度公开数据，运行等级降为 C，不使用主观“发量”描述。',
-    semantics: { within: 'and', cross: 'grouped', empty: 'ignore' }, binding: 'correlated.hairCriteria', correlationGroup: 'health_body', order: 170,
+    evidenceId: 'evidence.appearance.hair_full.community-study', evidenceGrade: 'C', sensitive: true, population: false, populationUse: 'unquantified',
+    match: false, entertainment: false, shareDefault: false, description: '六城社区研究不能代表全国18–50岁，女性也缺同粒度数据；可作为硬边界记录，但不削减主人数。',
+    semantics: { within: 'and', cross: 'excluded', empty: 'ignore' }, binding: 'correlated.hairCriteria', correlationGroup: null, order: 170,
   },
 ]
 
@@ -295,6 +298,7 @@ const softEntries: DimensionRegistryEntry[] = softMetadata.map(([id, label, cate
   evidenceGrade: 'NA',
   sensitive,
   population: false,
+  populationUse: 'unquantified',
   match: true,
   entertainment: false,
   shareDefault: !sensitive,
@@ -309,14 +313,14 @@ const entertainmentEntries: DimensionRegistryEntry[] = [
   {
     id: 'entertainment.zodiac', label: '星座', category: 'entertainment', classification: 'entertainment',
     inputType: 'multi', options: ZODIACS.map((value) => option(value, value)), applicableTo: everyone,
-    evidenceId: null, evidenceGrade: 'D', sensitive: false, population: false, match: false, entertainment: true,
+    evidenceId: null, evidenceGrade: 'D', sensitive: false, population: false, populationUse: 'unquantified', match: false, entertainment: true,
     shareDefault: true, description: '只生成趣味指数，不进入人口估算。',
     semantics: { within: 'or', cross: 'excluded', empty: 'ignore' }, binding: 'entertainment.zodiacs', correlationGroup: null, order: 300,
   },
   {
     id: 'entertainment.mbti', label: 'MBTI 彩蛋', category: 'entertainment', classification: 'entertainment',
     inputType: 'multi', options: MBTI_POLES.map((value) => option(value, value)), applicableTo: everyone,
-    evidenceId: null, evidenceGrade: 'D', sensitive: false, population: false, match: false, entertainment: true,
+    evidenceId: null, evidenceGrade: 'D', sensitive: false, population: false, populationUse: 'unquantified', match: false, entertainment: true,
     shareDefault: true, description: '同轴互斥；只生成可复现的娱乐分，不推断人口。',
     semantics: { within: 'score', cross: 'excluded', empty: 'ignore' }, binding: 'entertainment.mbti', correlationGroup: null, order: 310,
   },

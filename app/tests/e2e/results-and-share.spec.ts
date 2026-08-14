@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { desktopEstimate, goToStep, openApp, selectDimension } from './helpers'
+import { desktopEstimate, desktopEstimateLabel, goToStep, openApp, selectDimension } from './helpers'
 
 async function setExtremeConditions(page: import('@playwright/test').Page) {
   await goToStep(page, 3, '核心条件')
@@ -36,15 +36,15 @@ test('11 影响排行和一键放宽：展示前后差异并可撤销', async ({
   await page.getByRole('button', { name: /敏感人口条件与偏好/ }).click()
   await page.getByRole('button', { name: '当前不吸烟', exact: true }).click()
   await goToStep(page, 6, '结果解释')
-  const before = await desktopEstimate(page).innerText()
+  const before = await desktopEstimateLabel(page)
 
   await expect(page.getByRole('heading', { name: '哪些条件最“狠”' })).toBeVisible()
   const relax = page.locator('.relax-list button').first()
   await expect(relax).toContainText('→')
   await relax.click()
-  await expect(desktopEstimate(page)).not.toHaveText(before)
+  await expect(desktopEstimate(page)).not.toHaveAttribute('aria-label', before)
   await page.getByRole('button', { name: '撤销' }).click()
-  await expect(desktopEstimate(page)).toHaveText(before)
+  await expect(desktopEstimate(page)).toHaveAttribute('aria-label', before)
 })
 
 test('12 反向偏好：双向条件命中示意明确不是爱情预测', async ({ page }) => {

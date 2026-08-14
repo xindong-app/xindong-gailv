@@ -30,11 +30,19 @@ const HEIGHT_MEANS: Record<Gender, ReadonlyArray<readonly [number, number]>> = {
 }
 
 export const HEIGHT_DISTRIBUTION_GRADE = 'C' as const
+export const HEIGHT_SD_SCENARIOS: Readonly<Record<Gender, {
+  conservative: number
+  baseline: number
+  optimistic: number
+}>> = {
+  male: { conservative: 5.8, baseline: 6.2, optimistic: 6.6 },
+  female: { conservative: 5.3, baseline: 5.7, optimistic: 6.1 },
+}
 export function heightDist(age: number, gender: Gender): { mean: number; sd: number } {
   return {
     mean: interpolate(HEIGHT_MEANS[gender], age),
     // The registry explicitly records these as replaceable C-grade assumptions.
-    sd: gender === 'male' ? 6.2 : 5.7,
+    sd: HEIGHT_SD_SCENARIOS[gender].baseline,
   }
 }
 
@@ -49,16 +57,21 @@ export function bmiDist(age: number, gender: Gender): { mean: number; sd: number
   return { mean: baseMean + ageAdjustment, sd: gender === 'male' ? 4.16 : 4.0 }
 }
 
-// ---------- Income ---------------------------------------------------------
+// ---------- Income (research scenario only) -------------------------------
 // The registry has 2025 wage/household/migrant-worker anchors, but no direct
-// personal pre-tax income quantiles for every 18–50-year-old. The centre and
-// spread below are consequently C-grade. The previous unsupported piecewise
-// million-income tail has intentionally been removed; the engine now uses one
-// continuous lognormal sensitivity model.
+// personal pre-tax income quantiles for every 18–50-year-old. These anchors
+// also have different denominators. The constants below remain solely for
+// saved-result/research compatibility; population-policy.ts explicitly marks
+// economy.income as do_not_apply in the main estimate.
 export const INCOME_DISTRIBUTION_GRADE = 'C' as const
-export const INCOME_MEDIAN_WAN = 6.09 // 2025 migrant-worker annualised anchor; not claimed as a national direct median.
-export const INCOME_SIGMA = 0.68 // Retained legacy spread, explicitly C-grade and widened in output uncertainty.
-export const NATIONAL_INCOME_ANCHOR = 106_080 // 2025 scale-enterprise mean wage; anchor only.
+export const INCOME_QUANTIFICATION_STATUS = 'research_only' as const
+export const INCOME_MAIN_ESTIMATE_EFFECT = 'do_not_apply' as const
+/** @deprecated Research scenario centre; 6.09 is an annualised mean, not a median. */
+export const INCOME_MEDIAN_WAN = 6.09
+/** @deprecated Unvalidated legacy log spread for research sensitivity only. */
+export const INCOME_SIGMA = 0.68
+/** @deprecated Scale-enterprise employee mean; not an all-adult personal income anchor. */
+export const NATIONAL_INCOME_ANCHOR = 106_080
 
 export function incomeAgeFactor(age: number): number {
   return interpolate([
@@ -67,12 +80,17 @@ export function incomeAgeFactor(age: number): number {
   ], age)
 }
 
-// ---------- Household wealth ---------------------------------------------
-// A-grade median and C-grade log spread are both registered. High-wealth
-// piecewise tails from the old model were removed because they lacked an active
-// evidence entry with the same denominator.
+// ---------- Household wealth (research scenario only) ---------------------
+// The 2019 anchor describes urban households, while the product asks about a
+// target person's/family's threshold across mainland adults. No denominator-
+// matched, current age×sex×city microdistribution is available. Keep these
+// legacy parameters for sensitivity experiments only; never reduce main count.
 export const WEALTH_DISTRIBUTION_GRADE = 'C' as const
+export const WEALTH_QUANTIFICATION_STATUS = 'research_only' as const
+export const WEALTH_MAIN_ESTIMATE_EFFECT = 'do_not_apply' as const
+/** @deprecated 2019 urban-household research anchor; not a mainland personal median. */
 export const WEALTH_MEDIAN_WAN = 163
+/** @deprecated Unvalidated log spread for research sensitivity only. */
 export const WEALTH_SIGMA = 0.563
 export function wealthAgeFactor(age: number): number {
   return interpolate([
@@ -106,10 +124,18 @@ export const EDU_INCOME_PREMIUM: Readonly<Record<string, number>> = {
   博士: 2.4,
 }
 
-// ---------- Housing and vehicle -------------------------------------------
-// These are the registry's explicit C-grade sensitivity baselines for a target
-// individual, not the A-grade household ownership calibration values.
+// ---------- Housing and vehicle (research scenario only) ------------------
+// Household ownership and vehicles-per-100-households do not identify whether
+// the target individual owns a local home/car of the requested type/price.
+// These legacy baselines may power an explicitly labelled sensitivity sandbox,
+// but population-policy.ts forbids using them in the main estimate.
+export const HOUSE_QUANTIFICATION_STATUS = 'research_only' as const
+export const HOUSE_MAIN_ESTIMATE_EFFECT = 'do_not_apply' as const
+export const VEHICLE_QUANTIFICATION_STATUS = 'research_only' as const
+export const VEHICLE_MAIN_ESTIMATE_EFFECT = 'do_not_apply' as const
+/** @deprecated Assumption, not an observed probability for the product definition. */
 export const HOUSE_LOCAL_RATE = 0.45
+/** @deprecated Assumption, not an observed personal vehicle probability. */
 export const CAR_RATE = 0.35
 
 // ---------- Lifestyle ------------------------------------------------------
@@ -142,6 +168,47 @@ export function drinkingRate(gender: Gender, level: 'none' | 'notRegular', age?:
   const allAgeUseRate = level === 'notRegular' ? 0.203 : 0.276
   const adjustedUseRate = (1 - sexRate) * ageUseRate / allAgeUseRate
   return Math.min(1, Math.max(0, 1 - adjustedUseRate))
+}
+
+export interface ProbabilityScenario {
+  conservative: number
+  baseline: number
+  optimistic: number
+}
+
+/**
+ * C-grade raking sensitivity. The registry's 30-day all-age prevalence range
+ * (18.4%–22.2%, centre 20.3%) is propagated through the actual raking
+ * denominator. The 12-month branch uses the same relative uncertainty because
+ * no separate joint age×sex table is available. This is a scenario range, not
+ * a sampling confidence interval.
+ */
+export function drinkingRateScenario(
+  gender: Gender,
+  level: 'none' | 'notRegular',
+  age: number,
+): ProbabilityScenario {
+  const baseline = drinkingRate(gender, level, age)
+  const sexRate = level === 'notRegular'
+    ? (gender === 'male' ? 0.657 : 0.941)
+    : (gender === 'male' ? 0.555 : 0.898)
+  const ageUseRate = age <= 24
+    ? (level === 'notRegular' ? 0.143 : 0.220)
+    : age <= 44
+      ? (level === 'notRegular' ? 0.232 : 0.325)
+      : (level === 'notRegular' ? 0.212 : 0.273)
+  const centralDenominator = level === 'notRegular' ? 0.203 : 0.276
+  const lowerDenominator = centralDenominator * (0.184 / 0.203)
+  const upperDenominator = centralDenominator * (0.222 / 0.203)
+  const noUseAtDenominator = (denominator: number) => Math.min(
+    1,
+    Math.max(0, 1 - ((1 - sexRate) * ageUseRate / denominator)),
+  )
+  return {
+    conservative: Math.min(baseline, noUseAtDenominator(lowerDenominator)),
+    baseline,
+    optimistic: Math.max(baseline, noUseAtDenominator(upperDenominator)),
+  }
 }
 
 // ---------- Hair -----------------------------------------------------------

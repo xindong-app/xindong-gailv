@@ -9,13 +9,14 @@ describe('representative golden scenarios', () => {
     expect(result.population.estimate).toBeGreaterThanOrEqual(0)
     expect(result.population.estimate).toBeLessThanOrEqual(result.population.base)
     expect(result.groups.length).toBeGreaterThan(0)
-    expect(result.versions.modelVersion).toMatch(/^2\./)
+    expect(result.versions.modelVersion).toMatch(/^\d+\./)
     expect(result.versions.dataVersion).toBeTruthy()
   })
 
   it('leaves population invariant under the soft-heavy scenario', () => {
     const base = computeModel(GOLDEN_SCENARIOS.find((item) => item.id === 'base')!.input)
     const soft = computeModel(GOLDEN_SCENARIOS.find((item) => item.id === 'soft-heavy')!.input)
-    expect(soft.population).toEqual(base.population)
+    expect(soft.population.estimate).toBe(base.population.estimate)
+    expect(soft.population.range).toEqual(base.population.range)
   })
 })

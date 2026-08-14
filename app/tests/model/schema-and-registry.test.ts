@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { DIMENSION_REGISTRY, dimensionsByClass } from '../../src/model/dimensions'
 import { SOFT_PREFERENCE_IDS } from '../../src/model/schema'
 import evidenceRegistryJson from '../../src/data/evidence-registry.json'
-import { EVIDENCE_REGISTRY, parseEvidenceRegistry, validateEvidenceRegistry } from '../../src/data/evidence'
+import { EVIDENCE_REGISTRY, parseEvidenceRegistry, validateEvidenceRegistry } from '../../src/data/evidence-validation'
 
 describe('dimension registry', () => {
   it('has unique machine ids and all four required classes', () => {
@@ -61,19 +61,23 @@ describe('machine-readable evidence registry', () => {
       expect(entry.dataVersion).toBe(EVIDENCE_REGISTRY.dataVersion)
       expect(entry.sourceUrl.startsWith('https://')).toBe(true)
       if (entry.grade === 'D') expect(entry.modelUse).toBe('excluded')
-      const shareUnitException = entry.id === 'evidence.economy.car.household-2025' &&
-        entry.limitations.some((limitation) => limitation.includes('辆/百户'))
-      if (entry.estimate.unit === 'share' && !shareUnitException) {
+      if (entry.estimate.unit === 'share') {
         for (const value of [entry.estimate.conservative, entry.estimate.baseline, entry.estimate.optimistic]) {
           if (value != null) expect(value).toBeGreaterThanOrEqual(0)
           if (value != null) expect(value).toBeLessThanOrEqual(1)
         }
       }
     }
+    expect(EVIDENCE_REGISTRY.entries.find((entry) =>
+      entry.id === 'evidence.economy.wealth.distribution-assumption')?.estimate.unit,
+    ).toBe('log_scale_sd')
+    expect(EVIDENCE_REGISTRY.entries.find((entry) =>
+      entry.id === 'evidence.economy.car.household-2025')?.estimate.unit,
+    ).toBe('vehicles_per_100_households')
   })
 
   it('rejects evidence retrieved after an injectable build date', () => {
     expect(() => parseEvidenceRegistry(evidenceRegistryJson, '2026-08-12')).toThrow(/晚于构建日期/)
-    expect(parseEvidenceRegistry(evidenceRegistryJson, '2026-08-13')).toEqual(EVIDENCE_REGISTRY)
+    expect(parseEvidenceRegistry(evidenceRegistryJson, '2026-08-14')).toEqual(EVIDENCE_REGISTRY)
   })
 })
