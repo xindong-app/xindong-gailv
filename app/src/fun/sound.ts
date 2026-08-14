@@ -295,3 +295,62 @@ export function playCrowdMurmur(ratio: number): void {
     noise.stop(now + seconds + 0.02)
   } catch { /* 静默 */ }
 }
+
+/** 翻卡: 一声上扬的纸面滑扫 + 落定轻「嗒」 */
+export function playCardFlip(): void {
+  if (!isSoundOn()) return
+  const context = ensureContext()
+  if (!context) return
+  try {
+    const now = context.currentTime
+    const sweep = context.createBufferSource()
+    sweep.buffer = noiseBuffer(context, 0.18)
+    const bandpass = context.createBiquadFilter()
+    bandpass.type = 'bandpass'
+    bandpass.Q.value = 1.4
+    bandpass.frequency.setValueAtTime(900, now)
+    bandpass.frequency.exponentialRampToValueAtTime(2600, now + 0.16)
+    const sweepGain = context.createGain()
+    sweepGain.gain.setValueAtTime(0.0001, now)
+    sweepGain.gain.exponentialRampToValueAtTime(0.07, now + 0.03)
+    sweepGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18)
+    sweep.connect(bandpass).connect(sweepGain).connect(context.destination)
+    sweep.start(now)
+    sweep.stop(now + 0.2)
+
+    const tap = context.createOscillator()
+    tap.type = 'sine'
+    tap.frequency.value = 1900
+    const tapGain = context.createGain()
+    tapGain.gain.setValueAtTime(0.0001, now + 0.15)
+    tapGain.gain.exponentialRampToValueAtTime(0.08, now + 0.16)
+    tapGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.24)
+    tap.connect(tapGain).connect(context.destination)
+    tap.start(now + 0.15)
+    tap.stop(now + 0.26)
+  } catch { /* 静默 */ }
+}
+
+/** 撕卡: 一截干脆的纸面撕裂噪声, 音高下坠 */
+export function playTear(): void {
+  if (!isSoundOn()) return
+  const context = ensureContext()
+  if (!context) return
+  try {
+    const now = context.currentTime
+    const tear = context.createBufferSource()
+    tear.buffer = noiseBuffer(context, 0.3)
+    const bandpass = context.createBiquadFilter()
+    bandpass.type = 'bandpass'
+    bandpass.Q.value = 0.8
+    bandpass.frequency.setValueAtTime(2800, now)
+    bandpass.frequency.exponentialRampToValueAtTime(700, now + 0.26)
+    const gain = context.createGain()
+    gain.gain.setValueAtTime(0.0001, now)
+    gain.gain.exponentialRampToValueAtTime(0.11, now + 0.015)
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3)
+    tear.connect(bandpass).connect(gain).connect(context.destination)
+    tear.start(now)
+    tear.stop(now + 0.32)
+  } catch { /* 静默 */ }
+}

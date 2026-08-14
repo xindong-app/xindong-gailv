@@ -5676,3 +5676,259 @@ body::before {
   .tier-M { box-shadow: 4px 4px 0 var(--ink), 0 0 14px 3px rgba(255, 200, 60, 0.5); }
   .person.is-caishen:hover > svg { transform: none; }
 }
+
+/* ================= 批次2 P0 心动卡池: 占卜牌骨架 × 镭射闪膜 ================= */
+
+/* ---------- 卡面翻牌舞台 ---------- */
+.dimension-card.dc {
+  padding: 0;
+  border: none;
+  background: transparent;
+  perspective: 900px;
+  min-height: 300px;
+}
+.dc-flip {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  transform-style: preserve-3d;
+  transition: transform var(--dur-slow) var(--spring-soft, cubic-bezier(0.22, 1, 0.36, 1));
+}
+.dimension-card.is-flipped .dc-flip { transform: rotateY(180deg); }
+.dc-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  backface-visibility: hidden;
+  border-radius: 18px;
+  overflow: hidden;
+}
+/* C 骨架: 墨色牌壳 + 放射光芒 + 虚线内框 */
+.dc-front {
+  padding: 6px;
+  background: var(--ink);
+  box-shadow: 5px 5px 0 rgba(59, 48, 80, 0.28);
+}
+.dc-front::before { /* D 镭射斜纹闪膜 */
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: repeating-linear-gradient(115deg, transparent 0 22px, rgba(255, 255, 255, 0.5) 22px 30px);
+  mix-blend-mode: soft-light;
+}
+.dc-front::after { /* 顶部镭射高光 */
+  content: '';
+  position: absolute;
+  left: -30%;
+  top: -45%;
+  z-index: 3;
+  width: 160%;
+  height: 70%;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.55), transparent 65%);
+}
+.dc-front-inner { position: relative; }
+.dc-face.dc-back {
+  transform: rotateY(180deg);
+  align-items: stretch;
+  padding: 16px 18px;
+  border: 2.5px solid var(--ink);
+  background: var(--surface-strong);
+  box-shadow: 5px 5px 0 rgba(59, 48, 80, 0.28);
+  text-align: left;
+}
+.dc-back .dc-flipbtn { margin-top: auto; align-self: flex-start; }
+
+/* 正面内页: 放射光芒底按 tier 换色 */
+.dc-rays {
+  position: absolute;
+  inset: 6px;
+  z-index: 0;
+  border: 1.5px dashed rgba(59, 48, 80, 0.4);
+  border-radius: 12px;
+}
+.dimension-card[data-tier="N"] .dc-rays { background: conic-gradient(from -30deg at 50% 42%, #ece5d8 0 20deg, #f8f3e9 20deg 40deg, #ece5d8 40deg 60deg, #f8f3e9 60deg 80deg, #ece5d8 80deg 100deg, #f8f3e9 100deg 120deg, #ece5d8 120deg 140deg, #f8f3e9 140deg 160deg, #ece5d8 160deg 180deg, #f8f3e9 180deg 200deg, #ece5d8 200deg 220deg, #f8f3e9 220deg 240deg, #ece5d8 240deg 260deg, #f8f3e9 260deg 280deg, #ece5d8 280deg 300deg, #f8f3e9 300deg 320deg, #ece5d8 320deg 340deg, #f8f3e9 340deg 360deg); }
+.dimension-card[data-tier="R"] .dc-rays { background: conic-gradient(from -30deg at 50% 42%, var(--sky) 0 20deg, #eef7fc 20deg 40deg, var(--sky) 40deg 60deg, #eef7fc 60deg 80deg, var(--sky) 80deg 100deg, #eef7fc 100deg 120deg, var(--sky) 120deg 140deg, #eef7fc 140deg 160deg, var(--sky) 160deg 180deg, #eef7fc 180deg 200deg, var(--sky) 200deg 220deg, #eef7fc 220deg 240deg, var(--sky) 240deg 260deg, #eef7fc 260deg 280deg, var(--sky) 280deg 300deg, #eef7fc 300deg 320deg, var(--sky) 320deg 340deg, #eef7fc 340deg 360deg); }
+.dimension-card[data-tier="SR"] .dc-rays { background: conic-gradient(from -30deg at 50% 42%, var(--lilac) 0 20deg, #f4edfb 20deg 40deg, var(--lilac) 40deg 60deg, #f4edfb 60deg 80deg, var(--lilac) 80deg 100deg, #f4edfb 100deg 120deg, var(--lilac) 120deg 140deg, #f4edfb 140deg 160deg, var(--lilac) 160deg 180deg, #f4edfb 180deg 200deg, var(--lilac) 200deg 220deg, #f4edfb 220deg 240deg, var(--lilac) 240deg 260deg, #f4edfb 260deg 280deg, var(--lilac) 280deg 300deg, #f4edfb 300deg 320deg, var(--lilac) 320deg 340deg, #f4edfb 340deg 360deg); }
+.dimension-card[data-tier="SSR"] .dc-rays { background: conic-gradient(from -30deg at 50% 42%, var(--rose) 0 20deg, #fdf0f4 20deg 40deg, var(--rose) 40deg 60deg, #fdf0f4 60deg 80deg, var(--rose) 80deg 100deg, #fdf0f4 100deg 120deg, var(--rose) 120deg 140deg, #fdf0f4 140deg 160deg, var(--rose) 160deg 180deg, #fdf0f4 180deg 200deg, var(--rose) 200deg 220deg, #fdf0f4 220deg 240deg, var(--rose) 240deg 260deg, #fdf0f4 260deg 280deg, var(--rose) 280deg 300deg, #fdf0f4 300deg 320deg, var(--rose) 320deg 340deg, #fdf0f4 340deg 360deg); }
+.dimension-card[data-tier="UR"] .dc-rays { background: conic-gradient(from -30deg at 50% 42%, var(--sun) 0 20deg, #fff7d6 20deg 40deg, var(--sun) 40deg 60deg, #fff7d6 60deg 80deg, var(--sun) 80deg 100deg, #fff7d6 100deg 120deg, var(--sun) 120deg 140deg, #fff7d6 140deg 160deg, var(--sun) 160deg 180deg, #fff7d6 180deg 200deg, var(--sun) 200deg 220deg, #fff7d6 220deg 240deg, var(--sun) 240deg 260deg, #fff7d6 260deg 280deg, var(--sun) 280deg 300deg, #fff7d6 300deg 320deg, var(--sun) 320deg 340deg, #fff7d6 340deg 360deg); }
+.dimension-card[data-tier="M"] .dc-rays { background: conic-gradient(from -30deg at 50% 42%, var(--peach) 0 20deg, #fdf1e6 20deg 40deg, var(--peach) 40deg 60deg, #fdf1e6 60deg 80deg, var(--peach) 80deg 100deg, #fdf1e6 100deg 120deg, var(--peach) 120deg 140deg, #fdf1e6 140deg 160deg, var(--peach) 160deg 180deg, #fdf1e6 180deg 200deg, var(--peach) 200deg 220deg, #fdf1e6 220deg 240deg, var(--peach) 240deg 260deg, #fdf1e6 260deg 280deg, var(--peach) 280deg 300deg, #fdf1e6 300deg 320deg, var(--peach) 320deg 340deg, #fdf1e6 340deg 360deg); }
+
+/* 正面内容层 */
+.dc-ribbon {
+  position: relative;
+  z-index: 2;
+  margin-top: 16px;
+  padding: 4px 18px;
+  border-radius: 4px;
+  background: var(--rose-strong);
+  color: #fffdf8;
+  font-size: 14.5px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  box-shadow: 0 3px 0 rgba(59, 48, 80, 0.35);
+}
+.dimension-card[data-tier="UR"] .dc-ribbon { background: #a0153e; }
+.dimension-card[data-tier="M"] .dc-ribbon { background: #5c4383; }
+.dc-medal {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 104px;
+  height: 104px;
+  margin-top: 12px;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: #fffdf8;
+  box-shadow: 3px 3px 0 rgba(59, 48, 80, 0.3);
+}
+.dc-flavor {
+  position: relative;
+  z-index: 2;
+  margin-top: 10px;
+  padding: 0 14px;
+  font-family: 'Kaiti SC', 'STKaiti', 'KaiTi', serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+  text-align: center;
+}
+.dc-official {
+  position: relative;
+  z-index: 2;
+  margin-top: 5px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.dc-tierline {
+  position: relative;
+  z-index: 2;
+  margin-top: 6px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.26em;
+  color: var(--ink-soft);
+}
+.dimension-card[data-tier="SR"] .dc-tierline { color: var(--lilac-strong); }
+.dimension-card[data-tier="SSR"] .dc-tierline { color: var(--rose-strong); }
+.dimension-card[data-tier="UR"] .dc-tierline { color: #a67c00; }
+.dimension-card[data-tier="M"] .dc-tierline { color: #a3522b; }
+.dc-spark { position: absolute; z-index: 2; color: rgba(255, 255, 255, 0.9); text-shadow: 0 0 6px rgba(255, 255, 255, 0.8); pointer-events: none; }
+.dc-s1 { top: 12px; right: 16px; font-size: 12px; }
+.dc-s2 { bottom: 64px; left: 14px; font-size: 10px; }
+.dc-actions {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding: 12px 0 12px;
+}
+.dc-flipbtn {
+  padding: 4px 10px;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.85);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--spring, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+.dc-flipbtn:hover { transform: rotate(-3deg) scale(1.08); }
+.dc-back h3 { margin: 10px 0 8px; font-size: 1rem; }
+.dc-back p { color: var(--ink-soft); font-size: 0.8rem; line-height: 1.6; }
+.dc-back small { color: var(--ink-faint); font-size: 0.72rem; }
+/* 已装备: 缎带变绿, 盖章保留 */
+.dimension-card.equipped .dc-ribbon { background: var(--success); }
+.dimension-card .equipped-stamp { z-index: 4; }
+
+/* ---------- 手牌区: 扇形迷你卡 ---------- */
+.selected-list { align-items: stretch; }
+.selected-pill.hand-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 118px;
+  max-width: 150px;
+  padding: 8px 12px 9px;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  box-shadow: 3px 3px 0 var(--ink);
+  transition: transform 200ms var(--spring, cubic-bezier(0.34, 1.56, 0.64, 1)), box-shadow 200ms;
+}
+.selected-list .hand-card:nth-child(odd) { transform: rotate(-2.2deg); }
+.selected-list .hand-card:nth-child(even) { transform: rotate(1.8deg); }
+.selected-pill.hand-card:hover {
+  transform: rotate(0deg) translateY(-5px);
+  box-shadow: 4px 6px 0 var(--ink);
+  z-index: 2;
+}
+.selected-pill.hand-card b { font-size: 13px; font-weight: 900; letter-spacing: 0.02em; }
+.selected-pill.hand-card .hand-official { font-size: 10px; font-weight: 700; color: var(--ink); }
+.selected-pill.hand-card > span:last-of-type { font-size: 11px; font-weight: 600; color: var(--ink-soft); }
+.hand-tier {
+  align-self: flex-start;
+  margin-bottom: 3px;
+  padding: 0 6px;
+  border: 1.5px dashed var(--ink);
+  border-radius: 999px;
+  color: var(--ink);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+.hand-card[data-tier="UR"] .hand-tier, .hand-card[data-tier="M"] .hand-tier { border-style: solid; }
+.selected-pill.hand-card .pill-remove {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--surface-strong);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--spring, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+.selected-pill.hand-card .pill-remove:hover { transform: rotate(90deg) scale(1.15); background: var(--danger-soft); }
+/* 撕卡幽灵: 原位撕碎消散 */
+.hand-ghost {
+  position: fixed;
+  z-index: 90;
+  pointer-events: none;
+  margin: 0;
+  animation: cardTear 0.42s cubic-bezier(0.4, 0, 0.6, 1) both;
+}
+@keyframes cardTear {
+  0% { transform: rotate(0deg) scale(1); opacity: 1; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+  35% { transform: rotate(-4deg) scale(1.02); clip-path: polygon(0 0, 100% 0, 96% 48%, 100% 100%, 0 100%, 4% 52%); }
+  100% { transform: rotate(-14deg) translateY(26px) scale(0.86); opacity: 0; clip-path: polygon(0 0, 100% 0, 88% 42%, 100% 100%, 0 100%, 12% 46%); }
+}
+
+/* ---------- 卡池降级登记 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .dc-flip { transition: none !important; }
+  .hand-ghost { animation: none !important; opacity: 0; }
+  .selected-pill.hand-card,
+  .selected-pill.hand-card .pill-remove,
+  .dc-flipbtn { transition: none !important; }
+  .selected-list .hand-card:nth-child(odd),
+  .selected-list .hand-card:nth-child(even) { transform: none; }
+}
