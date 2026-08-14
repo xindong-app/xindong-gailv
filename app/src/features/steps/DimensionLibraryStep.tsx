@@ -5,6 +5,7 @@ import { toggleArrayValue } from '../../model/selectionUtils'
 import { Chip, EvidenceStatusBadge } from '../../components/ui'
 import { CardArt } from '../../fun/cardpool/cardArt'
 import { CARD_TIER_NAMES, cardMetaFor } from '../../fun/cardpool/cardMeta'
+import { DailyPack } from '../../fun/cardpool/PackOpening'
 import { playCardFlip } from '../../fun/sound'
 
 const CLASS_COPY = {
@@ -74,6 +75,7 @@ export function DimensionLibraryStep({ selection, onChange, onNext }: {
         <h2 id="library-title" tabIndex={-1}>抽卡时间到，想好收哪张了吗</h2>
         <p>每张卡都是一个筛选维度：卡框越闪，这关砍人越狠。点「底细」翻面看数据依据，点「加入条件」收进卡组。</p>
       </div>
+      <DailyPack isActive={isActive} onToggle={(id) => toggleDimension(id)} />
       <div className="library-toolbar">
         <label className="search-field" htmlFor="dimension-search"><span>搜索维度</span><input id="dimension-search" type="search" placeholder="例如：沟通、做饭、工作稳定…" value={query} onChange={(event) => setQuery(event.target.value)} />{query && <button aria-label="清除搜索" type="button" onClick={() => setQuery('')}>×</button>}</label>
         <label className="select-field" htmlFor="category-filter"><span>分类</span><select id="category-filter" value={category} onChange={(event) => setCategory(event.target.value as DimensionCategory | 'all')}><option value="all">全部分类</option>{DIMENSION_CATEGORIES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
