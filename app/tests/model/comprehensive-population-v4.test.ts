@@ -408,20 +408,23 @@ describe('v4 set and monotonicity semantics', () => {
   })
 
   it('keeps all three income endpoints monotone when any education subset is added', () => {
-    const ageBands = [[18, 19], [20, 24], [25, 29], [30, 34], [35, 39], [40, 44], [45, 49], [50, 50]] as const
     const levels = ['junior_college', 'bachelor', 'master', 'doctorate'] as const
+    const subsets = Array.from({ length: (1 << levels.length) - 1 }, (_, maskIndex) => {
+      const mask = maskIndex + 1
+      return levels.filter((_, levelIndex) => (mask & (1 << levelIndex)) !== 0)
+    })
     for (const gender of ['male', 'female'] as const) {
-      for (const [min, max] of ageBands) {
-        for (const threshold of [1e-9, 5, 20, 100]) {
+      for (let age = 18; age <= 50; age += 1) {
+        for (const threshold of [1e-9, 20, 100]) {
           const result = (educationLevels: ModelSelection['correlated']['educationLevels']) => computeModel(selection((draft) => {
             draft.target.gender = gender
-            draft.target.age = { min, max }
+            draft.target.age = { min: age, max: age }
             draft.correlated.minAnnualIncomeWan = threshold
             draft.correlated.educationLevels = [...educationLevels]
           })).comprehensivePopulation
           const incomeOnly = result([])
-          for (const level of levels) {
-            const subset = result([level])
+          for (const educationSubset of subsets) {
+            const subset = result(educationSubset)
             expect(subset.range.conservative).toBeLessThanOrEqual(incomeOnly.range.conservative + 1e-8)
             expect(subset.estimate).toBeLessThanOrEqual(incomeOnly.estimate + 1e-8)
             expect(subset.range.optimistic).toBeLessThanOrEqual(incomeOnly.range.optimistic + 1e-8)

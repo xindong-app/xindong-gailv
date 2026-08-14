@@ -130,6 +130,12 @@ function validateMethodModel(
       issues.push({ path, message: '对数正态尺度与sigma必须为正数' })
     }
     if (entry.dimensionId === 'economy.income') {
+      if (!entry.limitationCodes.includes('analyst_prior')) {
+        issues.push({
+          path: `${path}.educationFactors`,
+          message: '收入学历尺度是分析者先验，必须显式声明 analyst_prior',
+        })
+      }
       const educationFactors = model.educationFactors as Record<string, unknown>
       const expectedEducationFactors = ['junior_college', 'bachelor', 'master', 'doctorate', 'other']
       if (educationFactors == null || typeof educationFactors !== 'object' || Array.isArray(educationFactors) ||
