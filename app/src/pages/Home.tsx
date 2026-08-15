@@ -8,7 +8,7 @@ import { computeModel, sanitizeModelComputationOptions } from '../engine/modelEn
 import { Confetti } from '../fun/Confetti'
 import { buildFunnelFrames } from '../fun/funnelFrames'
 import { IntroCurtain } from '../fun/IntroCurtain'
-import { playWhoosh } from '../fun/sound'
+import { playWhoosh, startBgm } from '../fun/sound'
 import { Stage } from '../fun/Stage'
 import { CoreCriteriaStep } from '../features/steps/CoreCriteriaStep'
 import { DimensionLibraryStep } from '../features/steps/DimensionLibraryStep'
@@ -153,6 +153,18 @@ export default function Home() {
   const prevStepRef = useRef(0)
 
   const clearSavedSession = useSessionSelection(selection)
+
+  // 背景音乐: 浏览器要求首次交互后才能出声, 开园第一下点击/按键即开曲;
+  // 之后由音效总开关接管(setSoundOn 内联动 startBgm/stopBgm)
+  useEffect(() => {
+    const kick = () => startBgm()
+    window.addEventListener('pointerdown', kick, { once: true })
+    window.addEventListener('keydown', kick, { once: true })
+    return () => {
+      window.removeEventListener('pointerdown', kick)
+      window.removeEventListener('keydown', kick)
+    }
+  }, [])
 
   useEffect(() => {
     const update = () => setOnline(navigator.onLine)

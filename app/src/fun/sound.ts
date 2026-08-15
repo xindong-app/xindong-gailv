@@ -16,7 +16,12 @@ export function setSoundOn(on: boolean): void {
   try {
     window.localStorage.setItem(STORAGE_KEY, on ? 'on' : 'off')
   } catch { /* 隐私模式下静默失败 */ }
-  if (on) ensureContext()
+  if (on) {
+    ensureContext()
+    startBgm()
+  } else {
+    stopBgm()
+  }
 }
 
 function ensureContext(): AudioContext | null {
@@ -216,4 +221,69 @@ export function playTear(): void {
   run((c, now) => {
     noise(c, now, { filter: 'bandpass', q: 0.8, freq: 2800, slideTo: 700, slideT: 0.26, vol: 0.11, attack: 0.015, dur: 0.3 })
   })
+}
+
+// ---------- 背景音乐: 马戏团圆舞曲(八小节循环, 现场合成, 无音频文件) ----------
+// 3/4 蹦擦擦: 三角波低音打拍, 八音盒旋律飘在上面; 跟随音效总开关, 页面隐藏时自动暂停
+const BGM_BEAT = 0.55 // 每拍秒数, 一小节三拍
+// 八小节和弦根音: C G Am F / C F G C
+const BGM_ROOTS = [130.81, 98, 110, 87.31, 130.81, 87.31, 98, 130.81]
+// 每小节三拍的八音盒旋律(null = 休止)
+const BGM_MELODY: (number | null)[][] = [
+  [659.25, null, 784],
+  [587.33, null, 493.88],
+  [523.25, null, 659.25],
+  [440, 523.25, 698.46],
+  [784, null, 659.25],
+  [880, null, 698.46],
+  [587.33, 784, 987.77],
+  [1046.5, null, null],
+]
+let bgmTimer: number | null = null
+let bgmBar = 0
+let bgmNext = 0
+let bgmVisibilityWired = false
+
+function playBgmBar(): void {
+  if (!isSoundOn()) {
+    stopBgm()
+    return
+  }
+  const context = ensureContext()
+  if (!context) return
+  // 固定节拍时间轴, 不受 setInterval 抖动影响
+  const now = Math.max(context.currentTime + 0.05, bgmNext)
+  bgmNext = now + BGM_BEAT * 3
+  const root = BGM_ROOTS[bgmBar % 8]
+  // 蹦 · 擦 擦
+  tone(context, now, { type: 'triangle', freq: root, vol: 0.055, decay: 0.5 })
+  tone(context, now, { type: 'triangle', freq: root * 1.5, vol: 0.036, decay: 0.28, at: BGM_BEAT })
+  tone(context, now, { type: 'triangle', freq: root * 1.5, vol: 0.036, decay: 0.28, at: BGM_BEAT * 2 })
+  // 八音盒旋律
+  BGM_MELODY[bgmBar % 8].forEach((freq, beat) => {
+    if (freq != null) {
+      tone(context, now, { freq, vol: 0.04, attack: 0.01, decay: 1.1, at: beat * BGM_BEAT })
+    }
+  })
+  bgmBar += 1
+}
+
+/** 开园背景音乐; 浏览器自动播放策略要求首次交互后调用才出声 */
+export function startBgm(): void {
+  if (bgmTimer != null || !isSoundOn()) return
+  if (typeof document !== 'undefined' && !bgmVisibilityWired) {
+    bgmVisibilityWired = true
+    // 切后台自动静音, 回前台继续营业
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stopBgm()
+      else startBgm()
+    })
+  }
+  playBgmBar()
+  bgmTimer = window.setInterval(playBgmBar, BGM_BEAT * 3 * 1000)
+}
+
+export function stopBgm(): void {
+  if (bgmTimer != null) window.clearInterval(bgmTimer)
+  bgmTimer = null
 }
