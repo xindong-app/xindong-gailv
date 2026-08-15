@@ -50,6 +50,8 @@ export interface AvailableRelationshipFactor {
   limitations: readonly string[]
   isObservedPopulationRate: false
   isConfidenceInterval: false
+  /** True when this factor was already applied by the comprehensive population layer. */
+  appliedInMainPopulation: boolean
 }
 
 export interface MissingRelationshipFactor {
@@ -61,6 +63,7 @@ export interface MissingRelationshipFactor {
   sourceIds: readonly string[]
   isObservedPopulationRate: false
   isConfidenceInterval: false
+  appliedInMainPopulation: boolean
 }
 
 export type RelationshipFactorResult = AvailableRelationshipFactor | MissingRelationshipFactor
@@ -76,7 +79,7 @@ export interface RelationshipScenarioResult {
   targetGender: GenderId
   mainLayer: {
     status: 'available' | 'unavailable'
-    role: 'statistical_upper_bound'
+    role: 'statistical_upper_bound' | 'comprehensive_scenario'
     range: RelationshipCountRange | null
     modelVersion: string | null
     dataVersion: string | null
@@ -137,6 +140,7 @@ function defaultFactor(
     limitations: [...scenario.limitations],
     isObservedPopulationRate: false,
     isConfidenceInterval: false,
+    appliedInMainPopulation: false,
   }
 }
 
@@ -161,6 +165,7 @@ function factorFromOverride(
       limitations: ['调用方参数没有外部证据登记，结果只适合情境重算。'],
       isObservedPopulationRate: false,
       isConfidenceInterval: false,
+      appliedInMainPopulation: false,
     }
   }
   return {
@@ -172,6 +177,7 @@ function factorFromOverride(
     sourceIds: [],
     isObservedPopulationRate: false,
     isConfidenceInterval: false,
+    appliedInMainPopulation: false,
   }
 }
 
@@ -569,11 +575,22 @@ export function computeRelationshipScenario(input: unknown): RelationshipScenari
 export interface CompatibleModelResult {
   versions: { modelVersion: string; dataVersion: string }
   input: { target: { gender: GenderId } }
+  computationContext?: { seekerGender?: GenderId }
   population: {
     status?: 'estimated' | 'upper_bound' | 'unavailable'
     zeroMeaning?: 'not_zero' | 'positive_below_resolution' | 'model_underflow' | 'logical_zero' | 'unavailable'
     estimate: number
     range: { conservative: number; baseline: number; optimistic: number }
+    display?: string
+  }
+  comprehensivePopulation?: {
+    status: 'estimated' | 'unavailable'
+    numericStatus: 'available' | 'unavailable'
+    zeroMeaning: 'not_zero' | 'positive_below_resolution' | 'model_underflow' | 'logical_zero' | 'unavailable'
+    estimate: number
+    range: { conservative: number; baseline: number; optimistic: number }
+    modeledConditionIds: readonly string[]
+    directConditionIds: readonly string[]
     display?: string
   }
 }
@@ -590,39 +607,97 @@ export function computeRelationshipScenarioFromModel(
       `关系情境目标性别 ${parsedRequest.targetGender} 与主人口结果目标性别 ${modelResult.input.target.gender} 不一致`,
     )
   }
-  if (modelResult.population.status === 'unavailable') {
-    return computeRelationshipScenario({
-      ...parsedRequest,
+  const comprehensive = modelResult.comprehensivePopulation
+  const comprehensiveDimensions = new Set(comprehensive == null
+    ? []
+    : [...comprehensive.modeledConditionIds, ...comprehensive.directConditionIds])
+  const appliedFactorDimensions = {
+    orientationCompatibility: 'relationship.orientation_compatible',
+    currentlySingle: 'relationship.currently_single',
+    relationshipWillingness: '',
+  } as const
+  const orientationAlreadyApplied = comprehensiveDimensions.has(
+    appliedFactorDimensions.orientationCompatibility,
+  )
+  const contextSeekerGender = modelResult.computationContext?.seekerGender
+  if (orientationAlreadyApplied && contextSeekerGender != null &&
+    contextSeekerGender !== parsedRequest.seekerGender) {
+    throw new Error('综合人口中的取向情境与关系层本人统计性别不一致，不能重复解释同一结果')
+  }
+  const reliableRequiresFallback = modelResult.population.status === 'unavailable' ||
+    (modelResult.population.estimate === 0 && modelResult.population.zeroMeaning !== 'logical_zero')
+  const usesComprehensive = comprehensive != null && !reliableRequiresFallback &&
+    (!orientationAlreadyApplied || contextSeekerGender === parsedRequest.seekerGender)
+  const sourcePopulation = usesComprehensive ? comprehensive : modelResult.population
+  const appliedDimensions = usesComprehensive ? comprehensiveDimensions : new Set<string>()
+  const appliedFactorIds = (Object.entries(appliedFactorDimensions) as Array<[
+    RelationshipFactorId,
+    string,
+  ]>).filter(([, dimensionId]) => dimensionId !== '' && appliedDimensions.has(dimensionId))
+    .map(([factorId]) => factorId)
+  const overrides = { ...parsedRequest.overrides }
+  for (const factorId of appliedFactorIds) {
+    overrides[factorId] = {
+      status: 'scenario',
+      range: { lower: 1, reference: 1, upper: 1 },
+      note: '该因素已经计入综合人口起点；关系层使用 100% 中性因子以避免重复扣减。',
+    }
+  }
+  const effectiveRequest = { ...parsedRequest, overrides }
+  const unavailable = sourcePopulation.status === 'unavailable' ||
+    ('numericStatus' in sourcePopulation && sourcePopulation.numericStatus === 'unavailable')
+  let result: RelationshipScenarioResult
+  if (unavailable) {
+    result = computeRelationshipScenario({
+      ...effectiveRequest,
       targetPopulation: {
         status: 'unavailable',
-        reason: modelResult.population.display ?? '主人口模型未能提供可靠的人口锚点',
+        reason: sourcePopulation.display ?? '人口模型未能提供可用的人口锚点',
+        modelVersion: modelResult.versions.modelVersion,
+        dataVersion: modelResult.versions.dataVersion,
+      },
+    })
+  } else if (sourcePopulation.estimate === 0 && sourcePopulation.zeroMeaning !== 'logical_zero') {
+    result = computeRelationshipScenario({
+      ...effectiveRequest,
+      targetPopulation: {
+        status: 'unavailable',
+        reason: sourcePopulation.zeroMeaning === 'model_underflow'
+          ? '人口模型数值下溢，不能解释为现实中 0 人'
+          : '人口模型未提供可证明的逻辑零原因',
+        modelVersion: modelResult.versions.modelVersion,
+        dataVersion: modelResult.versions.dataVersion,
+      },
+    })
+  } else {
+    result = computeRelationshipScenario({
+      ...effectiveRequest,
+      targetPopulation: {
+        status: 'available',
+        estimate: sourcePopulation.estimate,
+        range: sourcePopulation.range,
+        zeroMeaning: sourcePopulation.zeroMeaning,
         modelVersion: modelResult.versions.modelVersion,
         dataVersion: modelResult.versions.dataVersion,
       },
     })
   }
-  if (modelResult.population.estimate === 0 && modelResult.population.zeroMeaning !== 'logical_zero') {
-    return computeRelationshipScenario({
-      ...parsedRequest,
-      targetPopulation: {
-        status: 'unavailable',
-        reason: modelResult.population.zeroMeaning === 'model_underflow'
-          ? '主人口模型数值下溢，不能解释为现实中 0 人'
-          : '主人口模型未提供可证明的逻辑零原因',
-        modelVersion: modelResult.versions.modelVersion,
-        dataVersion: modelResult.versions.dataVersion,
-      },
-    })
+  if (!usesComprehensive) return result
+  const factors = { ...result.factors }
+  for (const factorId of appliedFactorIds) {
+    factors[factorId] = { ...factors[factorId], appliedInMainPopulation: true }
   }
-  return computeRelationshipScenario({
-    ...parsedRequest,
-    targetPopulation: {
-      status: 'available',
-      estimate: modelResult.population.estimate,
-      range: modelResult.population.range,
-      zeroMeaning: modelResult.population.zeroMeaning,
-      modelVersion: modelResult.versions.modelVersion,
-      dataVersion: modelResult.versions.dataVersion,
+  return {
+    ...result,
+    mainLayer: {
+      ...result.mainLayer,
+      role: 'comprehensive_scenario',
+      note: '起点是全条件综合人口；已在其中计入的关系因素不会在关系层重复扣减。',
     },
-  })
+    factors,
+    explanation: [
+      ...result.explanation,
+      '关系层从综合人口继续演算，并对已计入综合人口的同名关系因素使用中性因子。',
+    ],
+  }
 }

@@ -20,6 +20,17 @@ export interface ComprehensiveRange {
   optimistic: number
 }
 
+export interface ComprehensiveReferencePool {
+  /** Target gender × age × geography before marital status or any optional cut. */
+  estimate: number
+  range: ComprehensiveRange
+}
+
+export interface ComprehensiveConfidence {
+  grade: EvidenceGrade
+  reasons: string[]
+}
+
 export interface ComprehensiveConditionFactor {
   dimensionId: string
   label: string
@@ -58,6 +69,8 @@ export interface ComprehensiveConditionImpact {
 }
 
 export interface ComprehensivePopulationResult {
+  /** Stable denominator for rarity/funnel views; unlike base, it excludes every optional cut. */
+  initialPool: ComprehensiveReferencePool
   /** Reliable-layer reference value before the scenario-only conditions. */
   base: number
   scopeCeiling: number
@@ -79,6 +92,7 @@ export interface ComprehensivePopulationResult {
   interpretation: 'identified_scenario' | 'prior_sensitivity_only'
   correlationScenarios: ComprehensiveCorrelationScenario[]
   evidenceCoverage: Record<EvidenceGrade, number>
+  confidence: ComprehensiveConfidence
   directConditionIds: string[]
   modeledConditionIds: string[]
   factors: ComprehensiveConditionFactor[]
@@ -106,6 +120,10 @@ export interface ComprehensivePopulationOptions {
   seekerGender?: 'male' | 'female'
   /** Reliable-layer counts after all direct conditions, one row per age. */
   ageStrata?: readonly ComprehensiveAgeStratum[]
+  /** Gender × age × geography pool before every optional condition. */
+  initialPool?: ComprehensiveRange
+  /** Nested leave-one-out recomputations can skip modeled impacts. */
+  includeImpacts?: boolean
 }
 
 interface ReliablePopulationLayer {
@@ -676,6 +694,34 @@ function buildCoverage(
   return coverage
 }
 
+function buildComprehensiveConfidence(
+  status: ComprehensivePopulationResult['status'],
+  interpretation: ComprehensivePopulationResult['interpretation'],
+  evidenceCoverage: Record<EvidenceGrade, number>,
+  assumptionCount: number,
+): ComprehensiveConfidence {
+  if (status === 'unavailable') {
+    return { grade: 'NA', reasons: ['基础人口锚点不可用，综合情景不能给出可信等级。'] }
+  }
+  if (interpretation === 'prior_sensitivity_only') {
+    return {
+      grade: 'NA',
+      reasons: ['至少一个条件没有可识别方向或阈值，只能按最大熵先验做敏感性演算。'],
+    }
+  }
+  const weakest = (['NA', 'D', 'C', 'B', 'A'] as const).find(
+    (grade) => evidenceCoverage[grade] > 0,
+  ) ?? 'NA'
+  const grade: EvidenceGrade = assumptionCount > 0 && !['NA', 'D'].includes(weakest)
+    ? 'D'
+    : weakest
+  const reasons = [`综合口径按当前启用条件的最弱证据标为 ${grade} 级。`]
+  if (assumptionCount > 0) {
+    reasons.push(`当前包含 ${assumptionCount} 个分析者先验或相关性情景，因此不会沿用可靠层的高等级。`)
+  }
+  return { grade, reasons }
+}
+
 export function computeComprehensivePopulation(
   selection: ModelSelection,
   reliable: ReliablePopulationLayer,
@@ -728,9 +774,15 @@ export function computeComprehensivePopulation(
   const genericPriorConditionIds = modeled
     .filter((factor) => factor.eventStatus === 'generic_binary_prior')
     .map((factor) => factor.dimensionId)
+  const initialPoolRange = options.initialPool ?? reliable.range
+  const initialPool: ComprehensiveReferencePool = {
+    estimate: initialPoolRange.baseline,
+    range: { ...initialPoolRange },
+  }
 
   if (reliable.numericStatus === 'unavailable') {
     return {
+      initialPool,
       base: 0,
       scopeCeiling: reliable.scopeCeiling,
       estimate: 0,
@@ -751,6 +803,9 @@ export function computeComprehensivePopulation(
       interpretation,
       correlationScenarios,
       evidenceCoverage,
+      confidence: buildComprehensiveConfidence(
+        'unavailable', interpretation, evidenceCoverage, assumptionCount,
+      ),
       directConditionIds: directIds,
       modeledConditionIds: modeled.map((factor) => factor.dimensionId),
       factors: [],
@@ -788,7 +843,7 @@ export function computeComprehensivePopulation(
       : resolutionExceeded
         ? 'positive_below_resolution'
         : 'not_zero'
-  const impacts = buildImpacts(estimate, modeled, ageRows)
+  const impacts = options.includeImpacts === false ? [] : buildImpacts(estimate, modeled, ageRows)
   const impactById = new Map(impacts.map((impact) => [impact.dimensionId, impact]))
   const factors: ComprehensiveConditionFactor[] = modeled.map((factor) => ({
     dimensionId: factor.dimensionId,
@@ -806,6 +861,7 @@ export function computeComprehensivePopulation(
   }))
 
   return {
+    initialPool,
     base: reliable.estimate,
     scopeCeiling: reliable.scopeCeiling,
     estimate,
@@ -836,6 +892,9 @@ export function computeComprehensivePopulation(
     interpretation,
     correlationScenarios,
     evidenceCoverage,
+    confidence: buildComprehensiveConfidence(
+      'estimated', interpretation, evidenceCoverage, assumptionCount,
+    ),
     directConditionIds: directIds,
     modeledConditionIds: modeled.map((factor) => factor.dimensionId),
     factors,

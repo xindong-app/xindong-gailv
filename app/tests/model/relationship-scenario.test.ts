@@ -260,16 +260,53 @@ describe('main-model adapter and traceability', () => {
       ...DEFAULT_SELECTION,
       softPreferenceIds: ['relationship.orientation_compatible', 'relationship.currently_single'],
       selfPreferenceIds: ['relationship.orientation_compatible', 'relationship.currently_single'],
-    })
+    }, { seekerGender: 'female' })
     expect(modelResult.scores.bidirectionalIllustration).toBe(100)
     const result = computeRelationshipScenarioFromModel(modelResult, {
       seekerGender: 'female',
       targetGender: 'male',
     })
-    expect(result.mainLayer.range?.reference).toBe(modelResult.population.estimate)
+    expect(result.mainLayer.range?.reference).toBe(modelResult.comprehensivePopulation.estimate)
+    expect(result.mainLayer.role).toBe('comprehensive_scenario')
     expect(result.factors.orientationCompatibility.status).toBe('scenario')
+    expect(result.factors.orientationCompatibility.appliedInMainPopulation).toBe(true)
+    expect(result.factors.currentlySingle.appliedInMainPopulation).toBe(true)
+    expect(result.factors.relationshipWillingness.appliedInMainPopulation).toBe(false)
+    if (result.factors.orientationCompatibility.status === 'scenario') {
+      expect(result.factors.orientationCompatibility.range).toEqual({ lower: 1, reference: 1, upper: 1 })
+    }
     expect(result.combined.note).not.toContain('Jaccard')
     expect(result.explanation.join(' ')).toContain('不会使用软偏好重合分数')
+  })
+
+  it('applies each relationship factor at most once after the comprehensive layer', () => {
+    const input = structuredClone(DEFAULT_SELECTION)
+    input.target.gender = 'male'
+    input.softPreferenceIds = [
+      'relationship.orientation_compatible',
+      'relationship.currently_single',
+    ]
+    const modelResult = computeModel(input, { seekerGender: 'female' })
+    const result = computeRelationshipScenarioFromModel(modelResult, {
+      seekerGender: 'female',
+      targetGender: 'male',
+    })
+    expect(result.mainLayer.range?.reference).toBe(modelResult.comprehensivePopulation.estimate)
+    if (
+      result.combined.status === 'scenario' &&
+      result.combined.range != null &&
+      result.factors.relationshipWillingness.status === 'scenario'
+    ) {
+      expect(result.combined.range.reference).toBeCloseTo(
+        modelResult.comprehensivePopulation.estimate *
+          result.factors.relationshipWillingness.range.reference,
+        5,
+      )
+    }
+    expect(() => computeRelationshipScenarioFromModel(modelResult, {
+      seekerGender: 'male',
+      targetGender: 'male',
+    })).toThrow('本人统计性别不一致')
   })
 
   it('rejects a target-gender mismatch between the two layers', () => {

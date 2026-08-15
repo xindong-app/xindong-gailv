@@ -31,11 +31,12 @@ import {
   unsupportedSelectedCities,
 } from '../data/population-policy'
 import { DIMENSION_BY_ID, type DimensionClass, type EvidenceGrade } from '../model/dimensions'
-import { activeConditions } from '../model/selectionUtils'
+import { activeConditions, removeSelectionDimension } from '../model/selectionUtils'
 import { DATA_VERSION, MODEL_VERSION } from '../model/versions'
 import {
   computeComprehensivePopulation,
   type ComprehensiveAgeStratum,
+  type ComprehensiveConditionImpact,
   type ComprehensivePopulationResult,
 } from './comprehensivePopulation'
 import {
@@ -165,6 +166,8 @@ export class ModelInputError extends Error {
 
 interface RawPopulationResult {
   base: number
+  /** Gender × age × geography before marital status or any optional cut. */
+  initialPoolRange: PopulationRange
   scopeCeiling: number
   estimate: number
   groups: GroupResult[]
@@ -196,6 +199,29 @@ const modelComputationOptionsSchema = strictObject({
   )),
   seekerGender: optional(enumSchema(GENDERS)),
 })
+
+interface ParsedModelComputationOptions {
+  hardRequirementIds?: string[]
+  seekerGender?: 'male' | 'female'
+}
+
+/**
+ * Keeps reusable calculation context valid after a draft removes conditions.
+ * Public computeModel remains strict; callers must opt into this sanitizer.
+ */
+export function sanitizeModelComputationOptions(
+  selection: ModelSelection,
+  options: ModelComputationOptions,
+): ModelComputationOptions {
+  const activeIds = new Set(activeConditions(selection).map((condition) => condition.dimensionId))
+  return {
+    ...(options.seekerGender == null ? {} : { seekerGender: options.seekerGender }),
+    hardRequirementIds: [...new Set(options.hardRequirementIds ?? [])].filter((dimensionId) => {
+      const dimension = DIMENSION_BY_ID.get(dimensionId)
+      return dimension != null && dimension.classification !== 'entertainment' && activeIds.has(dimensionId)
+    }),
+  }
+}
 
 export class ModelOptionsError extends Error {
   readonly issues: z.core.$ZodIssue[]
@@ -432,6 +458,7 @@ function calculatePopulation(selection: ModelSelection): RawPopulationResult {
   if (unsupportedCities.length > 0) {
     return {
       base: 0,
+      initialPoolRange: { conservative: 0, baseline: 0, optimistic: 0 },
       estimate: 0,
       groups: [{
         id: 'demographic',
@@ -456,6 +483,11 @@ function calculatePopulation(selection: ModelSelection): RawPopulationResult {
   }
 
   const strata = populationStrata(selection)
+  const initialPoolRange = strata.reduce<PopulationRange>((sum, stratum) => ({
+    conservative: sum.conservative + stratum.residents.conservative,
+    baseline: sum.baseline + stratum.residents.baseline,
+    optimistic: sum.optimistic + stratum.residents.optimistic,
+  }), { conservative: 0, baseline: 0, optimistic: 0 })
   const maritalActive = selection.target.maritalStatuses.length > 0
   const base = strata.reduce((sum, stratum) => {
     const marital = maritalShareScenarioAtAge(selection, stratum.age)
@@ -606,6 +638,7 @@ function calculatePopulation(selection: ModelSelection): RawPopulationResult {
 
   return {
     base,
+    initialPoolRange,
     scopeCeiling,
     estimate: Math.max(0, Number.isFinite(baseline) ? baseline : 0),
     groups,
@@ -630,51 +663,6 @@ function calculatePopulation(selection: ModelSelection): RawPopulationResult {
   }
 }
 
-function cloneSelection(selection: ModelSelection): ModelSelection {
-  return {
-    target: {
-      ...selection.target,
-      age: { ...selection.target.age },
-      cities: [...selection.target.cities],
-      maritalStatuses: [...selection.target.maritalStatuses],
-      heightCm: selection.target.heightCm == null ? null : { ...selection.target.heightCm },
-    },
-    correlated: {
-      ...selection.correlated,
-      bodyTypes: [...selection.correlated.bodyTypes],
-      educationLevels: [...selection.correlated.educationLevels],
-      housing: { ...selection.correlated.housing },
-      vehicle: { ...selection.correlated.vehicle, priceBands: [...selection.correlated.vehicle.priceBands] },
-      healthCriteria: [...selection.correlated.healthCriteria],
-      hairCriteria: [...selection.correlated.hairCriteria],
-    },
-    softPreferenceIds: [...selection.softPreferenceIds],
-    entertainment: { zodiacs: [...selection.entertainment.zodiacs], mbti: [...selection.entertainment.mbti] },
-    selfPreferenceIds: [...selection.selfPreferenceIds],
-  }
-}
-
-function removeDimension(selection: ModelSelection, dimensionId: string): ModelSelection {
-  const relaxed = cloneSelection(selection)
-  switch (dimensionId) {
-    case 'base.age': relaxed.target.age = { min: MIN_MODEL_AGE, max: MAX_MODEL_AGE }; break
-    case 'base.region': relaxed.target.cities = ['全国']; break
-    case 'base.marital': relaxed.target.maritalStatuses = []; break
-    case 'appearance.height': relaxed.target.heightCm = null; break
-    case 'appearance.body_type': relaxed.correlated.bodyTypes = []; break
-    case 'education.level': relaxed.correlated.educationLevels = []; break
-    case 'economy.income': relaxed.correlated.minAnnualIncomeWan = null; break
-    case 'economy.wealth': relaxed.correlated.minHouseholdWealthWan = null; break
-    case 'economy.house': relaxed.correlated.housing = { required: false, location: null, minAreaSqm: null, type: null }; break
-    case 'economy.vehicle': relaxed.correlated.vehicle = { required: false, priceBands: [] }; break
-    case 'lifestyle.smoking': relaxed.correlated.smoking = 'any'; break
-    case 'lifestyle.drinking': relaxed.correlated.drinking = 'any'; break
-    case 'health.chronic': relaxed.correlated.healthCriteria = relaxed.correlated.healthCriteria.filter((item) => item !== 'no_major_chronic'); break
-    case 'appearance.hair_full': relaxed.correlated.hairCriteria = []; break
-  }
-  return relaxed
-}
-
 function impactCandidates(selection: ModelSelection, raw: RawPopulationResult): string[] {
   const candidates = [...raw.activeDimensions]
   if (selection.target.age.min !== MIN_MODEL_AGE || selection.target.age.max !== MAX_MODEL_AGE) candidates.push('base.age')
@@ -690,9 +678,20 @@ function groupForDimension(dimensionId: string): string {
   return 'socioeconomic'
 }
 
+function relaxPopulationDimension(selection: ModelSelection, dimensionId: string): ModelSelection {
+  const relaxed = removeSelectionDimension(selection, dimensionId)
+  if (dimensionId === 'base.age') {
+    relaxed.target.age = { min: MIN_MODEL_AGE, max: MAX_MODEL_AGE }
+  }
+  return relaxed
+}
+
 function buildImpacts(selection: ModelSelection, raw: RawPopulationResult): ConditionImpact[] {
   return impactCandidates(selection, raw).map((dimensionId) => {
-    const relaxedEstimate = Math.max(raw.estimate, calculatePopulation(removeDimension(selection, dimensionId)).estimate)
+    const relaxedEstimate = Math.max(
+      raw.estimate,
+      calculatePopulation(relaxPopulationDimension(selection, dimensionId)).estimate,
+    )
     const registry = DIMENSION_BY_ID.get(dimensionId)
     return {
       dimensionId,
@@ -711,7 +710,10 @@ function buildImpacts(selection: ModelSelection, raw: RawPopulationResult): Cond
   }).sort((left, right) => right.marginalLoss - left.marginalLoss)
 }
 
-function buildRelaxations(impacts: readonly ConditionImpact[]): RelaxationSuggestion[] {
+function buildRelaxations(impacts: readonly Pick<
+  ConditionImpact,
+  'dimensionId' | 'label' | 'before' | 'after' | 'marginalLoss'
+>[]): RelaxationSuggestion[] {
   // Neighbor scenarios are shown only for non-sensitive boundaries. Sensitive
   // boundaries remain user-controlled and are never proactively suggested for
   // relaxation by the engine.
@@ -727,6 +729,45 @@ function buildRelaxations(impacts: readonly ConditionImpact[]): RelaxationSugges
     action: `remove:${impact.dimensionId}`,
     note: `模型重算后约增加 ${formatCount(impact.marginalLoss)}；这是边际敏感度，不是对现实个体的承诺。`,
   }))
+}
+
+function comprehensiveDirectImpactGrade(
+  selection: ModelSelection,
+  dimensionId: string,
+): EvidenceGrade {
+  if (dimensionId === 'base.region' && !isNationwideSelection(selection)) return 'C'
+  if (dimensionId === 'base.marital' && (
+    selection.target.age.min < 20 || selection.target.age.max > 49
+  )) return 'C'
+  return DIMENSION_BY_ID.get(dimensionId)?.evidenceGrade ?? 'NA'
+}
+
+function buildComprehensiveDirectImpacts(
+  selection: ModelSelection,
+  raw: RawPopulationResult,
+  options: ParsedModelComputationOptions,
+  current: ComprehensivePopulationResult,
+): ComprehensiveConditionImpact[] {
+  return impactCandidates(selection, raw).map((dimensionId) => {
+    const relaxedSelection = relaxPopulationDimension(selection, dimensionId)
+    const sanitized = sanitizeModelComputationOptions(relaxedSelection, options)
+    const relaxed = computeParsedModel(relaxedSelection, {
+      ...(sanitized.seekerGender == null ? {} : { seekerGender: sanitized.seekerGender }),
+      hardRequirementIds: [...(sanitized.hardRequirementIds ?? [])],
+    }, false).comprehensivePopulation
+    const before = Math.max(current.estimate, relaxed.estimate)
+    return {
+      dimensionId,
+      label: DIMENSION_BY_ID.get(dimensionId)?.label ?? dimensionId,
+      group: groupForDimension(dimensionId),
+      before,
+      after: current.estimate,
+      retention: before > 0 ? clampProbability(current.estimate / before) : 1,
+      marginalLoss: Math.max(0, before - current.estimate),
+      evidenceGrade: comprehensiveDirectImpactGrade(selection, dimensionId),
+      note: '保持其他条件与计算上下文不变，仅放宽这一项后重新计算综合人口。',
+    }
+  })
 }
 
 function softScores(selection: ModelSelection): ModelResult['scores'] & ModelResult['scoreDetails'] {
@@ -815,22 +856,21 @@ export function formatCountShort(value: number): string {
   return formatted === '期望值低于 1 人' ? '< 1 人' : formatted.replace(/^约\s*/, '')
 }
 
-export function computeModel(input: unknown, options: unknown = {}): ModelResult {
-  const parsed = selectionSchema.safeParse(input)
-  if (!parsed.success) throw new ModelInputError(parsed.error)
-  const parsedOptions = modelComputationOptionsSchema.safeParse(options)
-  if (!parsedOptions.success) throw new ModelOptionsError(parsedOptions.error)
-  const selection = parsed.data
+function computeParsedModel(
+  selection: ModelSelection,
+  parsedOptions: ParsedModelComputationOptions,
+  includeAnalysis: boolean,
+): ModelResult {
   const raw = calculatePopulation(selection)
   const range = sensitivityRange(raw)
   const isUnavailable = raw.availability === 'unavailable'
   const resolutionFloor = isUnavailable ? 0 : Math.max(1, raw.base / 1_000_000)
   const resolutionExceeded = !isUnavailable && raw.estimate < resolutionFloor
-  const impacts = isUnavailable ? [] : buildImpacts(selection, raw)
+  const impacts = isUnavailable || !includeAnalysis ? [] : buildImpacts(selection, raw)
   const scores = softScores(selection)
   const unquantifiedHardConditions = selectedUnquantifiedHardConditions(
     selection,
-    parsedOptions.data.hardRequirementIds ?? [],
+    parsedOptions.hardRequirementIds ?? [],
   )
   const isUpperBound = !isUnavailable && unquantifiedHardConditions.length > 0
   const includedHardConditions = isUnavailable
@@ -870,15 +910,17 @@ export function computeModel(input: unknown, options: unknown = {}): ModelResult
       : resolutionExceeded ? '低于模型分辨率' : formatCountShort(raw.estimate),
   }
   const comprehensivePopulation = computeComprehensivePopulation(selection, population, {
-    seekerGender: parsedOptions.data.seekerGender,
+    seekerGender: parsedOptions.seekerGender,
     ageStrata: raw.reliableAgeStrata,
+    initialPool: raw.initialPoolRange,
+    includeImpacts: includeAnalysis,
   })
   return {
     versions: { modelVersion: MODEL_VERSION, dataVersion: DATA_VERSION },
     input: selection,
     computationContext: {
-      ...(parsedOptions.data.seekerGender == null ? {} : { seekerGender: parsedOptions.data.seekerGender }),
-      hardRequirementIds: [...(parsedOptions.data.hardRequirementIds ?? [])],
+      ...(parsedOptions.seekerGender == null ? {} : { seekerGender: parsedOptions.seekerGender }),
+      hardRequirementIds: [...(parsedOptions.hardRequirementIds ?? [])],
     },
     population,
     comprehensivePopulation,
@@ -901,7 +943,7 @@ export function computeModel(input: unknown, options: unknown = {}): ModelResult
     },
     confidence: confidence(raw),
     impacts,
-    relaxations: isUnavailable ? [] : buildRelaxations(impacts),
+    relaxations: isUnavailable || !includeAnalysis ? [] : buildRelaxations(impacts),
     groups: raw.groups,
     explanation: [
       isUnavailable
@@ -914,6 +956,42 @@ export function computeModel(input: unknown, options: unknown = {}): ModelResult
       ...(resolutionExceeded ? ['当前结果低于模型分辨率，只能解释为期望值极小，不能解释为现实中不存在。'] : []),
     ],
   }
+}
+
+export function computeModel(input: unknown, options: unknown = {}): ModelResult {
+  const parsed = selectionSchema.safeParse(input)
+  if (!parsed.success) throw new ModelInputError(parsed.error)
+  const parsedOptions = modelComputationOptionsSchema.safeParse(options)
+  if (!parsedOptions.success) throw new ModelOptionsError(parsedOptions.error)
+  return computeParsedModel(parsed.data, parsedOptions.data, true)
+}
+
+export interface ComprehensiveConditionAnalysis {
+  impacts: ComprehensiveConditionImpact[]
+  relaxations: RelaxationSuggestion[]
+}
+
+/**
+ * Computes the heavier all-condition leave-one-out analysis on demand.
+ * Keeping it separate prevents every summary calculation from paying for
+ * direct-condition recomputation when the detail panel is not opened.
+ */
+export function computeComprehensiveConditionAnalysis(
+  result: ModelResult,
+): ComprehensiveConditionAnalysis {
+  if (result.comprehensivePopulation.numericStatus === 'unavailable') {
+    return { impacts: [], relaxations: [] }
+  }
+  const raw = calculatePopulation(result.input)
+  const directImpacts = buildComprehensiveDirectImpacts(
+    result.input,
+    raw,
+    result.computationContext,
+    result.comprehensivePopulation,
+  )
+  const impacts = [...result.comprehensivePopulation.impacts, ...directImpacts]
+    .sort((left, right) => right.marginalLoss - left.marginalLoss)
+  return { impacts, relaxations: buildRelaxations(impacts) }
 }
 
 export function tryComputeModel(input: unknown, options: unknown = {}):

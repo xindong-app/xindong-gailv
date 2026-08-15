@@ -19,6 +19,10 @@ describe('model performance', () => {
   })
 
   it('keeps the all-dimension worst case under a dedicated p95 budget', () => {
+    const configuredBudget = Number(process.env.MODEL_ALL_DIMENSION_P95_BUDGET_MS ?? 150)
+    const p95Budget = Number.isFinite(configuredBudget) && configuredBudget > 0
+      ? configuredBudget
+      : 150
     const input = structuredClone(DEFAULT_SELECTION)
     input.target.age = { min: 18, max: 50 }
     input.target.maritalStatuses = ['never_married']
@@ -48,6 +52,6 @@ describe('model performance', () => {
     }
     samples.sort((left, right) => left - right)
     const p95 = samples[Math.floor(samples.length * 0.95)]
-    expect(p95).toBeLessThan(150)
+    expect(p95).toBeLessThan(p95Budget)
   })
 })
