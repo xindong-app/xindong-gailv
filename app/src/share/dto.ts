@@ -1,6 +1,6 @@
 import type { ModelResult } from '../engine/modelEngine'
-import { formatCount, tryComputeModel } from '../engine/modelEngine'
-import { buildVerdict, collectVerdictImpacts, fmtRarity, rarityTier } from '../fun/rarity'
+import { computeComprehensiveConditionAnalysis, formatCount, tryComputeModel } from '../engine/modelEngine'
+import { buildVerdict, fmtRarity, rarityTier } from '../fun/rarity'
 import { pickProf } from '../fun/skins'
 import { DIMENSION_BY_ID } from '../model/dimensions'
 import { activeConditions, removeSelectionDimension } from '../model/selectionUtils'
@@ -85,6 +85,8 @@ export function buildShareDto(
     seekerGender: result.computationContext.seekerGender,
   })
   const pool = publicComputed.success ? publicComputed.data.comprehensivePopulation : null
+  // 分享主数字=综合人口层, 可信等级同步用综合层的; 顶层 confidence 只作可靠层锚点
+  if (pool) dto.confidenceGrade = pool.confidence.grade
 
   if (settings.showCount && pool && pool.numericStatus !== 'unavailable') {
     const priorScenario = pool.interpretation === 'prior_sensitivity_only' || pool.genericPriorConditionIds.length > 0
@@ -100,7 +102,8 @@ export function buildShareDto(
     const funAllowed = pool.zeroMeaning !== 'model_underflow' && pool.zeroMeaning !== 'logical_zero'
     if (funAllowed) {
       // 趣味块完全由人数派生: 人数不公开时稀有度同样不能出现(防止反推)
-      const base = pool.base
+      // 分母用后端真实初始候选池 initialPool(任何可选条件之前), 不是筛过的 base
+      const base = pool.initialPool.estimate
       const probability = base > 0 ? pool.estimate / base : 0
       const tier = rarityTier(probability * 10_000)
       const survivors = base > 0 ? Math.min(80, Math.max(0, Math.round((80 * pool.estimate) / base))) : 0
@@ -110,7 +113,7 @@ export function buildShareDto(
       // 毒舌总评: 公开副本的 leave-one-out 边际归因(与条件顺序无关);
       // 没有公开条件时整段省略(存在性也不泄露)
       const verdict = conditions && conditions.length > 0 && publicComputed.success
-        ? buildVerdict(collectVerdictImpacts(publicComputed.data))
+        ? buildVerdict(computeComprehensiveConditionAnalysis(publicComputed.data).impacts)
         : null
       dto.fun = {
         tierKey: tier.key,

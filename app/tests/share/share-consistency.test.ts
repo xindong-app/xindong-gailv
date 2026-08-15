@@ -1,8 +1,8 @@
 // v4 分享一致性反例 —— 隐藏敏感条件后, 分享输出必须与"从未选过"逐位一致;
 // 幸存者数量永远钳制在 0–80; 总评归因与条件点选顺序无关。
 import { describe, expect, it } from 'vitest'
-import { computeModel } from '../../src/engine/modelEngine'
-import { buildVerdict, collectVerdictImpacts } from '../../src/fun/rarity'
+import { computeComprehensiveConditionAnalysis, computeModel } from '../../src/engine/modelEngine'
+import { buildVerdict } from '../../src/fun/rarity'
 import { DEFAULT_SELECTION, type ModelSelection } from '../../src/model/schema'
 import { buildShareDto, createDefaultShareSettings } from '../../src/share'
 
@@ -64,8 +64,8 @@ describe('分享一致性(v4 公开副本整体重算)', () => {
     const b = baseSelection()
     b.softPreferenceIds = ['communication.conflict_repair', 'lifestyle.exercise', 'lifestyle.cooking']
 
-    const verdictA = buildVerdict(collectVerdictImpacts(computeModel(a)))
-    const verdictB = buildVerdict(collectVerdictImpacts(computeModel(b)))
+    const verdictA = buildVerdict(computeComprehensiveConditionAnalysis(computeModel(a)).impacts)
+    const verdictB = buildVerdict(computeComprehensiveConditionAnalysis(computeModel(b)).impacts)
     expect(verdictA).toBeTruthy()
     expect(verdictB).toBe(verdictA)
   })

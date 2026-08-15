@@ -41,351 +41,179 @@ function noiseBuffer(context: AudioContext, seconds: number): AudioBuffer {
   return buffer
 }
 
-/** 刀光剑影: 噪声扫频 + 高频「唰」 */
-export function playSlash(): void {
+/** 统一演奏入口: 音效开关 + 上下文 + 设备不可用时静默 */
+function run(play: (context: AudioContext, now: number) => void): void {
   if (!isSoundOn()) return
   const context = ensureContext()
   if (!context) return
   try {
-    const now = context.currentTime
-    const noise = context.createBufferSource()
-    noise.buffer = noiseBuffer(context, 0.28)
-    const bandpass = context.createBiquadFilter()
-    bandpass.type = 'bandpass'
-    bandpass.Q.value = 1.2
-    bandpass.frequency.setValueAtTime(2800, now)
-    bandpass.frequency.exponentialRampToValueAtTime(420, now + 0.24)
-    const noiseGain = context.createGain()
-    noiseGain.gain.setValueAtTime(0.0001, now)
-    noiseGain.gain.exponentialRampToValueAtTime(0.22, now + 0.03)
-    noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.26)
-    noise.connect(bandpass).connect(noiseGain).connect(context.destination)
-    noise.start(now)
-    noise.stop(now + 0.28)
-
-    const shing = context.createOscillator()
-    shing.type = 'triangle'
-    shing.frequency.setValueAtTime(1400, now)
-    shing.frequency.exponentialRampToValueAtTime(240, now + 0.18)
-    const shingGain = context.createGain()
-    shingGain.gain.setValueAtTime(0.0001, now)
-    shingGain.gain.exponentialRampToValueAtTime(0.08, now + 0.02)
-    shingGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2)
-    shing.connect(shingGain).connect(context.destination)
-    shing.start(now)
-    shing.stop(now + 0.2)
+    play(context, context.currentTime)
   } catch { /* 音频设备不可用时静默 */ }
+}
+
+interface ToneOptions {
+  type?: OscillatorType
+  freq: number
+  /** 有滑音时给到目标频率 */
+  slideTo?: number
+  slideT?: number
+  vol: number
+  attack?: number
+  /** 增益归零时刻(相对发音起点, 秒) */
+  decay: number
+  /** 相对 now 的延迟(秒) */
+  at?: number
+}
+
+function tone(context: AudioContext, now: number, o: ToneOptions): void {
+  const start = now + (o.at ?? 0)
+  const osc = context.createOscillator()
+  osc.type = o.type ?? 'sine'
+  if (o.slideTo != null) {
+    osc.frequency.setValueAtTime(o.freq, start)
+    osc.frequency.exponentialRampToValueAtTime(o.slideTo, start + (o.slideT ?? o.decay))
+  } else {
+    osc.frequency.value = o.freq
+  }
+  const gain = context.createGain()
+  gain.gain.setValueAtTime(0.0001, start)
+  gain.gain.exponentialRampToValueAtTime(o.vol, start + (o.attack ?? 0.02))
+  gain.gain.exponentialRampToValueAtTime(0.0001, start + o.decay)
+  osc.connect(gain).connect(context.destination)
+  osc.start(start)
+  osc.stop(start + o.decay + 0.05)
+}
+
+interface NoiseOptions {
+  filter: BiquadFilterType
+  q?: number
+  freq: number
+  slideTo?: number
+  slideT?: number
+  vol: number
+  attack?: number
+  /** 增益归零时刻(相对发音起点, 秒) */
+  dur: number
+  at?: number
+}
+
+function noise(context: AudioContext, now: number, o: NoiseOptions): void {
+  const start = now + (o.at ?? 0)
+  const src = context.createBufferSource()
+  src.buffer = noiseBuffer(context, o.dur + 0.02)
+  const filter = context.createBiquadFilter()
+  filter.type = o.filter
+  if (o.q != null) filter.Q.value = o.q
+  if (o.slideTo != null) {
+    filter.frequency.setValueAtTime(o.freq, start)
+    filter.frequency.exponentialRampToValueAtTime(o.slideTo, start + (o.slideT ?? o.dur))
+  } else {
+    filter.frequency.value = o.freq
+  }
+  const gain = context.createGain()
+  gain.gain.setValueAtTime(0.0001, start)
+  gain.gain.exponentialRampToValueAtTime(o.vol, start + (o.attack ?? 0.03))
+  gain.gain.exponentialRampToValueAtTime(0.0001, start + o.dur)
+  src.connect(filter).connect(gain).connect(context.destination)
+  src.start(start)
+  src.stop(start + o.dur + 0.02)
+}
+
+/** 刀光剑影: 噪声扫频 + 高频「唰」 */
+export function playSlash(): void {
+  run((c, now) => {
+    noise(c, now, { filter: 'bandpass', q: 1.2, freq: 2800, slideTo: 420, slideT: 0.24, vol: 0.22, dur: 0.26 })
+    tone(c, now, { type: 'triangle', freq: 1400, slideTo: 240, slideT: 0.18, vol: 0.08, decay: 0.2 })
+  })
 }
 
 /** 揭榜开奖: 三连上行 + 终音, 小小的仪式感 */
 export function playTada(): void {
-  if (!isSoundOn()) return
-  const context = ensureContext()
-  if (!context) return
-  try {
-    const now = context.currentTime
-    ;[392, 523.25, 659.25, 784].forEach((freq, index) => {
-      const osc = context.createOscillator()
-      osc.type = 'triangle'
-      osc.frequency.value = freq
-      const gain = context.createGain()
-      const start = now + index * 0.11
-      gain.gain.setValueAtTime(0.0001, start)
-      gain.gain.exponentialRampToValueAtTime(0.11, start + 0.02)
-      gain.gain.exponentialRampToValueAtTime(0.0001, start + (index === 3 ? 0.7 : 0.22))
-      osc.connect(gain).connect(context.destination)
-      osc.start(start)
-      osc.stop(start + 0.75)
+  run((c, now) => {
+    [392, 523.25, 659.25, 784].forEach((freq, index) => {
+      tone(c, now, { type: 'triangle', freq, vol: 0.11, decay: index === 3 ? 0.7 : 0.22, at: index * 0.11 })
     })
-  } catch { /* 静默 */ }
+  })
 }
 
 /** 翻关: 一页纸翻过去的轻「唰」 */
 export function playWhoosh(): void {
-  if (!isSoundOn()) return
-  const context = ensureContext()
-  if (!context) return
-  try {
-    const now = context.currentTime
-    const noise = context.createBufferSource()
-    noise.buffer = noiseBuffer(context, 0.22)
-    const bandpass = context.createBiquadFilter()
-    bandpass.type = 'bandpass'
-    bandpass.Q.value = 0.9
-    bandpass.frequency.setValueAtTime(520, now)
-    bandpass.frequency.exponentialRampToValueAtTime(1650, now + 0.17)
-    const gain = context.createGain()
-    gain.gain.setValueAtTime(0.0001, now)
-    gain.gain.exponentialRampToValueAtTime(0.08, now + 0.04)
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2)
-    noise.connect(bandpass).connect(gain).connect(context.destination)
-    noise.start(now)
-    noise.stop(now + 0.22)
-  } catch { /* 静默 */ }
+  run((c, now) => {
+    noise(c, now, { filter: 'bandpass', q: 0.9, freq: 520, slideTo: 1650, slideT: 0.17, vol: 0.08, attack: 0.04, dur: 0.2 })
+  })
 }
 
 /** 点 chip: 一声短促的「啵」, 选条件上瘾音 */
 export function playPop(): void {
-  if (!isSoundOn()) return
-  const context = ensureContext()
-  if (!context) return
-  try {
-    const now = context.currentTime
-    const osc = context.createOscillator()
-    osc.type = 'sine'
-    osc.frequency.setValueAtTime(540, now)
-    osc.frequency.exponentialRampToValueAtTime(920, now + 0.07)
-    const gain = context.createGain()
-    gain.gain.setValueAtTime(0.0001, now)
-    gain.gain.exponentialRampToValueAtTime(0.14, now + 0.012)
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12)
-    osc.connect(gain).connect(context.destination)
-    osc.start(now)
-    osc.stop(now + 0.13)
-  } catch { /* 音频设备不可用时静默 */ }
+  run((c, now) => {
+    tone(c, now, { freq: 540, slideTo: 920, slideT: 0.07, vol: 0.14, attack: 0.012, decay: 0.12 })
+  })
 }
 
 /** 盖章: 低频「砰」+ 一点纸面摩擦 */
 export function playStamp(): void {
-  if (!isSoundOn()) return
-  const context = ensureContext()
-  if (!context) return
-  try {
-    const now = context.currentTime
-    const thud = context.createOscillator()
-    thud.type = 'square'
-    thud.frequency.setValueAtTime(160, now)
-    thud.frequency.exponentialRampToValueAtTime(64, now + 0.1)
-    const thudGain = context.createGain()
-    thudGain.gain.setValueAtTime(0.0001, now)
-    thudGain.gain.exponentialRampToValueAtTime(0.18, now + 0.014)
-    thudGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16)
-    thud.connect(thudGain).connect(context.destination)
-    thud.start(now)
-    thud.stop(now + 0.17)
-
-    const paper = context.createBufferSource()
-    paper.buffer = noiseBuffer(context, 0.08)
-    const lowpass = context.createBiquadFilter()
-    lowpass.type = 'lowpass'
-    lowpass.frequency.value = 900
-    const paperGain = context.createGain()
-    paperGain.gain.setValueAtTime(0.0001, now)
-    paperGain.gain.exponentialRampToValueAtTime(0.07, now + 0.01)
-    paperGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08)
-    paper.connect(lowpass).connect(paperGain).connect(context.destination)
-    paper.start(now)
-    paper.stop(now + 0.09)
-  } catch { /* 静默 */ }
+  run((c, now) => {
+    tone(c, now, { type: 'square', freq: 160, slideTo: 64, slideT: 0.1, vol: 0.18, attack: 0.014, decay: 0.16 })
+    noise(c, now, { filter: 'lowpass', freq: 900, vol: 0.07, attack: 0.01, dur: 0.08 })
+  })
 }
 
 /** 新关卡开启: 两声轻快的「叮」 */
 export function playLevelUp(): void {
-  if (!isSoundOn()) return
-  const context = ensureContext()
-  if (!context) return
-  try {
-    const now = context.currentTime
-    ;[523.25, 784].forEach((freq, index) => {
-      const osc = context.createOscillator()
-      osc.type = 'sine'
-      osc.frequency.value = freq
-      const gain = context.createGain()
-      const start = now + index * 0.09
-      gain.gain.setValueAtTime(0.0001, start)
-      gain.gain.exponentialRampToValueAtTime(0.12, start + 0.015)
-      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.35)
-      osc.connect(gain).connect(context.destination)
-      osc.start(start)
-      osc.stop(start + 0.4)
+  run((c, now) => {
+    [523.25, 784].forEach((freq, index) => {
+      tone(c, now, { freq, vol: 0.12, attack: 0.015, decay: 0.35, at: index * 0.09 })
     })
-  } catch { /* 静默 */ }
+  })
 }
 
 /** 财神爷彩蛋: 小金锣 —— 金属双音 + 亮噪, 敲一下财气到外溢 */
 export function playCaishen(): void {
-  if (!isSoundOn()) return
-  const context = ensureContext()
-  if (!context) return
-  try {
-    const now = context.currentTime
+  run((c, now) => {
     ;[659.25, 987.77].forEach((freq) => {
-      const osc = context.createOscillator()
-      osc.type = 'triangle'
-      osc.frequency.value = freq
-      const gain = context.createGain()
-      gain.gain.setValueAtTime(0.0001, now)
-      gain.gain.exponentialRampToValueAtTime(0.1, now + 0.008)
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.9)
-      osc.connect(gain).connect(context.destination)
-      osc.start(now)
-      osc.stop(now + 0.95)
+      tone(c, now, { type: 'triangle', freq, vol: 0.1, attack: 0.008, decay: 0.9 })
     })
-    const shine = context.createBufferSource()
-    shine.buffer = noiseBuffer(context, 0.3)
-    const highpass = context.createBiquadFilter()
-    highpass.type = 'highpass'
-    highpass.frequency.value = 3200
-    const shineGain = context.createGain()
-    shineGain.gain.setValueAtTime(0.0001, now)
-    shineGain.gain.exponentialRampToValueAtTime(0.05, now + 0.01)
-    shineGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3)
-    shine.connect(highpass).connect(shineGain).connect(context.destination)
-    shine.start(now)
-    shine.stop(now + 0.32)
-  } catch { /* 静默 */ }
+    noise(c, now, { filter: 'highpass', freq: 3200, vol: 0.05, attack: 0.01, dur: 0.3 })
+  })
 }
 
 /** 团灭(逻辑空集): 低频「咚」+ 长尾空场回音 —— 灯灭了 */
 export function playWipeout(): void {
-  if (!isSoundOn()) return
-  const context = ensureContext()
-  if (!context) return
-  try {
-    const now = context.currentTime
-    const boom = context.createOscillator()
-    boom.type = 'sine'
-    boom.frequency.setValueAtTime(110, now)
-    boom.frequency.exponentialRampToValueAtTime(38, now + 0.7)
-    const boomGain = context.createGain()
-    boomGain.gain.setValueAtTime(0.0001, now)
-    boomGain.gain.exponentialRampToValueAtTime(0.2, now + 0.02)
-    boomGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.1)
-    boom.connect(boomGain).connect(context.destination)
-    boom.start(now)
-    boom.stop(now + 1.15)
-
-    const hall = context.createBufferSource()
-    hall.buffer = noiseBuffer(context, 1.2)
-    const lowpass = context.createBiquadFilter()
-    lowpass.type = 'lowpass'
-    lowpass.frequency.setValueAtTime(700, now)
-    lowpass.frequency.exponentialRampToValueAtTime(140, now + 1.1)
-    const hallGain = context.createGain()
-    hallGain.gain.setValueAtTime(0.0001, now)
-    hallGain.gain.exponentialRampToValueAtTime(0.06, now + 0.05)
-    hallGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2)
-    hall.connect(lowpass).connect(hallGain).connect(context.destination)
-    hall.start(now)
-    hall.stop(now + 1.25)
-  } catch { /* 静默 */ }
+  run((c, now) => {
+    tone(c, now, { freq: 110, slideTo: 38, slideT: 0.7, vol: 0.2, decay: 1.1 })
+    noise(c, now, { filter: 'lowpass', freq: 700, slideTo: 140, slideT: 1.1, vol: 0.06, attack: 0.05, dur: 1.2 })
+  })
 }
 
 /** 人群氛围: 一刀之后幸存量越少, 嗡嗡声越轻越短 —— 听得见的人数 */
 export function playCrowdMurmur(ratio: number): void {
-  if (!isSoundOn()) return
-  const context = ensureContext()
-  if (!context) return
   const safe = Math.min(1, Math.max(0, ratio))
-  try {
-    const now = context.currentTime
-    const seconds = 0.25 + safe * 0.55
-    const noise = context.createBufferSource()
-    noise.buffer = noiseBuffer(context, seconds)
-    const bandpass = context.createBiquadFilter()
-    bandpass.type = 'bandpass'
-    bandpass.Q.value = 0.6
-    bandpass.frequency.value = 320 + safe * 480
-    const gain = context.createGain()
-    gain.gain.setValueAtTime(0.0001, now)
-    gain.gain.exponentialRampToValueAtTime(0.015 + safe * 0.05, now + 0.06)
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + seconds)
-    noise.connect(bandpass).connect(gain).connect(context.destination)
-    noise.start(now)
-    noise.stop(now + seconds + 0.02)
-  } catch { /* 静默 */ }
+  run((c, now) => {
+    noise(c, now, { filter: 'bandpass', q: 0.6, freq: 320 + safe * 480, vol: 0.015 + safe * 0.05, attack: 0.06, dur: 0.25 + safe * 0.55 })
+  })
 }
 
 /** 翻卡: 一声上扬的纸面滑扫 + 落定轻「嗒」 */
 export function playCardFlip(): void {
-  if (!isSoundOn()) return
-  const context = ensureContext()
-  if (!context) return
-  try {
-    const now = context.currentTime
-    const sweep = context.createBufferSource()
-    sweep.buffer = noiseBuffer(context, 0.18)
-    const bandpass = context.createBiquadFilter()
-    bandpass.type = 'bandpass'
-    bandpass.Q.value = 1.4
-    bandpass.frequency.setValueAtTime(900, now)
-    bandpass.frequency.exponentialRampToValueAtTime(2600, now + 0.16)
-    const sweepGain = context.createGain()
-    sweepGain.gain.setValueAtTime(0.0001, now)
-    sweepGain.gain.exponentialRampToValueAtTime(0.07, now + 0.03)
-    sweepGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18)
-    sweep.connect(bandpass).connect(sweepGain).connect(context.destination)
-    sweep.start(now)
-    sweep.stop(now + 0.2)
-
-    const tap = context.createOscillator()
-    tap.type = 'sine'
-    tap.frequency.value = 1900
-    const tapGain = context.createGain()
-    tapGain.gain.setValueAtTime(0.0001, now + 0.15)
-    tapGain.gain.exponentialRampToValueAtTime(0.08, now + 0.16)
-    tapGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.24)
-    tap.connect(tapGain).connect(context.destination)
-    tap.start(now + 0.15)
-    tap.stop(now + 0.26)
-  } catch { /* 静默 */ }
+  run((c, now) => {
+    noise(c, now, { filter: 'bandpass', q: 1.4, freq: 900, slideTo: 2600, slideT: 0.16, vol: 0.07, dur: 0.18 })
+    tone(c, now, { freq: 1900, vol: 0.08, attack: 0.01, decay: 0.09, at: 0.15 })
+  })
 }
 
 /** 梦幻联动: 三连上行琶音 + 一点亮噪 —— 条件合体, combo 达成 */
 export function playCombo(): void {
-  if (!isSoundOn()) return
-  const context = ensureContext()
-  if (!context) return
-  try {
-    const now = context.currentTime
-    ;[523.25, 659.25, 1046.5].forEach((freq, index) => {
-      const osc = context.createOscillator()
-      osc.type = 'triangle'
-      osc.frequency.value = freq
-      const gain = context.createGain()
-      const start = now + index * 0.08
-      gain.gain.setValueAtTime(0.0001, start)
-      gain.gain.exponentialRampToValueAtTime(0.1, start + 0.015)
-      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.4)
-      osc.connect(gain).connect(context.destination)
-      osc.start(start)
-      osc.stop(start + 0.45)
+  run((c, now) => {
+    [523.25, 659.25, 1046.5].forEach((freq, index) => {
+      tone(c, now, { type: 'triangle', freq, vol: 0.1, attack: 0.015, decay: 0.4, at: index * 0.08 })
     })
-    const shine = context.createBufferSource()
-    shine.buffer = noiseBuffer(context, 0.25)
-    const highpass = context.createBiquadFilter()
-    highpass.type = 'highpass'
-    highpass.frequency.value = 3600
-    const shineGain = context.createGain()
-    shineGain.gain.setValueAtTime(0.0001, now + 0.2)
-    shineGain.gain.exponentialRampToValueAtTime(0.04, now + 0.22)
-    shineGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45)
-    shine.connect(highpass).connect(shineGain).connect(context.destination)
-    shine.start(now + 0.2)
-    shine.stop(now + 0.47)
-  } catch { /* 静默 */ }
+    noise(c, now, { filter: 'highpass', freq: 3600, vol: 0.04, attack: 0.02, dur: 0.25, at: 0.2 })
+  })
 }
 
 /** 撕卡: 一截干脆的纸面撕裂噪声, 音高下坠 */
 export function playTear(): void {
-  if (!isSoundOn()) return
-  const context = ensureContext()
-  if (!context) return
-  try {
-    const now = context.currentTime
-    const tear = context.createBufferSource()
-    tear.buffer = noiseBuffer(context, 0.3)
-    const bandpass = context.createBiquadFilter()
-    bandpass.type = 'bandpass'
-    bandpass.Q.value = 0.8
-    bandpass.frequency.setValueAtTime(2800, now)
-    bandpass.frequency.exponentialRampToValueAtTime(700, now + 0.26)
-    const gain = context.createGain()
-    gain.gain.setValueAtTime(0.0001, now)
-    gain.gain.exponentialRampToValueAtTime(0.11, now + 0.015)
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3)
-    tear.connect(bandpass).connect(gain).connect(context.destination)
-    tear.start(now)
-    tear.stop(now + 0.32)
-  } catch { /* 静默 */ }
+  run((c, now) => {
+    noise(c, now, { filter: 'bandpass', q: 0.8, freq: 2800, slideTo: 700, slideT: 0.26, vol: 0.11, attack: 0.015, dur: 0.3 })
+  })
 }

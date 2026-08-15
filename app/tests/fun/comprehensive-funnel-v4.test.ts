@@ -9,6 +9,12 @@ function baseSelection(): ModelSelection {
   return structuredClone(DEFAULT_SELECTION)
 }
 
+// 生产侧所有调用点都带后端 initialPool 作分母; 测试同样走这条契约
+function framesOf(selection: ModelSelection, hardRequirementIds: string[] = []) {
+  const pool = computeModel(selection, { hardRequirementIds }).comprehensivePopulation
+  return buildFunnelFrames(selection, { hardRequirementIds, initialPoolEstimate: pool.initialPool.estimate })
+}
+
 describe('v4 综合人口层接入', () => {
   it('收入条件不影响可靠层 population, 但降低综合层 comprehensivePopulation', () => {
     const plain = computeModel(baseSelection())
@@ -50,13 +56,13 @@ describe('v4 综合人口层接入', () => {
 
 describe('漏斗帧拆解(v4 通用反向链)', () => {
   it('无出刀条件时无帧', () => {
-    expect(buildFunnelFrames(baseSelection())).toEqual([])
+    expect(framesOf(baseSelection())).toEqual([])
   })
 
   it('收入关卡真实砍人: 帧幸存数与引擎综合估算一致', () => {
     const selection = baseSelection()
     selection.correlated.minAnnualIncomeWan = 100
-    const frames = buildFunnelFrames(selection)
+    const frames = framesOf(selection)
     expect(frames.length).toBe(1)
     expect(frames[0].dimensionId).toBe('economy.income')
     const finalEstimate = computeModel(selection).comprehensivePopulation.estimate
@@ -70,7 +76,7 @@ describe('漏斗帧拆解(v4 通用反向链)', () => {
     selection.correlated.minAnnualIncomeWan = 50
     selection.correlated.educationLevels = ['bachelor', 'master', 'doctorate']
     selection.correlated.smoking = 'non_smoker'
-    const frames = buildFunnelFrames(selection)
+    const frames = framesOf(selection)
     expect(frames.length).toBe(3)
     const last = frames[frames.length - 1]
     const finalEstimate = computeModel(selection).comprehensivePopulation.estimate
@@ -80,15 +86,15 @@ describe('漏斗帧拆解(v4 通用反向链)', () => {
   it('同一选择对象命中缓存, 不会因重复挂载重复重算', () => {
     const selection = baseSelection()
     selection.correlated.minAnnualIncomeWan = 50
-    const first = buildFunnelFrames(selection)
-    const second = buildFunnelFrames(selection)
+    const first = framesOf(selection)
+    const second = framesOf(selection)
     expect(second).toBe(first)
   })
 
   it('娱乐条件(星座)也作为真实关卡出现, 彩蛋不再隐身', () => {
     const selection = baseSelection()
     selection.entertainment.zodiacs = ['leo']
-    const frames = buildFunnelFrames(selection)
+    const frames = framesOf(selection)
     expect(frames.some((frame) => frame.dimensionId === 'entertainment.zodiac')).toBe(true)
   })
 
@@ -97,7 +103,7 @@ describe('漏斗帧拆解(v4 通用反向链)', () => {
     selection.softPreferenceIds = ['lifestyle.cooking', 'communication.conflict_repair']
     // cooking 被声明为硬边界; 漏斗中间帧的草稿会移除它,
     // 不同步清理 hardRequirementIds 会触发 ModelRequirementError
-    const frames = buildFunnelFrames(selection, { hardRequirementIds: ['lifestyle.cooking'] })
+    const frames = framesOf(selection, ['lifestyle.cooking'])
     expect(frames.length).toBe(2)
     const finalEstimate = computeModel(selection, { hardRequirementIds: ['lifestyle.cooking'] })
       .comprehensivePopulation.estimate

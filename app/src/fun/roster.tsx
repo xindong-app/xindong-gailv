@@ -253,14 +253,6 @@ export const CAISHEN: Prof = {
   bye: ['财运已到账, 勿念', '我去别家送钱了', '红包已发完'],
 }
 
-// 场上「最后下班」的小人(用于分享卡剧本): 与漏斗内的确定性随机一致
-export function survivorProf(survivorCount: number): { name: string; emoji: string } | null {
-  if (!Number.isFinite(survivorCount) || survivorCount <= 0) return null
-  const i = survivorCount - 1
-  const p = ROSTER[Math.floor(rnd(i, 9) * ROSTER.length)]
-  return { name: p.name, emoji: p.emoji }
-}
-
 /** 完整版: 稀有度图鉴卡要让幸存者本人登场(带帽子和衣服) */
 export function survivorProfFull(survivorCount: number): Prof | null {
   if (!Number.isFinite(survivorCount) || survivorCount <= 0) return null

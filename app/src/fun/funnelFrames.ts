@@ -9,8 +9,7 @@
 // v4: 主口径切换到 comprehensivePopulation —— 收入/资产/房车/性格等
 // 全部已选条件都参与综合情景估算, 因此漏斗恢复为通用反向链:
 // 每一关都是一个真实出刀条件, 不再只保留可靠层的四个关卡。
-import { computeModel } from '../engine/modelEngine'
-import { sanitizeHardRequirementIds } from '../features/hardDeclaration'
+import { computeModel, sanitizeModelComputationOptions } from '../engine/modelEngine'
 import { DIMENSION_BY_ID, type EvidenceGrade } from '../model/dimensions'
 import type { ModelSelection } from '../model/schema'
 import { activeConditions, removeSelectionDimension } from '../model/selectionUtils'
@@ -29,6 +28,8 @@ export interface FunnelFrame {
 export interface FunnelContext {
   seekerGender?: 'male' | 'female'
   hardRequirementIds?: string[]
+  /** 引擎算好的初始候选池(性别×年龄×地域, 婚史与一切可选条件之前)——分母必须用它, 没有就不演 */
+  initialPoolEstimate: number
 }
 
 const FRAME_EMOJI: Readonly<Record<string, string>> = {
@@ -62,8 +63,8 @@ const POOL_DEFINITION_IDS = new Set(['base.gender', 'base.age', 'base.region'])
 // seekerGender 等计算上下文参与缓存键, 换了人就重算。
 const frameCache = new WeakMap<ModelSelection, { key: string; frames: FunnelFrame[] }>()
 
-export function buildFunnelFrames(selection: ModelSelection, context: FunnelContext = {}): FunnelFrame[] {
-  const contextKey = `${context.seekerGender ?? ''}|${(context.hardRequirementIds ?? []).join(',')}`
+export function buildFunnelFrames(selection: ModelSelection, context: FunnelContext): FunnelFrame[] {
+  const contextKey = `${context.seekerGender ?? ''}|${(context.hardRequirementIds ?? []).join(',')}|${context.initialPoolEstimate}`
   const cached = frameCache.get(selection)
   if (cached && cached.key === contextKey) return cached.frames
 
@@ -76,29 +77,18 @@ export function buildFunnelFrames(selection: ModelSelection, context: FunnelCont
     return frames
   }
 
-  // 硬边界声明随草稿同步清理: 被本关移除的条件若已声明为硬边界,
-  // 留在 hardRequirementIds 里会触发 ModelRequirementError 崩屏
-  const rawHardIds = context.hardRequirementIds ?? []
-  const optionsFor = (draft: ModelSelection) => ({
-    hardRequirementIds: sanitizeHardRequirementIds(draft, rawHardIds),
+  // 失效的硬边界声明随草稿同步清理: 统一用引擎的 sanitizeModelComputationOptions,
+  // 不在前端重复造规则, 避免两套清理逻辑漂移
+  const rawOptions = {
+    hardRequirementIds: context.hardRequirementIds ?? [],
     ...(context.seekerGender ? { seekerGender: context.seekerGender } : {}),
-  })
-  // 帧 0 = 只保留池子定义(性别/年龄/城市)的综合估算
-  const removed = cuts.map((condition) => condition.dimensionId)
-  const draft = removeSelectionDimension(selection, '__none__') // 先克隆一份
-  let baseDraft = draft
-  for (const dimensionId of removed) {
-    baseDraft = removeSelectionDimension(baseDraft, dimensionId)
   }
-  const first = computeModel(baseDraft, optionsFor(baseDraft)).comprehensivePopulation
-  if (first.numericStatus !== 'available') {
-    const frames: FunnelFrame[] = []
-    frameCache.set(selection, { key: contextKey, frames })
-    return frames
-  }
+  const optionsFor = (draft: ModelSelection) => sanitizeModelComputationOptions(draft, rawOptions)
+  // 帧 0 = 后端 initialPool(任何可选条件之前), 前端绝不自己重算分母
+  const frameZero = Math.max(0, context.initialPoolEstimate)
 
   // 逐关把条件加回来: 第 k 关的草稿 = 完整选择移除第 k+1..n 关
-  const estimates: number[] = [first.estimate]
+  const estimates: number[] = [frameZero]
   for (let k = 1; k <= cuts.length; k += 1) {
     let frameDraft = selection
     for (let j = k; j < cuts.length; j += 1) {

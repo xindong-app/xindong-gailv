@@ -4,7 +4,7 @@ import { SelectedSummary } from '../components/SelectedSummary'
 import { StepNav, type StepDefinition } from '../components/StepNav'
 import { Dialog, ToastRegion, type ToastMessage } from '../components/ui'
 import { EVIDENCE_REGISTRY } from '../data/evidence'
-import { computeModel } from '../engine/modelEngine'
+import { computeModel, sanitizeModelComputationOptions } from '../engine/modelEngine'
 import { Confetti } from '../fun/Confetti'
 import { buildFunnelFrames } from '../fun/funnelFrames'
 import { IntroCurtain } from '../fun/IntroCurtain'
@@ -20,7 +20,6 @@ import { WelcomeStep } from '../features/steps/WelcomeStep'
 import { useHistoryState } from '../hooks/useHistoryState'
 import { loadSafeSessionSelection, useSessionSelection } from '../hooks/useSessionSelection'
 import { applyRelaxation } from '../features/applyRelaxation'
-import { sanitizeHardRequirementIds } from '../features/hardDeclaration'
 import { activeConditions, removeSelectionDimension } from '../model/selectionUtils'
 import { DEFAULT_SELECTION, safeParseSelection, type GenderId, type ModelSelection } from '../model/schema'
 import { SharePreviewDialog } from '../components/SharePreviewDialog'
@@ -110,27 +109,31 @@ export default function Home() {
   const [hardRequirementIds, setHardRequirementIds] = useState<string[]>([])
   // 关系情境入口: 本人统计性别, 自愿填写, 不写入会话草稿
   const [seekerGender, setSeekerGender] = useState<GenderId | null>(null)
-  const effectiveHardRequirementIds = useMemo(
-    () => sanitizeHardRequirementIds(selection, hardRequirementIds),
-    [hardRequirementIds, selection],
-  )
-  const result = useMemo(
-    // v4: 主口径为综合人口层; seekerGender 影响配对向情景因子, 必须传入
-    () => computeModel(selection, {
-      hardRequirementIds: effectiveHardRequirementIds,
+  // 失效硬边界随草稿同步清理: 统一用引擎 sanitizer, 前端不重复造清理规则;
+  // 只传"仍处选中态"的 id, 防止预设/清空后 ModelRequirementError 崩屏
+  const computationOptions = useMemo(
+    () => sanitizeModelComputationOptions(selection, {
+      hardRequirementIds,
       ...(seekerGender ? { seekerGender } : {}),
     }),
-    [selection, effectiveHardRequirementIds, seekerGender],
+    [selection, hardRequirementIds, seekerGender],
+  )
+  const effectiveHardRequirementIds = computationOptions.hardRequirementIds ?? []
+  const result = useMemo(
+    // v4: 主口径为综合人口层; seekerGender 影响配对向情景因子, 必须传入
+    () => computeModel(selection, computationOptions),
+    [selection, computationOptions],
   )
   const conditions = useMemo(() => activeConditions(selection), [selection])
   // SSR 及以上稀有度下彩带雨; seed 随结果变化, 同一份结果同一场雨
   const celebrationSeed = useMemo(() => {
     const pool = result.comprehensivePopulation
-    if (pool.numericStatus !== 'available' || pool.base <= 0 || pool.estimate <= 0) return null
+    const base = pool.initialPool.estimate
+    if (pool.numericStatus !== 'available' || base <= 0 || pool.estimate <= 0) return null
     if (pool.zeroMeaning === 'model_underflow' || pool.zeroMeaning === 'unavailable') return null
-    const perWan = (pool.estimate / pool.base) * 10_000
+    const perWan = (pool.estimate / base) * 10_000
     if (perWan >= 5) return null
-    return `${pool.estimate.toFixed(3)}-${buildFunnelFrames(result.input, result.computationContext).length}`
+    return `${pool.estimate.toFixed(3)}-${buildFunnelFrames(result.input, { ...result.computationContext, initialPoolEstimate: base }).length}`
   }, [result])
   const [currentStep, setCurrentStep] = useState(0)
   const [comparison, setComparison] = useState<ReturnType<typeof computeModel> | null>(null)

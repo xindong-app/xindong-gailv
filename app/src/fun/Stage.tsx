@@ -2,7 +2,7 @@
 // 桌面端固定于视口底部, 可折叠成字幕条; 手机端仍走底部字幕条+弹层(见 Home)
 import { useEffect, useMemo, useState } from 'react'
 import type { ModelResult } from '../engine/modelEngine'
-import { formatCount } from '../engine/modelEngine'
+import { computeComprehensiveConditionAnalysis, formatCount } from '../engine/modelEngine'
 import { FunFunnel } from './FunFunnel'
 import { buildFunnelFrames } from './funnelFrames'
 import { rarityTier } from './rarity'
@@ -13,17 +13,24 @@ export function Stage({ result }: { result: ModelResult }) {
   // v4: 舞台主数字走综合人口层, 与结果页同一份口径
   const pool = result.comprehensivePopulation
   const available = pool.numericStatus === 'available'
+  // 分母 = 后端真实初始候选池(任何可选条件之前), 漏斗帧 0 也用同一个数
+  const base = pool.initialPool.estimate
   const frames = useMemo(
-    () => buildFunnelFrames(result.input, result.computationContext),
-    [result.input, result.computationContext],
+    () => buildFunnelFrames(result.input, {
+      ...result.computationContext,
+      initialPoolEstimate: base,
+    }),
+    [result.input, result.computationContext, base],
   )
-  const base = pool.base
   const probability = available && base > 0 ? pool.estimate / base : 0
   const tier = rarityTier(probability * 10_000)
   const cities = result.input.target.cities
   const scope = `${cities.includes('全国') ? '全国' : cities.join('、')} · ${result.input.target.age.min}–${result.input.target.age.max} 岁 · ${result.input.target.gender === 'male' ? '男生' : '女生'}`
-  // "就差一点"字幕: 轮播引擎的放宽建议(前 3 条), 播报即链路反馈
-  const tips = available ? result.relaxations.slice(0, 3) : []
+  // "就差一点"字幕: 轮播综合层放宽建议(前 3 条), 播报即链路反馈
+  const tips = useMemo(
+    () => (available ? computeComprehensiveConditionAnalysis(result).relaxations.slice(0, 3) : []),
+    [available, result],
+  )
   const [tipIndex, setTipIndex] = useState(0)
   useEffect(() => {
     if (tips.length < 2) return undefined

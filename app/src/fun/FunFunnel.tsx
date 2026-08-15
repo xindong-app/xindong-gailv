@@ -68,9 +68,10 @@ function Person({ color, prof, out, delay, fx, fr, hopClass, hopDelay, nervous, 
 
 export function FunFunnel({ pool, frames, cities }: { pool: number; frames: readonly FunnelFrame[]; cities: readonly string[] }) {
   const safePool = pool > 0 ? pool : 1 // 防 0 池除零
+  // 任何场景不得出现超过 80 人: 幸存数永远钳在 0–TOTAL
   const stageCounts: number[] = [TOTAL]
   for (const frame of frames) {
-    stageCounts.push(Math.max(0, Math.round((TOTAL * frame.survivors) / safePool)))
+    stageCounts.push(Math.min(TOTAL, Math.max(0, Math.round((TOTAL * frame.survivors) / safePool))))
   }
   const finalCount = stageCounts[stageCounts.length - 1]
   const perPerson = pool > 0 ? pool / TOTAL : 0

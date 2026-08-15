@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { ModelResult } from '../../engine/modelEngine'
-import { formatCount } from '../../engine/modelEngine'
+import { computeComprehensiveConditionAnalysis, formatCount } from '../../engine/modelEngine'
 import { ResultSummary } from '../../components/ResultSummary'
 import { RelationshipScenarioCard } from '../../components/RelationshipScenarioCard'
 import { playTada } from '../../fun/sound'
@@ -44,6 +44,8 @@ export function ResultsStep({ result, selection, comparison, hardRequirementIds,
   const reciprocalOptions = [...targetSoftIds].map((id) => DIMENSION_BY_ID.get(id)).filter(Boolean)
   // 可声明为硬边界的候选: 已选且未量化的软偏好(含结构化字段里的慢性病/近视)
   const declarableSoftIds = declarableHardConditions(selection)
+  // 影响排行/放宽建议: 统一引擎综合条件分析(直接条件 leave-one-out + 情景因子, 按需重算)
+  const analysis = useMemo(() => computeComprehensiveConditionAnalysis(result), [result])
   return (
     <section className="step-panel results-step" aria-labelledby="results-title">
       <div className="reveal-spotlight" aria-hidden="true" />
@@ -97,11 +99,11 @@ export function ResultsStep({ result, selection, comparison, hardRequirementIds,
         <button className="button button-secondary" type="button" onClick={onCaptureComparison}>{comparison ? '用当前方案更新 A' : '保存当前为方案 A'}</button>
       </article>
       <div className="result-detail-grid">
-        <article className="detail-card"><div className="detail-head"><div><span className="eyebrow">边际重算 · 综合口径</span><h3>哪些条件最“狠”</h3></div><span className="count-badge">{result.comprehensivePopulation.impacts.length}</span></div>
-          {result.comprehensivePopulation.impacts.length === 0 ? <p className="empty-inline">当前只有基础范围，没有额外限制项。</p> : <ol className="impact-list">{result.comprehensivePopulation.impacts.slice(0, 6).map((impact) => <li key={impact.dimensionId}><div><b>{impact.label}</b><span><EvidenceStatusBadge grade={impact.evidenceGrade} /> · 保留 {(impact.retention * 100).toFixed(1)}%</span></div><strong>− {formatCount(impact.marginalLoss)}</strong></li>)}</ol>}
+        <article className="detail-card"><div className="detail-head"><div><span className="eyebrow">边际重算 · 综合口径</span><h3>哪些条件最“狠”</h3></div><span className="count-badge">{analysis.impacts.length}</span></div>
+          {analysis.impacts.length === 0 ? <p className="empty-inline">当前只有基础范围，没有额外限制项。</p> : <ol className="impact-list">{analysis.impacts.slice(0, 6).map((impact) => <li key={impact.dimensionId}><div><b>{impact.label}</b><span><EvidenceStatusBadge grade={impact.evidenceGrade} /> · 保留 {(impact.retention * 100).toFixed(1)}%</span></div><strong>− {formatCount(impact.marginalLoss)}</strong></li>)}</ol>}
         </article>
         <article className="detail-card"><div className="detail-head"><div><span className="eyebrow">灵敏度</span><h3>放宽一格，地球多多少人</h3></div></div>
-          {result.relaxations.length === 0 ? <p className="empty-inline">暂无可放宽条件。</p> : <div className="relax-list">{result.relaxations.slice(0, 5).map((suggestion) => <button key={suggestion.dimensionId} type="button" onClick={() => onRelax(suggestion.dimensionId)}><span><b>{suggestion.label}</b><small>{formatCount(suggestion.currentEstimate)} → {formatCount(suggestion.relaxedEstimate)}</small></span><span>应用</span></button>)}</div>}
+          {analysis.relaxations.length === 0 ? <p className="empty-inline">暂无可放宽条件。</p> : <div className="relax-list">{analysis.relaxations.slice(0, 5).map((suggestion) => <button key={suggestion.dimensionId} type="button" onClick={() => onRelax(suggestion.dimensionId)}><span><b>{suggestion.label}</b><small>{formatCount(suggestion.currentEstimate)} → {formatCount(suggestion.relaxedEstimate)}</small></span><span>应用</span></button>)}</div>}
         </article>
       </div>
       <article className="method-card"><div><span className="eyebrow">相关性处理</span><h3>新模型没有把每个条件都当独立事件</h3></div><div className="method-grid">{result.groups.map((group) => <section key={group.id}><span className="class-badge">{group.classification === 'hard_filter' ? '硬筛选' : '相关硬条件'}</span><h4>{group.label}</h4><p>{group.method}</p><small>{group.note}</small></section>)}</div></article>
@@ -110,7 +112,7 @@ export function ResultsStep({ result, selection, comparison, hardRequirementIds,
         <div className="intersection-score"><span>当前双向命中示意</span><b>{result.scores.bidirectionalIllustration}<small>/100</small></b><p>{result.scoreDetails.disclaimer}</p></div>
       </article>
       <RelationshipScenarioCard result={result} seekerGender={seekerGender} onSeekerGender={onSeekerGender} />
-      <article className="model-boundaries"><h3>模型知道什么，也知道自己不知道什么</h3><ul>{result.explanation.map((item) => <li key={item}>{item}</li>)}</ul><p>可信度 {result.confidence.grade}（{Math.round(result.confidence.score * 100)}% 方法评分）· 分辨率下限 {formatCount(result.comprehensivePopulation.resolutionFloor)}</p></article>
+      <article className="model-boundaries"><h3>模型知道什么，也知道自己不知道什么</h3><ul>{result.explanation.map((item) => <li key={item}>{item}</li>)}</ul><p>综合口径可信度 {result.comprehensivePopulation.confidence.grade}{result.comprehensivePopulation.confidence.reasons.length > 0 ? `（${result.comprehensivePopulation.confidence.reasons[0]}）` : ''} · 分辨率下限 {formatCount(result.comprehensivePopulation.resolutionFloor)}<small> · 可靠统计层锚点等级 {result.confidence.grade}（{Math.round(result.confidence.score * 100)}% 方法评分）</small></p></article>
     </section>
   )
 }

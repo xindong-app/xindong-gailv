@@ -17,9 +17,3 @@ export function declarableHardConditions(selection: ModelSelection): string[] {
     })
     .map((condition) => condition.dimensionId)
 }
-
-/** 只保留仍在选中态的声明 id —— 防预设/清空后触发 ModelRequirementError */
-export function sanitizeHardRequirementIds(selection: ModelSelection, ids: readonly string[]): string[] {
-  const activeIds = new Set(activeConditions(selection).map((condition) => condition.dimensionId))
-  return ids.filter((id) => activeIds.has(id))
-}

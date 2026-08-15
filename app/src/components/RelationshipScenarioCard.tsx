@@ -55,22 +55,31 @@ export function RelationshipScenarioCard({
       {scenario && (
         <div className="relationship-result">
           <span className="class-badge">{PAIRING_LABELS[scenario.pairing]}</span>
+          <span className="rel-grade" data-grade={scenario.mainLayer.role === 'comprehensive_scenario' ? 'C' : 'B'}>
+            {scenario.mainLayer.role === 'comprehensive_scenario' ? '主层: 综合情景口径' : '主层: 统计上限口径'}
+          </span>
           <div className="relationship-factors">
             {FACTOR_ORDER.map((id) => {
               const factor = scenario.factors[id]
+              // 该关已在综合主估算里扣过: 不重复展示概率, 也不再把中性系数读成"100%"
+              const alreadyApplied = factor.appliedInMainPopulation
               return (
                 <section key={id} className="relationship-factor">
                   <div className="relationship-factor-head">
                     <b>{factor.label}</b>
-                    {factor.status === 'scenario'
-                      ? (factor.evidenceGrade === 'NA'
-                        ? <span className="rel-grade" data-grade="NA">分析者情境 · NA</span>
-                        : <EvidenceBadge grade={factor.evidenceGrade} />)
-                      : <span className="rel-grade" data-grade="NA">{factor.status === 'not_estimated' ? '未估算' : '不可用'}</span>}
+                    {alreadyApplied
+                      ? <span className="rel-grade" data-grade="B">已在主估算计入</span>
+                      : factor.status === 'scenario'
+                        ? (factor.evidenceGrade === 'NA'
+                          ? <span className="rel-grade" data-grade="NA">分析者情境 · NA</span>
+                          : <EvidenceBadge grade={factor.evidenceGrade} />)
+                        : <span className="rel-grade" data-grade="NA">{factor.status === 'not_estimated' ? '未估算' : '不可用'}</span>}
                   </div>
-                  {factor.status === 'scenario'
-                    ? <p>{percent(factor.range.lower)} – {percent(factor.range.upper)}<small>（参考 {percent(factor.range.reference)}）</small></p>
-                    : <p>{factor.reason}</p>}
+                  {alreadyApplied
+                    ? <p>这一关主数字里已扣过，不重复扣。</p>
+                    : factor.status === 'scenario'
+                      ? <p>{percent(factor.range.lower)} – {percent(factor.range.upper)}<small>（参考 {percent(factor.range.reference)}）</small></p>
+                      : <p>{factor.reason}</p>}
                 </section>
               )
             })}

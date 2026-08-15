@@ -1,6 +1,4 @@
 // 稀有度抽卡分级 + 毒舌总评 —— 纯文案/纯函数, 不碰引擎数学
-import type { ModelResult } from '../engine/modelEngine'
-
 export interface Tier {
   key: string
   label: string
@@ -56,22 +54,14 @@ export interface VerdictImpact {
 const POOL_DEFINITION_IDS = new Set(['base.gender', 'base.age', 'base.region'])
 
 /**
- * 汇总两层的 leave-one-out 边际影响:
- * 可靠层 impacts 覆盖直接条件(身高/学历/烟酒…), 综合层 impacts 覆盖情景条件(收入/软偏好…),
- * 两者都是"去掉我试试"的重算, 与条件排列顺序无关。
- */
-export function collectVerdictImpacts(result: ModelResult): VerdictImpact[] {
-  return [...result.impacts, ...result.comprehensivePopulation.impacts]
-    .filter((impact) => !POOL_DEFINITION_IDS.has(impact.dimensionId))
-}
-
-/**
- * 毒舌总评 —— 归因用引擎的 leave-one-out 边际影响(每个条件都是"最后一个加入"),
- * 与条件的排列顺序无关: 同一套条件无论先点后点, 结论逐字一致。
+ * 毒舌总评 —— 入参统一为引擎 computeComprehensiveConditionAnalysis 的合并归因
+ * (每个条件都是"最后一个加入"的 leave-one-out 重算), 与条件排列顺序无关:
+ * 同一套条件无论先点后点, 结论逐字一致。
  */
 export function buildVerdict(impacts: readonly VerdictImpact[]): string | null {
-  if (impacts.length === 0) return null
-  const worst = impacts.reduce((a, b) => (b.retention < a.retention ? b : a))
+  const candidates = impacts.filter((impact) => !POOL_DEFINITION_IDS.has(impact.dimensionId))
+  if (candidates.length === 0) return null
+  const worst = candidates.reduce((a, b) => (b.retention < a.retention ? b : a))
   const joke = VERDICT_JOKES[worst.dimensionId] ?? '这一关是真·守门员'
   const pct = ((1 - worst.retention) * 100).toFixed(worst.retention > 0.1 ? 0 : 1)
   return `致命一击是「${worst.label}」, 一刀淘汰 ${pct}% 的选手 —— ${joke}`

@@ -1,12 +1,12 @@
 import { useMemo } from 'react'
 import type { ModelResult } from '../engine/modelEngine'
-import { formatCount, formatCountShort } from '../engine/modelEngine'
+import { computeComprehensiveConditionAnalysis, formatCount, formatCountShort } from '../engine/modelEngine'
 import { FunFunnel } from '../fun/FunFunnel'
 import { buildAnalogy } from '../fun/analogy'
 import { buildFunnelFrames } from '../fun/funnelFrames'
 import { RarityStamp } from '../fun/RarityStamp'
 import { WipeoutShow } from '../fun/WipeoutShow'
-import { buildComparisons, buildVerdict, collectVerdictImpacts, fmtRarity, rarityTier } from '../fun/rarity'
+import { buildComparisons, buildVerdict, fmtRarity, rarityTier } from '../fun/rarity'
 import { useCountUp } from '../fun/useCountUp'
 import { CityLeaderboard } from './CityLeaderboard'
 import { ModelConfidenceBadge } from './ui'
@@ -76,7 +76,6 @@ export function ResultSummary({
   // v4 主口径: 综合人口层——全部已选条件都参与; 可靠层只作锚点
   const pool = result.comprehensivePopulation
   const reliable = result.population
-  const topImpact = pool.impacts[0]
   const available = pool.numericStatus === 'available'
   const priorOnly = pool.interpretation === 'prior_sensitivity_only'
   // 数值下溢不是现实零人: 稀有度/毒舌/漏斗等人数派生趣味全部不演
@@ -84,21 +83,28 @@ export function ResultSummary({
   // 逻辑空集(条件互相打架, 上下界均为 0): 上演团灭专场, 不演稀有度
   const logicalZero = pool.zeroMeaning === 'logical_zero'
   const animated = useCountUp(available ? pool.estimate : 0)
-  // 帧拆解走趣味层(渐进调用引擎公开接口), 输入身份不变时命中缓存
+  // 帧拆解走趣味层(渐进调用引擎公开接口), 输入身份不变时命中缓存;
+  // 分母统一为后端 initialPool(任何可选条件之前的真实初始候选池)
   const frames = useMemo(
-    () => buildFunnelFrames(result.input, result.computationContext),
-    [result.input, result.computationContext],
+    () => buildFunnelFrames(result.input, {
+      ...result.computationContext,
+      initialPoolEstimate: pool.initialPool.estimate,
+    }),
+    [result.input, result.computationContext, pool.initialPool.estimate],
   )
-  const base = pool.base
+  // 影响排行/致命归因: 统一调用引擎的综合条件分析(含直接条件 leave-one-out)
+  const analysis = useMemo(() => computeComprehensiveConditionAnalysis(result), [result])
+  const topImpact = analysis.impacts[0]
+  const base = pool.initialPool.estimate
   const probability = funAllowed && base > 0 ? pool.estimate / base : 0
   const tier = rarityTier(probability * 10_000)
-  const verdict = funAllowed && !logicalZero ? buildVerdict(collectVerdictImpacts(result)) : null
+  const verdict = funAllowed && !logicalZero ? buildVerdict(analysis.impacts) : null
   const comparisons = funAllowed && !logicalZero ? buildComparisons(probability) : []
   const analogy = funAllowed && !logicalZero ? buildAnalogy(pool.estimate) : null
-  // 图鉴卡幸存者: 与漏斗阵列同一份确定性数学
+  // 图鉴卡幸存者: 与漏斗阵列同一份确定性数学, 永远钳在 0–80
   const FUNNEL_TOTAL = 80
-  const survivorCount = frames.length > 0 && base > 0
-    ? Math.min(FUNNEL_TOTAL, Math.round((FUNNEL_TOTAL * frames[frames.length - 1].survivors) / Math.max(1, base)))
+  const survivorCount = base > 0
+    ? Math.min(FUNNEL_TOTAL, Math.max(0, Math.round((FUNNEL_TOTAL * pool.estimate) / base)))
     : FUNNEL_TOTAL
   const cities = result.input.target.cities
   const scope = `${cities.includes('全国') ? '全国' : cities.join('、')} · ${result.input.target.age.min}–${result.input.target.age.max} 岁 · ${result.input.target.gender === 'male' ? '男生' : '女生'}`
@@ -111,7 +117,7 @@ export function ResultSummary({
       <div className="result-kicker">
         <span>满足全部已选条件的综合估算</span>
         {priorOnly && <span className="status-badge" data-kind="prior">先验情景</span>}
-        <ModelConfidenceBadge grade={result.confidence.grade} />
+        <ModelConfidenceBadge grade={pool.confidence.grade} />
       </div>
       {!compact && <h2 className="visually-hidden" id={headingId}>当前结果摘要</h2>}
       <div className="result-stage">
@@ -142,7 +148,7 @@ export function ResultSummary({
           {reliable.numericStatus === 'available' && (
             <p className="reliable-anchor">
               其中证据可靠层 {reliable.status === 'upper_bound' ? '上限 ' : ''}{reliable.displayShort}
-              <small>（仅官方统计口径条件计入）</small>
+              <small>（仅官方统计口径条件计入 · 证据等级 {result.confidence.grade}）</small>
             </p>
           )}
           {funAllowed && (
