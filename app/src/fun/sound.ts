@@ -331,6 +331,41 @@ export function playCardFlip(): void {
   } catch { /* 静默 */ }
 }
 
+/** 梦幻联动: 三连上行琶音 + 一点亮噪 —— 条件合体, combo 达成 */
+export function playCombo(): void {
+  if (!isSoundOn()) return
+  const context = ensureContext()
+  if (!context) return
+  try {
+    const now = context.currentTime
+    ;[523.25, 659.25, 1046.5].forEach((freq, index) => {
+      const osc = context.createOscillator()
+      osc.type = 'triangle'
+      osc.frequency.value = freq
+      const gain = context.createGain()
+      const start = now + index * 0.08
+      gain.gain.setValueAtTime(0.0001, start)
+      gain.gain.exponentialRampToValueAtTime(0.1, start + 0.015)
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.4)
+      osc.connect(gain).connect(context.destination)
+      osc.start(start)
+      osc.stop(start + 0.45)
+    })
+    const shine = context.createBufferSource()
+    shine.buffer = noiseBuffer(context, 0.25)
+    const highpass = context.createBiquadFilter()
+    highpass.type = 'highpass'
+    highpass.frequency.value = 3600
+    const shineGain = context.createGain()
+    shineGain.gain.setValueAtTime(0.0001, now + 0.2)
+    shineGain.gain.exponentialRampToValueAtTime(0.04, now + 0.22)
+    shineGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45)
+    shine.connect(highpass).connect(shineGain).connect(context.destination)
+    shine.start(now + 0.2)
+    shine.stop(now + 0.47)
+  } catch { /* 静默 */ }
+}
+
 /** 撕卡: 一截干脆的纸面撕裂噪声, 音高下坠 */
 export function playTear(): void {
   if (!isSoundOn()) return

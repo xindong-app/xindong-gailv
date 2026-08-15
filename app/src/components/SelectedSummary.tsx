@@ -1,9 +1,11 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 import { DIMENSION_BY_ID } from '../model/dimensions'
 import type { ActiveCondition } from '../model/selectionUtils'
 import { cardMetaFor } from '../fun/cardpool/cardMeta'
-import { playTear } from '../fun/sound'
+import { recordCollected } from '../fun/cardpool/album'
+import { completedCombos, type Combo } from '../fun/cardpool/combos'
+import { playCombo, playTear } from '../fun/sound'
 
 const CLASS_LABELS = {
   hard_filter: '硬筛选',
@@ -42,6 +44,24 @@ export function SelectedSummary({
   // 撕卡幽灵层: 状态立即移除(不阻塞模型), 残影在原位演完撕碎动画再消散
   const [ghosts, setGhosts] = useState<readonly TearGhost[]>([])
   const ghostSeq = useRef(0)
+  // 梦幻联动: 只在「没集齐 → 集齐」的瞬间庆祝一次, 撤掉再凑齐可以再庆祝
+  const [banner, setBanner] = useState<Combo | null>(null)
+  const prevCombos = useRef<ReadonlySet<string>>(new Set())
+
+  const activeIdsKey = conditions.map((condition) => condition.dimensionId).join('|')
+  useEffect(() => {
+    const ids = new Set(activeIdsKey ? activeIdsKey.split('|') : [])
+    recordCollected([...ids]) // 图鉴点亮: 任何步骤加的条件都算数
+    const now = completedCombos(ids)
+    const fresh = now.find((combo) => !prevCombos.current.has(combo.id))
+    prevCombos.current = new Set(now.map((combo) => combo.id))
+    if (fresh) {
+      playCombo()
+      setBanner(fresh)
+      const timer = setTimeout(() => setBanner(null), 5200)
+      return () => clearTimeout(timer)
+    }
+  }, [activeIdsKey])
 
   const handleRemove = (event: MouseEvent<HTMLButtonElement>, condition: ActiveCondition) => {
     playTear()
@@ -99,6 +119,13 @@ export function SelectedSummary({
           )
         })}
       </div>
+      {banner && (
+        <div className="combo-banner" role="status">
+          <b>🎉 梦幻联动 ·「{banner.name}」</b>
+          <span>{banner.line}</span>
+          <button aria-label="收下联动彩蛋" className="combo-close" type="button" onClick={() => setBanner(null)}>收下了</button>
+        </div>
+      )}
       {ghosts.map((ghost) => (
         <span
           aria-hidden="true"
