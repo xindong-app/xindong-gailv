@@ -6,7 +6,7 @@ import { buildAnalogy } from '../fun/analogy'
 import { buildFunnelFrames } from '../fun/funnelFrames'
 import { RarityStamp } from '../fun/RarityStamp'
 import { WipeoutShow } from '../fun/WipeoutShow'
-import { buildComparisons, buildVerdict, fmtRarity, rarityTier } from '../fun/rarity'
+import { buildComparisons, buildVerdict, collectVerdictImpacts, fmtRarity, rarityTier } from '../fun/rarity'
 import { useCountUp } from '../fun/useCountUp'
 import { CityLeaderboard } from './CityLeaderboard'
 import { ModelConfidenceBadge } from './ui'
@@ -92,13 +92,13 @@ export function ResultSummary({
   const base = pool.base
   const probability = funAllowed && base > 0 ? pool.estimate / base : 0
   const tier = rarityTier(probability * 10_000)
-  const verdict = funAllowed && !logicalZero ? buildVerdict(frames) : null
+  const verdict = funAllowed && !logicalZero ? buildVerdict(collectVerdictImpacts(result)) : null
   const comparisons = funAllowed && !logicalZero ? buildComparisons(probability) : []
   const analogy = funAllowed && !logicalZero ? buildAnalogy(pool.estimate) : null
   // 图鉴卡幸存者: 与漏斗阵列同一份确定性数学
   const FUNNEL_TOTAL = 80
   const survivorCount = frames.length > 0 && base > 0
-    ? Math.round((FUNNEL_TOTAL * frames[frames.length - 1].survivors) / Math.max(1, base))
+    ? Math.min(FUNNEL_TOTAL, Math.round((FUNNEL_TOTAL * frames[frames.length - 1].survivors) / Math.max(1, base)))
     : FUNNEL_TOTAL
   const cities = result.input.target.cities
   const scope = `${cities.includes('全国') ? '全国' : cities.join('、')} · ${result.input.target.age.min}–${result.input.target.age.max} 岁 · ${result.input.target.gender === 'male' ? '男生' : '女生'}`

@@ -10,6 +10,7 @@
 // 全部已选条件都参与综合情景估算, 因此漏斗恢复为通用反向链:
 // 每一关都是一个真实出刀条件, 不再只保留可靠层的四个关卡。
 import { computeModel } from '../engine/modelEngine'
+import { sanitizeHardRequirementIds } from '../features/hardDeclaration'
 import { DIMENSION_BY_ID, type EvidenceGrade } from '../model/dimensions'
 import type { ModelSelection } from '../model/schema'
 import { activeConditions, removeSelectionDimension } from '../model/selectionUtils'
@@ -75,10 +76,13 @@ export function buildFunnelFrames(selection: ModelSelection, context: FunnelCont
     return frames
   }
 
-  const options = {
-    hardRequirementIds: context.hardRequirementIds ?? [],
+  // 硬边界声明随草稿同步清理: 被本关移除的条件若已声明为硬边界,
+  // 留在 hardRequirementIds 里会触发 ModelRequirementError 崩屏
+  const rawHardIds = context.hardRequirementIds ?? []
+  const optionsFor = (draft: ModelSelection) => ({
+    hardRequirementIds: sanitizeHardRequirementIds(draft, rawHardIds),
     ...(context.seekerGender ? { seekerGender: context.seekerGender } : {}),
-  }
+  })
   // 帧 0 = 只保留池子定义(性别/年龄/城市)的综合估算
   const removed = cuts.map((condition) => condition.dimensionId)
   const draft = removeSelectionDimension(selection, '__none__') // 先克隆一份
@@ -86,7 +90,7 @@ export function buildFunnelFrames(selection: ModelSelection, context: FunnelCont
   for (const dimensionId of removed) {
     baseDraft = removeSelectionDimension(baseDraft, dimensionId)
   }
-  const first = computeModel(baseDraft, options).comprehensivePopulation
+  const first = computeModel(baseDraft, optionsFor(baseDraft)).comprehensivePopulation
   if (first.numericStatus !== 'available') {
     const frames: FunnelFrame[] = []
     frameCache.set(selection, { key: contextKey, frames })
@@ -100,7 +104,7 @@ export function buildFunnelFrames(selection: ModelSelection, context: FunnelCont
     for (let j = k; j < cuts.length; j += 1) {
       frameDraft = removeSelectionDimension(frameDraft, cuts[j].dimensionId)
     }
-    estimates.push(computeModel(frameDraft, options).comprehensivePopulation.estimate)
+    estimates.push(computeModel(frameDraft, optionsFor(frameDraft)).comprehensivePopulation.estimate)
   }
 
   const frames: FunnelFrame[] = cuts.map((condition, index) => {

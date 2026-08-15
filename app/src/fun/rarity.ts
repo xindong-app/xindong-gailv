@@ -1,5 +1,5 @@
 // 稀有度抽卡分级 + 毒舌总评 —— 纯文案/纯函数, 不碰引擎数学
-import type { FunnelFrame } from './funnelFrames'
+import type { ModelResult } from '../engine/modelEngine'
 
 export interface Tier {
   key: string
@@ -45,11 +45,35 @@ const VERDICT_JOKES: Record<string, string> = {
   'appearance.hair_full': '头发和缘分, 总得留一样',
 }
 
-export function buildVerdict(frames: readonly FunnelFrame[]): string | null {
-  if (frames.length === 0) return null
-  const worst = frames.reduce((a, b) => (b.factor < a.factor ? b : a))
+export interface VerdictImpact {
+  dimensionId: string
+  label: string
+  /** 保留率: 该条件"最后加入"时池子剩多少(leave-one-out, 与出刀顺序无关) */
+  retention: number
+}
+
+// 性别/年龄/城市是池子定义, 不参与"致命一击"归因
+const POOL_DEFINITION_IDS = new Set(['base.gender', 'base.age', 'base.region'])
+
+/**
+ * 汇总两层的 leave-one-out 边际影响:
+ * 可靠层 impacts 覆盖直接条件(身高/学历/烟酒…), 综合层 impacts 覆盖情景条件(收入/软偏好…),
+ * 两者都是"去掉我试试"的重算, 与条件排列顺序无关。
+ */
+export function collectVerdictImpacts(result: ModelResult): VerdictImpact[] {
+  return [...result.impacts, ...result.comprehensivePopulation.impacts]
+    .filter((impact) => !POOL_DEFINITION_IDS.has(impact.dimensionId))
+}
+
+/**
+ * 毒舌总评 —— 归因用引擎的 leave-one-out 边际影响(每个条件都是"最后一个加入"),
+ * 与条件的排列顺序无关: 同一套条件无论先点后点, 结论逐字一致。
+ */
+export function buildVerdict(impacts: readonly VerdictImpact[]): string | null {
+  if (impacts.length === 0) return null
+  const worst = impacts.reduce((a, b) => (b.retention < a.retention ? b : a))
   const joke = VERDICT_JOKES[worst.dimensionId] ?? '这一关是真·守门员'
-  const pct = ((1 - worst.factor) * 100).toFixed(worst.factor > 0.1 ? 0 : 1)
+  const pct = ((1 - worst.retention) * 100).toFixed(worst.retention > 0.1 ? 0 : 1)
   return `致命一击是「${worst.label}」, 一刀淘汰 ${pct}% 的选手 —— ${joke}`
 }
 

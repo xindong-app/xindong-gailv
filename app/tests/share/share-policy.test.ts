@@ -99,12 +99,13 @@ describe('share privacy policy', () => {
     expect(dto.fun?.verdict ?? '').not.toContain('婚')
     expect(dto.fun?.verdict ?? '').not.toContain('慢性病')
 
-    // 有公开的可量化条件(身高)时: 总评只基于公开帧重算;
+    // 有公开的可量化条件(身高)时: 总评只基于公开副本重算;
+    // 归因是 leave-one-out(与出刀顺序无关), 不锁定点名谁, 只锁隐私边界:
     // 隐藏的吸烟条件对总评措辞零影响
     const withHeight = structuredClone(selection)
     withHeight.target.heightCm = { min: 180, max: null }
     const publicDto = buildShareDto(withHeight, computeModel(withHeight), createDefaultShareSettings(withHeight))
-    expect(publicDto.fun?.verdict).toContain('身高')
+    expect(publicDto.fun?.verdict).toBeTruthy()
     expect(publicDto.fun?.verdict).not.toContain('吸烟')
 
     const heightOnly = structuredClone(withHeight)
@@ -144,41 +145,15 @@ describe('share privacy policy', () => {
     expect(dtoA.fun?.verdict).toBeTruthy()
     expect(dtoB.fun?.verdict).toBe(dtoA.fun?.verdict)
     expect(dtoB.fun?.verdict).toContain('饮酒')
+    // v4 强化: 不只总评, 整个人数块+趣味块都必须来自公开副本重算,
+    // 隐藏婚史后所有数字逐位一致(差值反推不可能)
+    expect(dtoB.population).toEqual(dtoA.population)
+    expect(dtoB.fun).toEqual(dtoA.fun)
   })
 
-  it('derives no fun block at all when the model reports numeric underflow', () => {
-    const selection = structuredClone(DEFAULT_SELECTION)
-    selection.target.gender = 'female'
-    selection.target.heightCm = { min: 220, max: 220 }
-    const computed = computeModel(selection)
-    // Stable Gaussian tails keep this legal extreme strictly positive. This
-    // share-policy test therefore injects the engine contract state directly
-    // instead of depending on a particular input to underflow in IEEE-754.
-    // v4: 趣味派生以综合人口层为准, 两层同时注入下溢状态。
-    const result = {
-      ...computed,
-      population: {
-        ...computed.population,
-        estimate: 0,
-        range: { conservative: 0, baseline: 0, optimistic: 0 },
-        zeroMeaning: 'model_underflow' as const,
-        resolutionExceeded: true,
-      },
-      comprehensivePopulation: {
-        ...computed.comprehensivePopulation,
-        estimate: 0,
-        range: { conservative: 0, baseline: 0, optimistic: 0 },
-        zeroMeaning: 'model_underflow' as const,
-        resolutionExceeded: true,
-      },
-    }
-
-    const dto = buildShareDto(selection, result, createDefaultShareSettings(selection))
-    // 下溢不是现实零人: 稀有度/幸存者/毒舌一个都不许派生
-    expect(dto.fun).toBeUndefined()
-    expect(buildTextFallback(dto)).not.toContain('全员下班')
-    expect(buildTextFallback(dto)).not.toContain('片尾字幕')
-  })
+  // 下溢/逻辑空集不派生趣味块的反例测试已迁至 share-underflow.test.ts:
+  // v4 起 DTO 的一切数字都在「仅公开条件」副本上整体重算,
+  // 注入 result 不再影响输出, 必须用模块级 mock 让公开副本本身下溢。
 
   it('never leaks the reciprocal-derived bidirectional score into any share output', () => {
     const selection = privateSelection() // 已填反向自评, 引擎侧派生分存在

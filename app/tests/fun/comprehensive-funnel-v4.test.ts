@@ -91,4 +91,16 @@ describe('漏斗帧拆解(v4 通用反向链)', () => {
     const frames = buildFunnelFrames(selection)
     expect(frames.some((frame) => frame.dimensionId === 'entertainment.zodiac')).toBe(true)
   })
+
+  it('硬边界声明的维度在链中被移除时不崩, 且失效声明被同步清理', () => {
+    const selection = baseSelection()
+    selection.softPreferenceIds = ['lifestyle.cooking', 'communication.conflict_repair']
+    // cooking 被声明为硬边界; 漏斗中间帧的草稿会移除它,
+    // 不同步清理 hardRequirementIds 会触发 ModelRequirementError
+    const frames = buildFunnelFrames(selection, { hardRequirementIds: ['lifestyle.cooking'] })
+    expect(frames.length).toBe(2)
+    const finalEstimate = computeModel(selection, { hardRequirementIds: ['lifestyle.cooking'] })
+      .comprehensivePopulation.estimate
+    expect(frames[frames.length - 1].survivors).toBeCloseTo(finalEstimate, 6)
+  })
 })

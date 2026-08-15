@@ -26,6 +26,11 @@ export function toggleArrayValue<T extends string>(values: readonly T[], value: 
 
 export function removeSelectionDimension(selection: ModelSelection, dimensionId: string): ModelSelection {
   const next = cloneSelection(selection)
+  // 同名软条件(软偏好/反向自评里的同 id 项)随结构化字段一起清理并去重
+  const stripTwinSoftIds = (id: string) => {
+    next.softPreferenceIds = next.softPreferenceIds.filter((item) => item !== id)
+    next.selfPreferenceIds = next.selfPreferenceIds.filter((item) => item !== id)
+  }
   switch (dimensionId) {
     case 'base.gender': next.target.gender = DEFAULT_SELECTION.target.gender; break
     case 'base.age': next.target.age = { ...DEFAULT_SELECTION.target.age }; break
@@ -34,7 +39,7 @@ export function removeSelectionDimension(selection: ModelSelection, dimensionId:
     case 'appearance.height': next.target.heightCm = null; break
     case 'appearance.body_type': next.correlated.bodyTypes = []; break
     case 'education.level': next.correlated.educationLevels = []; break
-    case 'education.school': next.correlated.schoolTier = null; break
+    case 'education.school': next.correlated.schoolTier = null; stripTwinSoftIds(dimensionId); break
     case 'economy.income': next.correlated.minAnnualIncomeWan = null; break
     case 'economy.wealth': next.correlated.minHouseholdWealthWan = null; break
     case 'economy.house': next.correlated.housing = { ...DEFAULT_SELECTION.correlated.housing }; break
@@ -43,9 +48,11 @@ export function removeSelectionDimension(selection: ModelSelection, dimensionId:
     case 'lifestyle.drinking': next.correlated.drinking = 'any'; break
     case 'health.chronic':
       next.correlated.healthCriteria = next.correlated.healthCriteria.filter((item) => item !== 'no_major_chronic')
+      stripTwinSoftIds(dimensionId)
       break
     case 'health.myopia':
       next.correlated.healthCriteria = next.correlated.healthCriteria.filter((item) => item !== 'no_myopia')
+      stripTwinSoftIds(dimensionId)
       break
     case 'appearance.hair_full': next.correlated.hairCriteria = []; break
     case 'entertainment.zodiac': next.entertainment.zodiacs = []; break

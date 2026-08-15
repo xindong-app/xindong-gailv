@@ -1,7 +1,6 @@
 import type { ModelResult } from '../engine/modelEngine'
-import { formatCount } from '../engine/modelEngine'
-import { buildFunnelFrames } from '../fun/funnelFrames'
-import { buildVerdict, fmtRarity, rarityTier } from '../fun/rarity'
+import { formatCount, tryComputeModel } from '../engine/modelEngine'
+import { buildVerdict, collectVerdictImpacts, fmtRarity, rarityTier } from '../fun/rarity'
 import { pickProf } from '../fun/skins'
 import { DIMENSION_BY_ID } from '../model/dimensions'
 import { activeConditions, removeSelectionDimension } from '../model/selectionUtils'
@@ -76,10 +75,19 @@ export function buildShareDto(
   if (settings.showRegion) {
     dto.region = selection.target.cities.length === 0 ? '全国' : selection.target.cities.join('、')
   }
-  // v4: 分享主数字走综合人口层(全部公开口径下的已选条件都参与)
-  const pool = result.comprehensivePopulation
-  const priorScenario = pool.interpretation === 'prior_sensitivity_only' || pool.genericPriorConditionIds.length > 0
-  if (settings.showCount && pool.numericStatus !== 'unavailable') {
+
+  // v4 隐私铁律: 分享内容里的一切数字都必须来自「仅公开条件」副本的整体重算——
+  // 人数、范围、稀有度、等级、幸存人数、先验标记、毒舌总评无一例外。
+  // 隐藏条件连链式影响都不进入, 否则任何人都能用差值反推被隐藏的敏感条件。
+  const publicIds = new Set((conditions ?? []).map((condition) => condition.dimensionId))
+  const publicSelection = selectionForVerdict(selection, settings, publicIds)
+  const publicComputed = tryComputeModel(publicSelection, {
+    seekerGender: result.computationContext.seekerGender,
+  })
+  const pool = publicComputed.success ? publicComputed.data.comprehensivePopulation : null
+
+  if (settings.showCount && pool && pool.numericStatus !== 'unavailable') {
+    const priorScenario = pool.interpretation === 'prior_sensitivity_only' || pool.genericPriorConditionIds.length > 0
     dto.population = {
       estimateLabel: pool.resolutionExceeded
         ? '低于模型可靠分辨率（不代表不存在）'
@@ -88,25 +96,22 @@ export function buildShareDto(
       resolutionExceeded: pool.resolutionExceeded,
       ...(priorScenario ? { priorScenario: true } : {}),
     }
-    // 数值下溢不是现实零人: 趣味层(稀有度/幸存者/总评)整体不派生
-    const funAllowed = pool.zeroMeaning !== 'model_underflow'
+    // 数值下溢/逻辑空集都不是现实零人: 趣味层(稀有度/幸存者/总评)整体不派生
+    const funAllowed = pool.zeroMeaning !== 'model_underflow' && pool.zeroMeaning !== 'logical_zero'
     if (funAllowed) {
       // 趣味块完全由人数派生: 人数不公开时稀有度同样不能出现(防止反推)
       const base = pool.base
       const probability = base > 0 ? pool.estimate / base : 0
       const tier = rarityTier(probability * 10_000)
-      const survivors = base > 0 ? Math.max(0, Math.round((80 * pool.estimate) / base)) : 0
+      const survivors = base > 0 ? Math.min(80, Math.max(0, Math.round((80 * pool.estimate) / base))) : 0
       const survivorIndex = Math.max(0, survivors - 1)
       // 隐藏地区时只用全国通用人物, 不能用城市皮肤反推地域
       const survivorProf = pickProf(survivorIndex, settings.showRegion ? selection.target.cities : ['全国'])
-      // 毒舌总评: 在"只含公开条件"的选择副本上整链重算,
-      // 没有可公开的量化条件时整段省略(存在性也不泄露)
-      const publicIds = new Set((conditions ?? []).map((condition) => condition.dimensionId))
-      const verdictFrames = buildFunnelFrames(
-        selectionForVerdict(selection, settings, publicIds),
-        { seekerGender: result.computationContext.seekerGender },
-      )
-      const verdict = conditions && conditions.length > 0 ? buildVerdict(verdictFrames) : null
+      // 毒舌总评: 公开副本的 leave-one-out 边际归因(与条件顺序无关);
+      // 没有公开条件时整段省略(存在性也不泄露)
+      const verdict = conditions && conditions.length > 0 && publicComputed.success
+        ? buildVerdict(collectVerdictImpacts(publicComputed.data))
+        : null
       dto.fun = {
         tierKey: tier.key,
         tierLabel: priorScenario ? `${tier.label}（含先验情景）` : tier.label,
