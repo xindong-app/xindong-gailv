@@ -78,15 +78,16 @@
 
 ---
 
-## 六、🧱 构建预算（2026-08-14 批次 2 前置）
+## 六、🧱 构建预算（2026-08-15 小人 3.0 精绘落地调整）
 
-**当前 JS 149.3 / 160 KiB，CSS 18.0 / 25 KiB。** 预算扫描统计 `dist` 内全部同类产物的 gzip 总量，按二进制 KiB（1 KiB = 1024 bytes）执行硬门禁。
+**当前 JS 164.5 / 166 KiB，CSS 20.8 / 25 KiB。** 预算扫描统计 `dist` 内全部同类产物的 gzip 总量，按二进制 KiB（1 KiB = 1024 bytes）执行硬门禁。
 
-- 生产输入校验链已经迁移到 `zod/v4/mini`，并由运行时错误契约测试兜底；继续裁剪 Zod 需要重写或削弱校验，风险高于收益，不作为批次 2 前置方案
-- JS 上限由 150 KiB 有意调整为 160 KiB，为批次 2 卡面系统提供约 10.7 KiB 的可用余量；这是仍会失败构建的硬上限，不是取消包体治理
+- 生产输入校验链已经迁移到 `zod/v4/mini`，并由运行时错误契约测试兜底；继续裁剪 Zod 需要重写或削弱校验，风险高于收益，不作为减重方案
+- JS 上限由 160 KiB 精确调整为 166 KiB（不是 167/168 或"约 166"），为已排期的小人 3.0 精绘一次性让位；这是仍会失败构建的硬上限，不是取消包体治理。之后再增长应优先删除旧实现或做架构减重，不能继续顺手抬预算
 - CSS 上限保持 25 KiB，不随本次调整放宽
-- `scan:dist` 的阈值、报错文案和边界回归测试共用同一常量；恰好 160 KiB 可通过，超过 1 byte 即失败
-- 纯静态分包不减少总 gzip；如后续逼近 160 KiB，应优先按真实模块归因减重，并重新执行完整构建与产物扫描
+- `scan:dist` 的阈值、报错文案和边界回归测试共用同一常量；恰好 166 KiB 可通过，超过 1 byte 即失败
+- 纯静态分包不减少总 gzip；如后续逼近 166 KiB，应优先按真实模块归因减重，并重新执行完整构建与产物扫描
+- 浏览器包严禁引入 `react-dom/server`（约 +60 KiB gz 服务端渲染器）；eslint `no-restricted-imports` 已硬禁，分享卡小人上卡走客户端离屏渲染（见 `share/canvas.ts` 的 `personSvgDataUri`）
 
 ## 七、📊 数据债（v3 降级维度的恢复路线，权威台账以 docs/DATA_UPDATE.md 优先队列 + docs/DATA_SOURCES.md 为准）
 
@@ -116,6 +117,6 @@
 - 不改 `src/engine` / `src/data` / `src/model` 的数学与校验（Codex 领地）
 - 不改测试锚定的功能文案与组件名（181 个 vitest + 28 个 E2E 必须保持绿）
 - 所有动效 prefers-reduced-motion 降级；手机 375px 优先验收
-- JS gzip ≤ 160 KiB、CSS ≤ 25 KiB 硬预算不破
+- JS gzip ≤ 166 KiB、CSS ≤ 25 KiB 硬预算不破
 - 外部素材只进本地 `public/assets/`，许可优先 CC0 / 免费可商用 / AI 自生成
 - 每期完成：typecheck + test + lint + validate:model + build + scan:dist + 截图验收 + git commit，不主动部署

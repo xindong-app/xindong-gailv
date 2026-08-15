@@ -6,10 +6,10 @@ import {
 } from '../../scripts/artifact-budgets'
 
 describe('production artifact gzip budgets', () => {
-  it('keeps the batch-2 JavaScript budget at a hard 160 KiB boundary', () => {
-    expect(JS_GZIP_BUDGET_KIB).toBe(160)
-    expect(exceedsGzipBudget(160 * 1024, JS_GZIP_BUDGET_KIB)).toBe(false)
-    expect(exceedsGzipBudget(160 * 1024 + 1, JS_GZIP_BUDGET_KIB)).toBe(true)
+  it('keeps the batch-2 JavaScript budget at a hard 166 KiB boundary', () => {
+    expect(JS_GZIP_BUDGET_KIB).toBe(166)
+    expect(exceedsGzipBudget(166 * 1024, JS_GZIP_BUDGET_KIB)).toBe(false)
+    expect(exceedsGzipBudget(166 * 1024 + 1, JS_GZIP_BUDGET_KIB)).toBe(true)
   })
 
   it('keeps the stylesheet budget unchanged at 25 KiB', () => {

@@ -287,3 +287,18 @@ export function pickProf(index: number, cities: readonly string[]): Prof {
   }
   return FULL_ROSTER[Math.floor(rnd(index, 9) * FULL_ROSTER.length)]
 }
+
+/** 按 emoji 反查职业 —— 分享卡只带 survivor.emoji, 靠它还原同款装扮; 查不到返回 undefined */
+export function profByEmoji(emoji: string): Prof | undefined {
+  if (!emoji) return undefined
+  if (CAISHEN.emoji === emoji) return CAISHEN
+  for (const prof of FULL_ROSTER) {
+    if (prof.emoji === emoji) return prof
+  }
+  for (const skins of Object.values(CITY_SKINS)) {
+    for (const prof of skins) {
+      if (prof.emoji === emoji) return prof
+    }
+  }
+  return undefined
+}

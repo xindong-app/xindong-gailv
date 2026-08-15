@@ -9,7 +9,8 @@ import { pickProf } from './skins'
 import { isSoundOn, playCaishen, playCrowdMurmur, playLevelUp, playSlash, setSoundOn } from './sound'
 
 const TOTAL = 80
-const PALETTE = ['#ffd9e2', '#ffd9b8', '#cdeafa', '#e6dbf7', '#ddefd3', '#ffeeb0', '#f5c1d4']
+// 马卡龙八色(方案一定稿)
+const PALETTE = ['#f9c6d3', '#a8dce6', '#b8e6c9', '#f9e3a1', '#d9c8ec', '#f9cfae', '#b5d9f5', '#f5b8d9']
 
 // ---------- 各关卡遗言弹幕 ----------
 // v4: 综合层里收入/房车等也会真实砍人, 可以配吐槽;

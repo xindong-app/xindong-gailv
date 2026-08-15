@@ -2813,6 +2813,27 @@ svg.p-nervous { animation: pShake 0.18s linear 2; }
   50% { transform: scale(0.4) rotate(45deg); opacity: 0.6; }
 }
 
+/* 小人 3.0: 待机呼吸(错相位, 由 --bob-del 决定) */
+svg.p-bob {
+  animation: pBob 2.8s ease-in-out infinite;
+  animation-delay: var(--bob-del, 0s);
+}
+@keyframes pBob {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50% { transform: translateY(-1.2px) scale(1.012, 0.988); }
+}
+/* 财神环绕金币浮动 */
+.p-coin {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pCoinFloat 2.6s ease-in-out infinite;
+  animation-delay: var(--coin-del, 0s);
+}
+@keyframes pCoinFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.4px); }
+}
+
 .fun-funnel { margin-top: 14px; }
 
 .ff-meta {
@@ -3059,6 +3080,8 @@ svg.p-nervous { animation: pShake 0.18s linear 2; }
   .p-sweat,
   .p-soul-svg,
   .p-spark,
+  svg.p-bob,
+  .p-coin,
   .confetti-piece,
   .ghost-float,
   .stamp-in,

@@ -3,7 +3,7 @@
 // 纯 CSS 驱动, 零 JS 帧; reduced-motion 给定格剧照。
 import { PersonSvg } from './person'
 
-const PALETTE = ['#ffd9e2', '#ffd9b8', '#cdeafa', '#e6dbf7', '#ddefd3', '#f5c1d4']
+const PALETTE = ['#f9c6d3', '#a8dce6', '#b8e6c9', '#f9e3a1', '#d9c8ec', '#f5b8d9']
 const INK = '#241c33'
 
 interface WalkerSpec { color: string; delay: number; passes: boolean; staticX: number }

@@ -1,4 +1,10 @@
+import { createElement } from 'react'
+import { flushSync } from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { encode as encodeQr } from 'uqr'
+import { PersonSvg } from '../fun/person'
+import type { Prof } from '../fun/roster'
+import { profByEmoji } from '../fun/skins'
 import { stickerFor } from '../fun/stickers'
 import { CHALLENGE_URL } from './challenge'
 import type { ShareConditionDto, ShareDto } from './types'
@@ -110,7 +116,7 @@ function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
   })
 }
 
-/** 画一个小人: 身体 + 头 + 笑脸 + 头顶 emoji 皮肤 */
+/** 旧版 Canvas 小画人: 仅作 SVG 位图加载失败时的兜底 */
 function drawPerson(
   context: CanvasRenderingContext2D,
   x: number,
@@ -270,6 +276,45 @@ async function collectStickerImages(conditions: ShareConditionDto[]): Promise<Ma
   return images
 }
 
+/* ============================================================
+   小人 3.0 上卡: 胶片里的小人与淘汰赛同源 —— PersonSvg 渲成 SVG 位图再贴
+   ============================================================ */
+
+/** 马卡龙八色, 与 FunFunnel 人群同盘 */
+const PERSON_PALETTE = ['#f9c6d3', '#a8dce6', '#b8e6c9', '#f9e3a1', '#d9c8ec', '#f9cfae', '#b5d9f5', '#f5b8d9']
+
+function personSvgDataUri(color: string, seed: number, prof?: Prof): string {
+  // 用客户端已打包的 react-dom 在离屏节点渲染再取 innerHTML ——
+  // 严禁引 react-dom/server: 它会把约 60KB 的服务端渲染器打进浏览器包
+  const host = document.createElement('div')
+  const root = createRoot(host)
+  flushSync(() => {
+    root.render(createElement(PersonSvg, { color, seed, prof: prof ?? null, blink: false, width: 68, height: 92 }))
+  })
+  const markup = host.innerHTML
+  root.unmount()
+  // React 字符串不带 xmlns, 作为独立 SVG 图片加载必须补上
+  const svg = markup.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"')
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
+}
+
+/** 预载胶片小人: p0-p7 群众 + survivor 本人(按 emoji 还原职业装扮); 失败只丢图不丢卡 */
+async function collectPersonImages(fun: NonNullable<ShareDto['fun']>): Promise<Map<string, HTMLImageElement>> {
+  const jobs: Array<{ key: string; src: string }> = []
+  for (let i = 0; i < 8; i += 1) {
+    jobs.push({ key: `p${i}`, src: personSvgDataUri(PERSON_PALETTE[i % PERSON_PALETTE.length], i * 13 + 5) })
+  }
+  jobs.push({ key: 'survivor', src: personSvgDataUri('#f9e3a1', 97, profByEmoji(fun.survivor.emoji)) })
+  const images = new Map<string, HTMLImageElement>()
+  const entries = await Promise.all(
+    jobs.map(async (job) => ({ key: job.key, image: await loadStickerImage(job.src) })),
+  )
+  for (const { key, image } of entries) {
+    if (image) images.set(key, image)
+  }
+  return images
+}
+
 /** 条件贴纸牌: 斜贴 + 硬阴影 + 剪纸画 + 短标签 */
 function drawStickerChip(
   context: CanvasRenderingContext2D,
@@ -353,6 +398,7 @@ function drawFilmstrip(
   y: number,
   fun: NonNullable<ShareDto['fun']>,
   ink: string,
+  persons: Map<string, HTMLImageElement>,
 ): number {
   context.fillStyle = '#655a75'
   context.font = '600 22px system-ui, "Microsoft YaHei", sans-serif'
@@ -387,7 +433,7 @@ function drawFilmstrip(
     `再过 ${counts[2]}`,
     survivors > 0 ? `留下 ${counts[3]}` : '全灭 0',
   ]
-  const palette = ['#cdeafa', '#ffd9b8', '#ddefd3', '#e6dbf7', '#ffd9e2']
+  const palette = PERSON_PALETTE
   const cellWidth = 197
   const cellHeight = 92
   const cellY = bandY + 23
@@ -418,15 +464,23 @@ function drawFilmstrip(
       const px = cellX + cellWidth / 2 + (rowIndex - (rowCount - 1) / 2) * 36
       const py = cellY + (inFirstRow ? 22 : 46)
       const isFinalSurvivor = index === 3 && person === 0 && survivors > 0
-      drawPerson(
-        context,
-        px,
-        py,
-        0.36,
-        palette[person % palette.length],
-        isFinalSurvivor ? fun.survivor.emoji : '',
-        ink,
-      )
+      const personImage = persons.get(isFinalSurvivor ? 'survivor' : `p${person % 8}`)
+      if (personImage) {
+        // 小人 3.0 位图: 34x46 比例, 脚底贴在旧基准线上
+        const height = 27
+        const width = Math.round((height * 34) / 46)
+        context.drawImage(personImage, px - width / 2, py - height / 2 - 4, width, height)
+      } else {
+        drawPerson(
+          context,
+          px,
+          py,
+          0.36,
+          palette[person % palette.length],
+          isFinalSurvivor ? fun.survivor.emoji : '',
+          ink,
+        )
+      }
     }
     context.fillStyle = ink
     context.font = '700 18px system-ui, "Microsoft YaHei", sans-serif'
@@ -479,8 +533,11 @@ export async function renderShareCard(
     throw new ShareCardError('CONTEXT_UNAVAILABLE', '当前浏览器无法初始化画布，请复制文字版战报。')
   }
 
-  // 贴纸墙素材: 与画布初始化并行预热, 失败静默降级为纯文字
-  const stickerImages = await collectStickerImages(dto.conditions ?? [])
+  // 贴纸墙素材 + 胶片小人位图: 与画布初始化并行预热, 失败静默降级为纯文字/旧版小画人
+  const [stickerImages, personImages] = await Promise.all([
+    collectStickerImages(dto.conditions ?? []),
+    dto.fun ? collectPersonImages(dto.fun) : Promise.resolve(new Map<string, HTMLImageElement>()),
+  ])
 
   const ink = '#3b3050'
   const brown = '#8f4c2d'
@@ -565,7 +622,7 @@ export async function renderShareCard(
     y += drawCenteredWrappedText(context, fun.tierComment, center, y, WIDTH - 320, 32, 1) + 10
 
     // 胶片分镜接管原"幸存者小人"一排: 既讲故事也报幕
-    y += drawFilmstrip(context, center, y + 6, fun, ink) + 4
+    y += drawFilmstrip(context, center, y + 6, fun, ink, personImages) + 4
 
     if (fun.verdict) {
       // 虚线毒舌框(emoji 单独画在框首, 避免代理对被换行拆散)

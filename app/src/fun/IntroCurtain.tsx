@@ -6,7 +6,7 @@ import { PersonSvg } from './person'
 
 const TITLE = [...'心动概率局']
 const RUNNERS = 14
-const PALETTE = ['#ffd9e2', '#ffd9b8', '#cdeafa', '#e6dbf7', '#ddefd3', '#ffeeb0']
+const PALETTE = ['#f9c6d3', '#a8dce6', '#b8e6c9', '#f9e3a1', '#d9c8ec', '#f9cfae']
 const INK = '#3b3050'
 
 function Runner({ index }: { index: number }) {
