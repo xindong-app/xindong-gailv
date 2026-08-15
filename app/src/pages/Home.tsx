@@ -115,17 +115,22 @@ export default function Home() {
     [hardRequirementIds, selection],
   )
   const result = useMemo(
-    () => computeModel(selection, { hardRequirementIds: effectiveHardRequirementIds }),
-    [selection, effectiveHardRequirementIds],
+    // v4: 主口径为综合人口层; seekerGender 影响配对向情景因子, 必须传入
+    () => computeModel(selection, {
+      hardRequirementIds: effectiveHardRequirementIds,
+      ...(seekerGender ? { seekerGender } : {}),
+    }),
+    [selection, effectiveHardRequirementIds, seekerGender],
   )
   const conditions = useMemo(() => activeConditions(selection), [selection])
   // SSR 及以上稀有度下彩带雨; seed 随结果变化, 同一份结果同一场雨
   const celebrationSeed = useMemo(() => {
-    const base = result.population.base
-    if (base <= 0 || result.population.estimate <= 0) return null
-    const perWan = (result.population.estimate / base) * 10_000
+    const pool = result.comprehensivePopulation
+    if (pool.numericStatus !== 'available' || pool.base <= 0 || pool.estimate <= 0) return null
+    if (pool.zeroMeaning === 'model_underflow' || pool.zeroMeaning === 'unavailable') return null
+    const perWan = (pool.estimate / pool.base) * 10_000
     if (perWan >= 5) return null
-    return `${result.population.estimate.toFixed(3)}-${buildFunnelFrames(result.input).length}`
+    return `${pool.estimate.toFixed(3)}-${buildFunnelFrames(result.input, result.computationContext).length}`
   }, [result])
   const [currentStep, setCurrentStep] = useState(0)
   const [comparison, setComparison] = useState<ReturnType<typeof computeModel> | null>(null)
@@ -319,7 +324,7 @@ export default function Home() {
           type="button"
           onClick={() => setMobileResultOpen(true)}
         >
-          <span><small>{result.population.status === 'unavailable' ? '这一片算不出' : result.population.status === 'upper_bound' ? '人数上限' : '满足硬条件'}</small><b>{result.population.displayShort}</b></span>
+          <span><small>{result.comprehensivePopulation.numericStatus === 'unavailable' ? '这一片算不出' : '综合估算'}</small><b>{result.comprehensivePopulation.displayShort}</b></span>
           <span>查看战况 ↑</span>
         </button>
       </div>
@@ -343,7 +348,7 @@ export default function Home() {
           <div><b>{EVIDENCE_REGISTRY.entries.filter((entry) => entry.modelUse === 'excluded').length}</b><span>条明确排除</span></div>
           <div><b>18–50</b><span>逐单岁人口</span></div>
         </div>
-        <p>硬筛选改变人口范围；相关硬条件在组内联合；软偏好只改契合；娱乐项只出彩蛋。乐观/基准/保守是敏感度范围，不是假装成抽样置信区间。</p>
+        <p>主数字是综合估算：全部已选条件都参与，证据强的先行，证据弱的按宽口径先验演算并单独标注。乐观/基准/保守是敏感度范围，不是假装成抽样置信区间。</p>
         <div className="source-list">
           {EVIDENCE_REGISTRY.entries.slice(0, 8).map((entry) => (
             <a href={entry.sourceUrl} key={entry.id} rel="noreferrer" target="_blank"><span>证据 {entry.grade}</span><b>{entry.sourceTitle}</b><small>{entry.publisher} · {entry.dataYear}</small></a>
@@ -364,7 +369,7 @@ export default function Home() {
         <div className="privacy-dialog-grid">
           <section><h3>你的条件只住在这台设备里</h3><p>筛选只在浏览器内存和本次会话中计算，不上传、无账号、无埋点。</p></section>
           <section><h3>算不准就老实说算不准</h3><p>估算给保守、基准、乐观三档；低到模型分辨率以下，它会直接说"数不出来"，不编数字哄你。</p></section>
-          <section><h3>四种条件，四种待遇</h3><p>硬条件砍人；软偏好只算契合；敏感项你主动拉开才生效；星座 MBTI 只负责出梗。</p></section>
+          <section><h3>四种条件，四种待遇</h3><p>硬条件砍人；软偏好既算契合也进综合情景；敏感项你主动拉开才生效；星座 MBTI 按最大熵凑热闹，证据等级最低。</p></section>
           <section><h3>不当月老</h3><p>不撮合、不拉郎配、不评价谁高谁低，也不预测真实爱情结果。它只回答一个问题：池子多大。</p></section>
         </div>
       </Dialog>

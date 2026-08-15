@@ -98,12 +98,12 @@ export function CoreCriteriaStep({ selection, onChange, onNext }: {
           <div className="criteria-card-head"><div><span className="class-badge">硬筛选 ＋ 软偏好</span><h3>学历与院校偏好{educationActive && <span aria-hidden="true" className="equipped-stamp equipped-inline">已装备</span>}</h3></div><EvidenceBadge grade="A" /></div>
           <div className="chip-row">{EDUCATION_OPTIONS.map((option) => <Chip key={option.id} active={selection.correlated.educationLevels.includes(option.id)} tone="sun" onClick={() => update((draft) => { draft.correlated.educationLevels = toggleArrayValue(draft.correlated.educationLevels, option.id) })}>{option.label}</Chip>)}</div>
           <div className="chip-row nested-row"><span>院校层级</span>{SCHOOL_OPTIONS.map((option) => <Chip key={option.id} active={selection.correlated.schoolTier === option.id} tone="sun" onClick={() => update((draft) => { draft.correlated.schoolTier = draft.correlated.schoolTier === option.id ? null : option.id })}>{option.label}</Chip>)}</div>
-          <FieldHelp>学历按七普表 4-1 逐岁×性别直接计入人数，多选按并集；院校层级仅作软偏好，不再砍人口。清北 ⊂ C9 ⊂ 985 ⊂ 211。</FieldHelp>
+          <FieldHelp>学历按七普表 4-1 逐岁×性别直接计入人数，多选按并集；院校层级以学历为条件做宽口径情景估算。清北 ⊂ C9 ⊂ 985 ⊂ 211。</FieldHelp>
         </article>
 
         <article className="criteria-card has-sticker" data-kind="correlated">
           <DimensionSticker dimensionId="economy.income" />
-          <div className="criteria-card-head"><div><span className="class-badge">硬边界 · 暂不砍人</span><h3>收入与资产{financeActive && <span aria-hidden="true" className="equipped-stamp equipped-inline">已装备</span>}</h3></div><EvidenceBadge grade="C" /></div>
+          <div className="criteria-card-head"><div><span className="class-badge">硬边界 · 宽口径计入</span><h3>收入与资产{financeActive && <span aria-hidden="true" className="equipped-stamp equipped-inline">已装备</span>}</h3></div><EvidenceBadge grade="C" /></div>
           <div className="number-fields">
             <label htmlFor="income-min">最低税前年收入（万元）</label>
             <ValidatedNumberField
@@ -128,7 +128,7 @@ export function CoreCriteriaStep({ selection, onChange, onNext }: {
               onCommit={(value) => update((draft) => { if (value != null) playStamp(); draft.correlated.minHouseholdWealthWan = value })}
             />
           </div>
-          <FieldHelp>平均工资 ≠ 18–50 岁个人收入分布，家庭资产 ≠ 个人门槛；两者缺少同口径分布，不会编造比例扣减。选中即把主数字标记为「上限」。</FieldHelp>
+          <FieldHelp>平均工资 ≠ 18–50 岁个人收入分布，家庭资产 ≠ 个人门槛；两者按宽口径包络进入综合估算，范围给得很宽，证据等级随结果公示。</FieldHelp>
         </article>
 
       </div>

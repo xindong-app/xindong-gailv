@@ -10,15 +10,20 @@ import { SlotNumber } from './SlotNumber'
 
 export function Stage({ result }: { result: ModelResult }) {
   const [collapsed, setCollapsed] = useState(false)
-  const available = result.population.numericStatus === 'available'
-  const frames = useMemo(() => buildFunnelFrames(result.input), [result.input])
-  const base = result.population.base
-  const probability = available && base > 0 ? result.population.estimate / base : 0
+  // v4: 舞台主数字走综合人口层, 与结果页同一份口径
+  const pool = result.comprehensivePopulation
+  const available = pool.numericStatus === 'available'
+  const frames = useMemo(
+    () => buildFunnelFrames(result.input, result.computationContext),
+    [result.input, result.computationContext],
+  )
+  const base = pool.base
+  const probability = available && base > 0 ? pool.estimate / base : 0
   const tier = rarityTier(probability * 10_000)
   const cities = result.input.target.cities
   const scope = `${cities.includes('全国') ? '全国' : cities.join('、')} · ${result.input.target.age.min}–${result.input.target.age.max} 岁 · ${result.input.target.gender === 'male' ? '男生' : '女生'}`
   // "就差一点"字幕: 轮播引擎的放宽建议(前 3 条), 播报即链路反馈
-  const tips = result.population.numericStatus === 'available' ? result.relaxations.slice(0, 3) : []
+  const tips = available ? result.relaxations.slice(0, 3) : []
   const [tipIndex, setTipIndex] = useState(0)
   useEffect(() => {
     if (tips.length < 2) return undefined
@@ -35,10 +40,10 @@ export function Stage({ result }: { result: ModelResult }) {
         <div className="stage-scoreboard">
           <span className="stage-scoreboard-label">
             {available
-              ? (result.population.zeroMeaning === 'model_underflow' ? '小到数不出来' : '池中还剩')
+              ? (pool.zeroMeaning === 'model_underflow' ? '小到数不出来' : '池中还剩')
               : '这一片算不出'}
           </span>
-          <SlotNumber text={result.population.displayShort} ariaLabel={result.population.display} />
+          <SlotNumber text={pool.displayShort} ariaLabel={pool.display} />
           <span className="stage-scope">{scope}</span>
           {!collapsed && currentTip && (
             <span key={currentTip.dimensionId} className="stage-tip">
@@ -56,7 +61,7 @@ export function Stage({ result }: { result: ModelResult }) {
         </div>
         {!collapsed && (
           <div className="stage-arena">
-            {available && result.population.zeroMeaning !== 'model_underflow' ? (
+            {available && pool.zeroMeaning !== 'model_underflow' ? (
               <FunFunnel pool={base} frames={frames} cities={cities} />
             ) : (
               <div className="stage-unavailable" role="status">

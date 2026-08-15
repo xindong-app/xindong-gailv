@@ -3,12 +3,16 @@
 //
 // 原理: 链式法则对任意条件顺序成立 ——
 //   P(A,B,C) = P(A) × P(B|A) × P(C|A,B)
-// 第 k 关条件概率 = 引擎在「前 k 关全开」下的联合估算 ÷「前 k- 1关」的联合估算,
+// 第 k 关条件概率 = 引擎在「前 k 关全开」下的综合估算 ÷「前 k-1 关」的综合估算,
 // 每一帧都由引擎亲自算出, 帧因子相乘精确望远镜回最终估算。
+//
+// v4: 主口径切换到 comprehensivePopulation —— 收入/资产/房车/性格等
+// 全部已选条件都参与综合情景估算, 因此漏斗恢复为通用反向链:
+// 每一关都是一个真实出刀条件, 不再只保留可靠层的四个关卡。
 import { computeModel } from '../engine/modelEngine'
-import { isDimensionAppliedToMainEstimate } from '../data/population-policy'
 import { DIMENSION_BY_ID, type EvidenceGrade } from '../model/dimensions'
 import type { ModelSelection } from '../model/schema'
+import { activeConditions, removeSelectionDimension } from '../model/selectionUtils'
 
 export interface FunnelFrame {
   dimensionId: string
@@ -21,102 +25,98 @@ export interface FunnelFrame {
   evidenceGrade: EvidenceGrade
 }
 
+export interface FunnelContext {
+  seekerGender?: 'male' | 'female'
+  hardRequirementIds?: string[]
+}
+
 const FRAME_EMOJI: Readonly<Record<string, string>> = {
+  'base.marital': '💍',
   'appearance.height': '📏',
+  'appearance.body_type': '🏋️',
+  'appearance.hair_full': '💇',
   'education.level': '🎓',
+  'education.school': '🏫',
+  'economy.income': '💰',
+  'economy.wealth': '💎',
+  'economy.house': '🏠',
+  'economy.vehicle': '🚗',
   'lifestyle.smoking': '🚭',
   'lifestyle.drinking': '🍺',
+  'health.chronic': '🩺',
+  'health.myopia': '👓',
+  'entertainment.zodiac': '🔮',
+  'entertainment.mbti': '🧩',
 }
 
 const clampProbability = (value: number): number =>
   Math.min(1, Math.max(0, Number.isFinite(value) ? value : 0))
 
-interface FrameRule {
-  dimensionId: string
-  isActive: (selection: ModelSelection) => boolean
-  enable: (draft: ModelSelection, full: ModelSelection) => void
-}
-
-// 出刀顺序固定: 基础圈 → 身高 → 吸烟 → 饮酒
-// v3: 收入/资产/房车/体型/学历/发际线等维度不对主估算产生扣减(do_not_apply),
-// 把它们画成"淘汰 0%"会误导成"现实中没有筛选作用", 因此只保留可量化关卡。
-const FRAME_RULES: readonly FrameRule[] = [
-  {
-    dimensionId: 'appearance.height',
-    isActive: (s) => s.target.heightCm != null && (s.target.heightCm.min != null || s.target.heightCm.max != null),
-    enable: (draft, full) => { draft.target.heightCm = full.target.heightCm == null ? null : { ...full.target.heightCm } },
-  },
-  {
-    dimensionId: 'education.level',
-    isActive: (s) => s.correlated.educationLevels.length > 0,
-    enable: (draft, full) => { draft.correlated.educationLevels = [...full.correlated.educationLevels] },
-  },
-  {
-    dimensionId: 'lifestyle.smoking',
-    isActive: (s) => s.correlated.smoking !== 'any',
-    enable: (draft, full) => { draft.correlated.smoking = full.correlated.smoking },
-  },
-  {
-    dimensionId: 'lifestyle.drinking',
-    isActive: (s) => s.correlated.drinking !== 'any',
-    enable: (draft, full) => { draft.correlated.drinking = full.correlated.drinking },
-  },
-]
-
-// v3: 收入/资产/房车/体型/学历/发际线等维度不对主估算产生扣减(do_not_apply),
-// 把它们画成"淘汰 0%"会误导成"现实中没有筛选作用", 因此只保留可量化关卡。
-const ACTIVE_FRAME_RULES: readonly FrameRule[] = FRAME_RULES.filter((rule) =>
-  isDimensionAppliedToMainEstimate(rule.dimensionId))
-
-/** 剥掉全部漏斗条件的基础选择(保留性别/年龄/城市/婚史) */
-function stripFunnelConditions(selection: ModelSelection): ModelSelection {
-  const draft = structuredClone(selection)
-  draft.target.heightCm = null
-  draft.correlated.educationLevels = []
-  draft.correlated.minAnnualIncomeWan = null
-  draft.correlated.minHouseholdWealthWan = null
-  draft.correlated.housing = { required: false, location: null, minAreaSqm: null, type: null }
-  draft.correlated.vehicle = { required: false, priceBands: [] }
-  draft.correlated.bodyTypes = []
-  draft.correlated.smoking = 'any'
-  draft.correlated.drinking = 'any'
-  draft.correlated.hairCriteria = []
-  return draft
-}
+// 性别/年龄/城市是池子定义而不是出刀。
+// v4: 星座/MBTI 也按最大熵先验真实计入综合估算, 同样配拥有一关。
+const POOL_DEFINITION_IDS = new Set(['base.gender', 'base.age', 'base.region'])
 
 // 同一份 selection 对象在桌面侧栏/结果页/手机弹窗间共享,
 // 用 WeakMap 按对象身份缓存, 避免每个挂载点重复渐进重算。
-const frameCache = new WeakMap<ModelSelection, FunnelFrame[]>()
+// seekerGender 等计算上下文参与缓存键, 换了人就重算。
+const frameCache = new WeakMap<ModelSelection, { key: string; frames: FunnelFrame[] }>()
 
-export function buildFunnelFrames(selection: ModelSelection): FunnelFrame[] {
+export function buildFunnelFrames(selection: ModelSelection, context: FunnelContext = {}): FunnelFrame[] {
+  const contextKey = `${context.seekerGender ?? ''}|${(context.hardRequirementIds ?? []).join(',')}`
   const cached = frameCache.get(selection)
-  if (cached) return cached
+  if (cached && cached.key === contextKey) return cached.frames
 
-  const activeRules = ACTIVE_FRAME_RULES.filter((rule) => rule.isActive(selection))
-  if (activeRules.length === 0) {
-    frameCache.set(selection, [])
-    return []
+  const cuts = activeConditions(selection).filter(
+    (condition) => !POOL_DEFINITION_IDS.has(condition.dimensionId),
+  )
+  if (cuts.length === 0) {
+    const frames: FunnelFrame[] = []
+    frameCache.set(selection, { key: contextKey, frames })
+    return frames
   }
 
-  const draft = stripFunnelConditions(selection)
-  let previous = computeModel(draft).population.estimate
-  const frames: FunnelFrame[] = []
+  const options = {
+    hardRequirementIds: context.hardRequirementIds ?? [],
+    ...(context.seekerGender ? { seekerGender: context.seekerGender } : {}),
+  }
+  // 帧 0 = 只保留池子定义(性别/年龄/城市)的综合估算
+  const removed = cuts.map((condition) => condition.dimensionId)
+  const draft = removeSelectionDimension(selection, '__none__') // 先克隆一份
+  let baseDraft = draft
+  for (const dimensionId of removed) {
+    baseDraft = removeSelectionDimension(baseDraft, dimensionId)
+  }
+  const first = computeModel(baseDraft, options).comprehensivePopulation
+  if (first.numericStatus !== 'available') {
+    const frames: FunnelFrame[] = []
+    frameCache.set(selection, { key: contextKey, frames })
+    return frames
+  }
 
-  for (const rule of activeRules) {
-    rule.enable(draft, selection)
-    const estimate = computeModel(draft).population.estimate
-    const registry = DIMENSION_BY_ID.get(rule.dimensionId)
-    frames.push({
-      dimensionId: rule.dimensionId,
-      label: registry?.label ?? rule.dimensionId,
-      emoji: FRAME_EMOJI[rule.dimensionId] ?? '🎯',
+  // 逐关把条件加回来: 第 k 关的草稿 = 完整选择移除第 k+1..n 关
+  const estimates: number[] = [first.estimate]
+  for (let k = 1; k <= cuts.length; k += 1) {
+    let frameDraft = selection
+    for (let j = k; j < cuts.length; j += 1) {
+      frameDraft = removeSelectionDimension(frameDraft, cuts[j].dimensionId)
+    }
+    estimates.push(computeModel(frameDraft, options).comprehensivePopulation.estimate)
+  }
+
+  const frames: FunnelFrame[] = cuts.map((condition, index) => {
+    const previous = estimates[index]
+    const estimate = estimates[index + 1]
+    const registry = DIMENSION_BY_ID.get(condition.dimensionId)
+    return {
+      dimensionId: condition.dimensionId,
+      label: condition.label,
+      emoji: FRAME_EMOJI[condition.dimensionId] ?? '🎯',
       factor: previous > 0 ? clampProbability(estimate / previous) : estimate > 0 ? 0 : 1,
       survivors: Math.max(0, estimate),
       evidenceGrade: registry?.evidenceGrade ?? 'C',
-    })
-    previous = estimate
-  }
+    }
+  })
 
-  frameCache.set(selection, frames)
+  frameCache.set(selection, { key: contextKey, frames })
   return frames
 }

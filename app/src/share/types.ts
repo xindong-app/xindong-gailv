@@ -55,8 +55,8 @@ export interface ShareFunDto {
   /** 80 小人剧场里还站着的数量(0–80) */
   survivors: number
   survivor: { name: string; emoji: string }
-  /** 主人数为"已计入条件上限"时置真: 稀有度按上限口径表达, 真实只会更稀有 */
-  upperBound?: boolean
+  /** 主人数含先验敏感性情景条件时置真: 文案按"情景演算"口径表达 */
+  priorScenario?: boolean
   /** 仅当条件列表公开时才带上毒舌总评(避免泄露被隐藏的维度) */
   verdict?: string
 }
@@ -77,8 +77,8 @@ export interface ShareDto {
     estimateLabel: string
     rangeLabel: string
     resolutionExceeded: boolean
-    /** 主数字为"已计入条件的人数上限"时置真 */
-    upperBound?: boolean
+    /** 主数字含先验敏感性情景条件时置真 */
+    priorScenario?: boolean
   }
   scores: {
     entertainment?: number

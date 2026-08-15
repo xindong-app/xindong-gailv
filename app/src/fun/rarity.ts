@@ -32,13 +32,17 @@ export function fmtRarity(p: number): string {
 }
 
 // ---------- 毒舌总评 ----------
-// v3: 只有可量化维度会进入漏斗帧, 玩笑只保留它们的份;
-// 收入/资产/房车/体型/疾病等不砍人数的维度, 不做"淘汰最多"的玩笑。
+// v4: 综合层全条件出刀, 玩笑跟着关卡走;
+// 但身体/疾病/收入羞辱类仍然不单独配梗, 走通用守门员吐槽。
 const VERDICT_JOKES: Record<string, string> = {
   'appearance.height': '海拔这关, 刻度说了算',
   'education.level': '知识确实改变…池子大小',
+  'education.school': '志愿填报, 从娃娃抓起',
+  'economy.house': '房产证才是最硬的情书',
+  'economy.vehicle': '四个轮子碾过一大片缘分',
   'lifestyle.smoking': '一根烟烧掉一大片缘分',
   'lifestyle.drinking': '感情深一口闷, 缘分浅全筛完',
+  'appearance.hair_full': '头发和缘分, 总得留一样',
 }
 
 export function buildVerdict(frames: readonly FunnelFrame[]): string | null {

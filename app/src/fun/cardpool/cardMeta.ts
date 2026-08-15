@@ -37,7 +37,7 @@ const META: Record<string, CardMeta> = {
   'economy.vehicle': { cardName: '车库通行证', flavor: '四个轮子的诚意', tier: 'SR', art: 'car' },
   'lifestyle.smoking': { cardName: '烟雾报警器', flavor: '一根烟，烧掉一大片缘分', tier: 'R', art: 'smoke' },
   'lifestyle.drinking': { cardName: '千杯不醉卡', flavor: '感情深一口闷，缘分浅筛完', tier: 'R', art: 'wine' },
-  'health.chronic': { cardName: '体检报告单', flavor: '这张只进契合度，不砍人', tier: 'N', art: 'stetho' },
+  'health.chronic': { cardName: '体检报告单', flavor: '宽口径计入，范围给得很诚实', tier: 'N', art: 'stetho' },
   'health.myopia': { cardName: '高清视界卡', flavor: '5.0 的世界确实稀缺', tier: 'N', art: 'glasses' },
   'appearance.hair_full': { cardName: '发际线保卫战', flavor: '头发还在，缘分就在', tier: 'R', art: 'hair' },
   'entertainment.zodiac': { cardName: '星座玄学盘', flavor: '玄学专区，图一乐', tier: 'M', art: 'star' },

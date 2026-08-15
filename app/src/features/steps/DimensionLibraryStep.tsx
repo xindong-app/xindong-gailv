@@ -11,8 +11,8 @@ import { playCardFlip } from '../../fun/sound'
 const CLASS_COPY = {
   hard_filter: ['硬筛选', '只用于有清晰统计含义的范围'],
   correlated_hard: ['相关硬条件', '在相关组内联合处理'],
-  soft_preference: ['软偏好', '只改变契合度，不砍人口'],
-  entertainment: ['娱乐', '只负责彩蛋，不碰人口'],
+  soft_preference: ['软偏好', '算契合度，也进综合情景'],
+  entertainment: ['娱乐', '彩蛋主力，按最大熵凑热闹'],
 } as const
 
 export function DimensionLibraryStep({ selection, onChange, onNext }: {

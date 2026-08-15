@@ -23,8 +23,8 @@ test('10 结果状态：普通结果与低于模型分辨率均诚实表达', as
   await setExtremeConditions(page)
   await goToStep(page, 6, '结果解释')
   const summary = page.locator('.workspace-main .result-summary')
-  await expect(summary.getByText('低于模型分辨率')).toBeVisible()
-  await expect(summary.getByText('期望值低于 1 人').first()).toBeVisible()
+  await expect(summary.getByText('低于模型分辨率').first()).toBeVisible()
+  await expect(summary.locator('.result-number')).toHaveAttribute('aria-label', /期望值低于 1 人/)
   await expect(summary.getByText(/现实中不等于绝对不存在/)).toBeVisible()
 })
 

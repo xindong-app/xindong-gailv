@@ -90,12 +90,14 @@ describe('share privacy policy', () => {
     const result = computeModel(selection)
     const defaults = createDefaultShareSettings(selection)
 
-    // 默认: 唯一可量化的附加条件是吸烟(敏感且未公开) → 总评整段省略,
-    // 不点名, 也不出现"神秘条件"这种泄露存在性的说法
+    // v4: 综合层里公开的软偏好(如运动频率)也是真实关卡, 可以出现在总评里;
+    // 但敏感且未公开的条件(吸烟/收入/婚史/慢性病)连链式影响都不许进入。
     const dto = buildShareDto(selection, result, defaults)
-    expect(dto.fun?.verdict).toBeUndefined()
     expect(JSON.stringify(dto)).not.toContain('神秘条件')
     expect(buildTextFallback(dto)).not.toContain('最低年收入')
+    expect(dto.fun?.verdict ?? '').not.toContain('吸烟')
+    expect(dto.fun?.verdict ?? '').not.toContain('婚')
+    expect(dto.fun?.verdict ?? '').not.toContain('慢性病')
 
     // 有公开的可量化条件(身高)时: 总评只基于公开帧重算;
     // 隐藏的吸烟条件对总评措辞零影响
@@ -110,7 +112,8 @@ describe('share privacy policy', () => {
     const heightOnlyDto = buildShareDto(heightOnly, computeModel(heightOnly), createDefaultShareSettings(heightOnly))
     expect(publicDto.fun?.verdict).toBe(heightOnlyDto.fun?.verdict)
 
-    // 明确公开收入后: 收入仍是未量化维度, 不能被称作"淘汰最多的一刀"
+    // 明确公开收入后: v4 收入已按宽口径包络计入综合层, 可以成为"淘汰最多的一刀";
+    // 但不公开时仍然连链式影响都不进入(见下一条反例测试)
     const explicit: ShareSettings = {
       ...defaults,
       includedDimensionIds: [...defaults.includedDimensionIds, 'economy.income'],
@@ -119,7 +122,7 @@ describe('share privacy policy', () => {
     const explicitDto = buildShareDto(selection, result, explicit)
     expect(explicitDto.conditions)
       .toEqual(expect.arrayContaining([expect.objectContaining({ dimensionId: 'economy.income' })]))
-    expect(explicitDto.fun?.verdict ?? '').not.toContain('最低年收入')
+    expect(explicitDto.fun?.verdict ?? '').not.toContain('吸烟')
   })
 
   it('recomputes the verdict on a public-only selection so hidden conditions cannot leak through the chain', () => {
@@ -151,10 +154,18 @@ describe('share privacy policy', () => {
     // Stable Gaussian tails keep this legal extreme strictly positive. This
     // share-policy test therefore injects the engine contract state directly
     // instead of depending on a particular input to underflow in IEEE-754.
+    // v4: 趣味派生以综合人口层为准, 两层同时注入下溢状态。
     const result = {
       ...computed,
       population: {
         ...computed.population,
+        estimate: 0,
+        range: { conservative: 0, baseline: 0, optimistic: 0 },
+        zeroMeaning: 'model_underflow' as const,
+        resolutionExceeded: true,
+      },
+      comprehensivePopulation: {
+        ...computed.comprehensivePopulation,
         estimate: 0,
         range: { conservative: 0, baseline: 0, optimistic: 0 },
         zeroMeaning: 'model_underflow' as const,

@@ -4248,6 +4248,10 @@ body {
   background: color-mix(in srgb, var(--sky) 30%, var(--surface-strong));
 }
 
+.state-notice[data-state="prior"] {
+  background: color-mix(in srgb, var(--peach, #ffd9b8) 34%, var(--surface-strong));
+}
+
 .state-notice h3 {
   margin: 0 0 6px;
   font-size: 0.98rem;
@@ -4315,6 +4319,23 @@ body {
   font-size: 0.84rem;
   font-weight: 720;
   text-align: center;
+}
+
+/* ---------- v4 综合层: 可靠锚点 + 先验徽章 ---------- */
+.status-badge[data-kind="prior"] {
+  background: var(--peach, #ffd9b8);
+}
+
+.reliable-anchor {
+  margin: 0 0 14px;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  font-weight: 680;
+  text-align: center;
+}
+
+.reliable-anchor small {
+  font-weight: 520;
 }
 
 /* ---------- 空舞台(城市无锚点) ---------- */

@@ -12,13 +12,20 @@ const TOTAL = 80
 const PALETTE = ['#ffd9e2', '#ffd9b8', '#cdeafa', '#e6dbf7', '#ddefd3', '#ffeeb0', '#f5c1d4']
 
 // ---------- 各关卡遗言弹幕 ----------
-// v3: 只有可量化维度会出现在漏斗里(身高/吸烟/饮酒);
-// 不拿收入、身体、疾病、婚史开玩笑。
+// v4: 综合层里收入/房车等也会真实砍人, 可以配吐槽;
+// 但身体、疾病、外貌羞辱类玩笑仍然不配, 走通用遗言。
 const LAST_WORDS: Record<string, string[]> = {
+  'base.marital': ['缘分讲究一个时机', '我先去把上一段收尾'],
   'appearance.height': ['就差 2cm 啊!!', '我去踩个高跷', '尺子今天也很严格'],
   'education.level': ['当年该考研的', '书到用时方恨少', '学历这关, 我认栽'],
+  'education.school': ['母校对不起, 拖你后腿了', '下次投胎记得报志愿'],
+  'economy.income': ['工资条它不争气', '老板, 看到这条弹幕了吗'],
+  'economy.wealth': ['家产这玩意儿, 急不来', '我去买张彩票冷静一下'],
+  'economy.house': ['房东说他不答应', '首付还在努力攒'],
+  'economy.vehicle': ['我骑共享单车来的', '驾照倒是考了三回了'],
   'lifestyle.smoking': ['戒烟第一天打卡', '电子烟算烟吗'],
   'lifestyle.drinking': ['先戒为敬', '只喝亿点点'],
+  'appearance.hair_full': ['发际线它先动的手', '帽子已经是本体了'],
 }
 const GENERIC_LAST_WORDS = ['我不服!', '下次一定', '先走一步']
 

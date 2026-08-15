@@ -76,44 +76,49 @@ export function buildShareDto(
   if (settings.showRegion) {
     dto.region = selection.target.cities.length === 0 ? '全国' : selection.target.cities.join('、')
   }
-  const upperBound = result.population.status === 'upper_bound'
-  if (settings.showCount && result.population.status !== 'unavailable') {
+  // v4: 分享主数字走综合人口层(全部公开口径下的已选条件都参与)
+  const pool = result.comprehensivePopulation
+  const priorScenario = pool.interpretation === 'prior_sensitivity_only' || pool.genericPriorConditionIds.length > 0
+  if (settings.showCount && pool.numericStatus !== 'unavailable') {
     dto.population = {
-      estimateLabel: result.population.resolutionExceeded
+      estimateLabel: pool.resolutionExceeded
         ? '低于模型可靠分辨率（不代表不存在）'
-        : result.population.displayShort,
-      rangeLabel: `${formatCount(result.population.range.conservative)}–${formatCount(result.population.range.optimistic)}`,
-      resolutionExceeded: result.population.resolutionExceeded,
-      ...(upperBound ? { upperBound: true } : {}),
+        : pool.displayShort,
+      rangeLabel: `${formatCount(pool.range.conservative)}–${formatCount(pool.range.optimistic)}`,
+      resolutionExceeded: pool.resolutionExceeded,
+      ...(priorScenario ? { priorScenario: true } : {}),
     }
     // 数值下溢不是现实零人: 趣味层(稀有度/幸存者/总评)整体不派生
-    const funAllowed = result.population.zeroMeaning !== 'model_underflow'
+    const funAllowed = pool.zeroMeaning !== 'model_underflow'
     if (funAllowed) {
       // 趣味块完全由人数派生: 人数不公开时稀有度同样不能出现(防止反推)
-      const base = result.population.base
-      const probability = base > 0 ? result.population.estimate / base : 0
+      const base = pool.base
+      const probability = base > 0 ? pool.estimate / base : 0
       const tier = rarityTier(probability * 10_000)
-      const survivors = base > 0 ? Math.max(0, Math.round((80 * result.population.estimate) / base)) : 0
+      const survivors = base > 0 ? Math.max(0, Math.round((80 * pool.estimate) / base)) : 0
       const survivorIndex = Math.max(0, survivors - 1)
       // 隐藏地区时只用全国通用人物, 不能用城市皮肤反推地域
       const survivorProf = pickProf(survivorIndex, settings.showRegion ? selection.target.cities : ['全国'])
       // 毒舌总评: 在"只含公开条件"的选择副本上整链重算,
       // 没有可公开的量化条件时整段省略(存在性也不泄露)
       const publicIds = new Set((conditions ?? []).map((condition) => condition.dimensionId))
-      const verdictFrames = buildFunnelFrames(selectionForVerdict(selection, settings, publicIds))
+      const verdictFrames = buildFunnelFrames(
+        selectionForVerdict(selection, settings, publicIds),
+        { seekerGender: result.computationContext.seekerGender },
+      )
       const verdict = conditions && conditions.length > 0 ? buildVerdict(verdictFrames) : null
       dto.fun = {
         tierKey: tier.key,
-        tierLabel: upperBound ? `${tier.label}（最低稀有程度）` : tier.label,
-        tierComment: upperBound
-          ? '加入尚未量化的硬条件后，真实稀有度只会更高'
+        tierLabel: priorScenario ? `${tier.label}（含先验情景）` : tier.label,
+        tierComment: priorScenario
+          ? '部分条件按通用先验演算，稀有度看着玩就好'
           : tier.comment,
         tierBg: tier.bg,
         tierFg: tier.fg,
-        rarityText: upperBound ? `最多 ${fmtRarity(probability)}` : fmtRarity(probability),
+        rarityText: fmtRarity(probability),
         survivors,
         survivor: { name: survivorProf.name, emoji: survivorProf.emoji },
-        ...(upperBound ? { upperBound: true } : {}),
+        ...(priorScenario ? { priorScenario: true } : {}),
         ...(verdict ? { verdict } : {}),
       }
     }

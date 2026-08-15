@@ -68,7 +68,7 @@ test('04 相关硬条件：学历、收入、资产、体型和烟酒按组解�
   await expect(desktopEstimate(page)).not.toHaveAttribute('aria-label', /^0 人$/)
 })
 
-test('05 软偏好：加入多个偏好不会砍掉人口池', async ({ page }) => {
+test('05 软偏好：进入综合情景, 可靠锚点不动', async ({ page }) => {
   await openApp(page)
   const before = await desktopEstimateLabel(page)
   await goToStep(page, 4, '维度库')
@@ -77,10 +77,13 @@ test('05 软偏好：加入多个偏好不会砍掉人口池', async ({ page }) 
   await page.getByRole('button', { name: '清除搜索' }).click()
   await selectDimension(page, '冲突', '冲突')
 
-  await expect(desktopEstimate(page)).toHaveAttribute('aria-label', before)
+  // v4: 主数字是综合估算, 软偏好按先验敏感性情景参与 → 主数字会变
+  await expect(desktopEstimate(page)).not.toHaveAttribute('aria-label', before)
+  await goToStep(page, 6, '结果解释')
+  await expect(page.getByText('含先验敏感性情景')).toBeVisible()
 })
 
-test('06 娱乐条件：星座与 MBTI 不污染可信人口估算', async ({ page }) => {
+test('06 娱乐条件：星座与 MBTI 按最大熵先验计入综合估算', async ({ page }) => {
   await openApp(page)
   const before = await desktopEstimateLabel(page)
   await goToStep(page, 5, '敏感与娱乐')
@@ -88,7 +91,8 @@ test('06 娱乐条件：星座与 MBTI 不污染可信人口估算', async ({ pa
   await page.getByRole('button', { name: '白羊' }).click()
   await page.getByRole('button', { name: 'E' }).click()
 
-  await expect(desktopEstimate(page)).toHaveAttribute('aria-label', before)
+  // v4: 玄学也真实出刀(最大熵先验, 证据等级 D), 主数字会变; 娱乐指数照常出
+  await expect(desktopEstimate(page)).not.toHaveAttribute('aria-label', before)
   await goToStep(page, 6, '结果解释')
   const scoreGrid = page.locator('.results-step > .result-summary .score-grid')
   await expect(scoreGrid.getByText('娱乐指数')).toBeVisible()

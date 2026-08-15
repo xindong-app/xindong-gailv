@@ -17,7 +17,7 @@ describe('result summary', () => {
     expect(screen.getByText(`模型 ${result.versions.modelVersion} · 数据 ${result.versions.dataVersion}`)).toBeTruthy()
     expect(screen.getByText(/全员摸鱼中/)).toBeTruthy()
     expect(screen.getByText('模型可信 A').getAttribute('title')).not.toContain('权威直接数据')
-    expect(screen.getByLabelText(result.population.display).getAttribute('aria-live')).toBe('polite')
+    expect(screen.getByLabelText(result.comprehensivePopulation.display).getAttribute('aria-live')).toBe('polite')
   })
 
   it('explains that a below-resolution estimate is not nonexistence', () => {
