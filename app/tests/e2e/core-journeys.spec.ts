@@ -52,7 +52,7 @@ test('04 相关硬条件：学历、收入、资产、体型和烟酒按组解�
   await openApp(page)
   await goToStep(page, 3, '核心条件')
 
-  await page.getByRole('button', { name: '本科', exact: true }).click()
+  await page.getByRole('button', { name: '本科（精确类别）', exact: true }).click()
   await page.getByLabel('最低税前年收入（万元）').fill('30')
   await page.getByLabel('最低家庭资产（万元）').fill('300')
   await goToStep(page, 5, '敏感与娱乐')

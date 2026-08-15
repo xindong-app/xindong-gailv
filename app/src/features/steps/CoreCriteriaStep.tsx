@@ -6,9 +6,11 @@ import { playStamp } from '../../fun/sound'
 import { DimensionSticker } from '../../fun/DimensionSticker'
 
 const EDUCATION_OPTIONS: Array<{ id: EducationId; label: string }> = [
-  { id: 'junior_college', label: '大专' }, { id: 'bachelor', label: '本科' },
+  { id: 'junior_college', label: '大专' }, { id: 'bachelor', label: '本科（精确类别）' },
   { id: 'master', label: '硕士' }, { id: 'doctorate', label: '博士' },
 ]
+// 「本科及以上」快捷组合: 一键映射本科+硕士+博士三档并集
+const BACHELOR_PLUS: readonly EducationId[] = ['bachelor', 'master', 'doctorate']
 const SCHOOL_OPTIONS: Array<{ id: SchoolTierId; label: string }> = [
   { id: '211', label: '211' }, { id: '985', label: '985' }, { id: 'c9', label: 'C9' }, { id: 'top2', label: '清北' },
 ]
@@ -72,7 +74,9 @@ export function CoreCriteriaStep({ selection, onChange, onNext }: {
     onChange(draft)
   }
   const heightEnabled = selection.target.heightCm != null
-  const educationActive = selection.correlated.educationLevels.length > 0 || selection.correlated.schoolTier != null
+  const educationLevels = selection.correlated.educationLevels
+  const educationActive = educationLevels.length > 0 || selection.correlated.schoolTier != null
+  const bachelorPlusOn = BACHELOR_PLUS.every((id) => educationLevels.includes(id))
   const financeActive = selection.correlated.minAnnualIncomeWan != null || selection.correlated.minHouseholdWealthWan != null
 
   return (
@@ -96,9 +100,10 @@ export function CoreCriteriaStep({ selection, onChange, onNext }: {
         <article className="criteria-card criteria-wide has-sticker" data-kind="correlated">
           <DimensionSticker dimensionId="education.level" />
           <div className="criteria-card-head"><div><span className="class-badge">硬筛选 ＋ 软偏好</span><h3>学历与院校偏好{educationActive && <span aria-hidden="true" className="equipped-stamp equipped-inline">已装备</span>}</h3></div><EvidenceBadge grade="A" /></div>
-          <div className="chip-row">{EDUCATION_OPTIONS.map((option) => <Chip key={option.id} active={selection.correlated.educationLevels.includes(option.id)} tone="sun" onClick={() => update((draft) => { draft.correlated.educationLevels = toggleArrayValue(draft.correlated.educationLevels, option.id) })}>{option.label}</Chip>)}</div>
+          <div className="chip-row nested-row"><span>快捷组合</span><Chip active={bachelorPlusOn} tone="pink" onClick={() => update((draft) => { draft.correlated.educationLevels = bachelorPlusOn ? draft.correlated.educationLevels.filter((id) => !BACHELOR_PLUS.includes(id)) : [...new Set([...draft.correlated.educationLevels, ...BACHELOR_PLUS])] })}>本科及以上</Chip></div>
+          <div className="chip-row">{EDUCATION_OPTIONS.map((option) => <Chip key={option.id} active={educationLevels.includes(option.id)} tone="sun" onClick={() => update((draft) => { draft.correlated.educationLevels = toggleArrayValue(draft.correlated.educationLevels, option.id) })}>{option.label}</Chip>)}</div>
           <div className="chip-row nested-row"><span>院校层级</span>{SCHOOL_OPTIONS.map((option) => <Chip key={option.id} active={selection.correlated.schoolTier === option.id} tone="sun" onClick={() => update((draft) => { draft.correlated.schoolTier = draft.correlated.schoolTier === option.id ? null : option.id })}>{option.label}</Chip>)}</div>
-          <FieldHelp>学历按七普表 4-1 逐岁×性别直接计入人数，多选按并集；院校层级以学历为条件做宽口径情景估算。清北 ⊂ C9 ⊂ 985 ⊂ 211。</FieldHelp>
+          <FieldHelp>「本科及以上」一键勾上本科+硕士+博士三档；「本科（精确类别）」只算本科这一档。学历按七普表 4-1 逐岁×性别直接计入人数，多选按并集；院校层级以学历为条件做宽口径情景估算。清北 ⊂ C9 ⊂ 985 ⊂ 211。</FieldHelp>
         </article>
 
         <article className="criteria-card has-sticker" data-kind="correlated">

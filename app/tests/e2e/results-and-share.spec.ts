@@ -31,7 +31,7 @@ test('10 结果状态：普通结果与低于模型分辨率均诚实表达', as
 test('11 影响排行和一键放宽：展示前后差异并可撤销', async ({ page }) => {
   await openApp(page)
   await goToStep(page, 3, '核心条件')
-  await page.getByRole('button', { name: '本科', exact: true }).click()
+  await page.getByRole('button', { name: '本科（精确类别）', exact: true }).click()
   await goToStep(page, 5, '敏感与娱乐')
   await page.getByRole('button', { name: /敏感人口条件与偏好/ }).click()
   await page.getByRole('button', { name: '当前不吸烟', exact: true }).click()
