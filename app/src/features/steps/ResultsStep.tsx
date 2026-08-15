@@ -3,7 +3,7 @@ import type { ModelResult } from '../../engine/modelEngine'
 import { computeComprehensiveConditionAnalysis, formatCount } from '../../engine/modelEngine'
 import { ResultSummary } from '../../components/ResultSummary'
 import { RelationshipScenarioCard } from '../../components/RelationshipScenarioCard'
-import { playTada } from '../../fun/sound'
+import { playTada, setBgmFinale } from '../../fun/sound'
 import type { GenderId, ModelSelection, SoftPreferenceId } from '../../model/schema'
 import { DIMENSION_BY_ID } from '../../model/dimensions'
 import { toggleArrayValue } from '../../model/selectionUtils'
@@ -28,6 +28,10 @@ export function ResultsStep({ result, selection, comparison, hardRequirementIds,
   const [revealKey] = useState(() => Date.now())
   useEffect(() => {
     playTada()
+    setBgmFinale(true) // BGM 终章变奏: 升 2 半音 + 提速, 开奖心跳感
+    return () => setBgmFinale(false)
+  }, [])
+  useEffect(() => {
     // 主数字必须完全露出在底部舞台之上: 滚到视口中偏上
     const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
     const numberEl = document.querySelector('.results-step .result-number')

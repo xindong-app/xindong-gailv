@@ -225,7 +225,10 @@ export function playTear(): void {
 
 // ---------- 背景音乐: 马戏团圆舞曲(八小节循环, 现场合成, 无音频文件) ----------
 // 3/4 蹦擦擦: 三角波低音打拍, 八音盒旋律飘在上面; 跟随音效总开关, 页面隐藏时自动暂停
-const BGM_BEAT = 0.55 // 每拍秒数, 一小节三拍
+// 揭榜时刻切终章变奏: 全曲升 2 个半音 + 提速约 15%, 开奖心跳感
+const BGM_BEAT = 0.55 // 平常每拍秒数, 一小节三拍
+const BGM_FINALE_BEAT = 0.47
+const FINALE_SHIFT = 1.1225 // +2 半音
 // 八小节和弦根音: C G Am F / C F G C
 const BGM_ROOTS = [130.81, 98, 110, 87.31, 130.81, 87.31, 98, 130.81]
 // 每小节三拍的八音盒旋律(null = 休止)
@@ -242,7 +245,10 @@ const BGM_MELODY: (number | null)[][] = [
 let bgmTimer: number | null = null
 let bgmBar = 0
 let bgmNext = 0
+let bgmFinale = false
 let bgmVisibilityWired = false
+
+const bgmBeat = () => (bgmFinale ? BGM_FINALE_BEAT : BGM_BEAT)
 
 function playBgmBar(): void {
   if (!isSoundOn()) {
@@ -252,20 +258,33 @@ function playBgmBar(): void {
   const context = ensureContext()
   if (!context) return
   // 固定节拍时间轴, 不受 setInterval 抖动影响
+  const beat = bgmBeat()
+  const shift = bgmFinale ? FINALE_SHIFT : 1
   const now = Math.max(context.currentTime + 0.05, bgmNext)
-  bgmNext = now + BGM_BEAT * 3
-  const root = BGM_ROOTS[bgmBar % 8]
+  bgmNext = now + beat * 3
+  const root = BGM_ROOTS[bgmBar % 8] * shift
   // 蹦 · 擦 擦
   tone(context, now, { type: 'triangle', freq: root, vol: 0.055, decay: 0.5 })
-  tone(context, now, { type: 'triangle', freq: root * 1.5, vol: 0.036, decay: 0.28, at: BGM_BEAT })
-  tone(context, now, { type: 'triangle', freq: root * 1.5, vol: 0.036, decay: 0.28, at: BGM_BEAT * 2 })
+  tone(context, now, { type: 'triangle', freq: root * 1.5, vol: 0.036, decay: 0.28, at: beat })
+  tone(context, now, { type: 'triangle', freq: root * 1.5, vol: 0.036, decay: 0.28, at: beat * 2 })
   // 八音盒旋律
-  BGM_MELODY[bgmBar % 8].forEach((freq, beat) => {
+  BGM_MELODY[bgmBar % 8].forEach((freq, beatIndex) => {
     if (freq != null) {
-      tone(context, now, { freq, vol: 0.04, attack: 0.01, decay: 1.1, at: beat * BGM_BEAT })
+      tone(context, now, { freq: freq * shift, vol: 0.04, attack: 0.01, decay: 1.1, at: beatIndex * beat })
     }
   })
   bgmBar += 1
+}
+
+/** 揭榜终章变奏开关: 曲速与调性切换, 正在播放时平滑换档 */
+export function setBgmFinale(on: boolean): void {
+  if (on === bgmFinale) return
+  bgmFinale = on
+  bgmNext = 0
+  if (bgmTimer != null) {
+    window.clearInterval(bgmTimer)
+    bgmTimer = window.setInterval(playBgmBar, bgmBeat() * 3000)
+  }
 }
 
 /** 开园背景音乐; 浏览器自动播放策略要求首次交互后调用才出声 */
@@ -280,7 +299,7 @@ export function startBgm(): void {
     })
   }
   playBgmBar()
-  bgmTimer = window.setInterval(playBgmBar, BGM_BEAT * 3 * 1000)
+  bgmTimer = window.setInterval(playBgmBar, bgmBeat() * 3 * 1000)
 }
 
 export function stopBgm(): void {
